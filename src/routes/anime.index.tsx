@@ -37,7 +37,7 @@ function AnimePage() {
   });
 
   return (
-    <div className="mx-auto max-w-7xl px-4 py-6">
+    <div className="mx-auto max-w-none px-6 lg:px-10 py-6">
       <div className="mb-4 flex items-baseline justify-between border-b border-border pb-2">
         <h1 className="font-mono text-xs uppercase tracking-widest text-muted-foreground">
           ~$ ls anime/ --tv

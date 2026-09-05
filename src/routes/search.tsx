@@ -59,7 +59,7 @@ function SearchPage() {
   });
 
   return (
-    <div className="mx-auto max-w-7xl px-4 py-6">
+    <div className="mx-auto max-w-none px-6 lg:px-10 py-6">
       <div className="mb-4 flex items-baseline justify-between border-b border-border pb-2">
         <h1 className="font-mono text-xs uppercase tracking-widest text-muted-foreground">
           ~$ ./search --anilist
@@ -123,11 +123,11 @@ function SearchPage() {
           ))}
         </div>
       ) : results.isError ? (
-        <div className="border border-destructive/40 bg-card px-4 py-6 text-xs text-destructive">
+        <div className="border border-destructive/40 bg-card px-6 lg:px-10 py-6 text-xs text-destructive">
           error: {(results.error as Error).message}
         </div>
       ) : (results.data ?? []).length === 0 ? (
-        <div className="border border-dashed border-border px-4 py-10 text-center text-xs uppercase tracking-widest text-muted-foreground">
+        <div className="border border-dashed border-border px-6 lg:px-10 py-10 text-center text-xs uppercase tracking-widest text-muted-foreground">
           no matches. try another query.
         </div>
       ) : (

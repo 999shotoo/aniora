@@ -17,7 +17,7 @@ function WishlistPage() {
   const { items, remove } = useWishlist();
 
   return (
-    <div className="mx-auto max-w-7xl px-4 py-6">
+    <div className="mx-auto max-w-none px-6 lg:px-10 py-6">
       <div className="mb-4 flex items-baseline justify-between border-b border-border pb-2">
         <h1 className="font-mono text-xs uppercase tracking-widest text-muted-foreground">
           ~$ cat wishlist.log
@@ -28,14 +28,14 @@ function WishlistPage() {
       </div>
 
       {items.length === 0 ? (
-        <div className="flex flex-col items-center gap-3 border border-dashed border-border px-4 py-16 text-center">
+        <div className="flex flex-col items-center gap-3 border border-dashed border-border px-6 lg:px-10 py-16 text-center">
           <Bookmark className="h-6 w-6 text-muted-foreground" />
           <p className="text-xs uppercase tracking-widest text-muted-foreground">
             no entries yet
           </p>
           <Link
             to="/search"
-            className="mt-2 inline-flex items-center border border-foreground bg-foreground px-4 py-2 text-[0.7rem] uppercase tracking-widest text-background"
+            className="mt-2 inline-flex items-center border border-foreground bg-foreground px-6 lg:px-10 py-2 text-[0.7rem] uppercase tracking-widest text-background"
           >
             find something
           </Link>

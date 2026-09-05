@@ -146,32 +146,45 @@ export async function searchAnime(
 export async function browseAnime(
   variables: Record<string, unknown>,
 ): Promise<AniListMedia[]> {
+  // Build args dynamically — passing `genre_in: [null]` or `season: null`
+  // returns 0 results from AniList, so only include filters that are set.
+  const argDefs: Array<[string, string, string]> = [
+    ["page", "Int", "page"],
+    ["perPage", "Int", "perPage"],
+    ["sort", "[MediaSort]", "sort"],
+    ["season", "MediaSeason", "season"],
+    ["seasonYear", "Int", "seasonYear"],
+    ["format", "MediaFormat", "format"],
+    ["status", "MediaStatus", "status"],
+  ];
+  const defs: string[] = [];
+  const args: string[] = ["type: ANIME", "isAdult: false"];
+  const vars: Record<string, unknown> = {};
+  for (const [key, type, argName] of argDefs) {
+    if (variables[key] !== undefined && variables[key] !== null && variables[key] !== "") {
+      defs.push(`$${key}: ${type}`);
+      args.push(`${argName}: $${key}`);
+      vars[key] = variables[key];
+    }
+  }
+  if (variables.genre) {
+    defs.push(`$genre: String`);
+    args.push(`genre_in: [$genre]`);
+    vars.genre = variables.genre;
+  }
   const gql = `
-    query (
-      $page: Int, $perPage: Int, $sort: [MediaSort],
-      $season: MediaSeason, $seasonYear: Int,
-      $format: MediaFormat, $status: MediaStatus,
-      $genre: String
-    ) {
+    query (${defs.join(", ")}) {
       Page(page: $page, perPage: $perPage) {
-        media(
-          type: ANIME,
-          sort: $sort,
-          season: $season,
-          seasonYear: $seasonYear,
-          format: $format,
-          status: $status,
-          genre_in: [$genre],
-          isAdult: false
-        ) {
+        media(${args.join(", ")}) {
           ${MEDIA_FIELDS}
         }
       }
     }
   `;
-  const data = await anilistFetch<{ Page: { media: AniListMedia[] } }>(gql, variables);
+  const data = await anilistFetch<{ Page: { media: AniListMedia[] } }>(gql, vars);
   return data.Page.media;
 }
+
 
 export async function getAnimeById(id: number): Promise<AniListMedia> {
   const gql = `

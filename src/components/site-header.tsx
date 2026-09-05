@@ -22,7 +22,7 @@ export function SiteHeader() {
 
   return (
     <header className="sticky top-0 z-40 border-b border-border bg-background/85 backdrop-blur">
-      <div className="mx-auto flex h-14 max-w-7xl items-center gap-4 px-4">
+      <div className="mx-auto flex h-14 max-w-none items-center gap-4 px-6 lg:px-10">
         <Link to="/" className="flex shrink-0 items-baseline gap-1 font-mono">
           <span className="text-muted-foreground">~//</span>
           <span className="text-foreground font-medium">zen</span>
@@ -129,7 +129,7 @@ export function SiteHeader() {
 
       {open && (
         <div className="border-t border-border bg-background md:hidden">
-          <nav className="mx-auto flex max-w-7xl flex-col px-4 py-2">
+          <nav className="mx-auto flex max-w-none flex-col px-6 lg:px-10 py-2">
             {LINKS.map((l) => (
               <Link
                 key={l.to}
