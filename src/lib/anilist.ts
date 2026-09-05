@@ -146,11 +146,14 @@ export async function searchAnime(
 export async function browseAnime(
   variables: Record<string, unknown>,
 ): Promise<AniListMedia[]> {
-  // Build args dynamically — passing `genre_in: [null]` or `season: null`
-  // returns 0 results from AniList, so only include filters that are set.
-  const argDefs: Array<[string, string, string]> = [
+  // Build args dynamically — page/perPage belong on Page(...), while filters
+  // belong on media(...). Passing null filters or Page args to media breaks
+  // AniList results.
+  const pageDefs: Array<[string, string, string]> = [
     ["page", "Int", "page"],
     ["perPage", "Int", "perPage"],
+  ];
+  const mediaDefs: Array<[string, string, string]> = [
     ["sort", "[MediaSort]", "sort"],
     ["season", "MediaSeason", "season"],
     ["seasonYear", "Int", "seasonYear"],
@@ -158,24 +161,34 @@ export async function browseAnime(
     ["status", "MediaStatus", "status"],
   ];
   const defs: string[] = [];
-  const args: string[] = ["type: ANIME", "isAdult: false"];
+  const pageArgs: string[] = [];
+  const mediaArgs: string[] = ["type: ANIME", "isAdult: false"];
   const vars: Record<string, unknown> = {};
-  for (const [key, type, argName] of argDefs) {
+
+  for (const [key, type, argName] of pageDefs) {
     if (variables[key] !== undefined && variables[key] !== null && variables[key] !== "") {
       defs.push(`$${key}: ${type}`);
-      args.push(`${argName}: $${key}`);
+      pageArgs.push(`${argName}: $${key}`);
+      vars[key] = variables[key];
+    }
+  }
+
+  for (const [key, type, argName] of mediaDefs) {
+    if (variables[key] !== undefined && variables[key] !== null && variables[key] !== "") {
+      defs.push(`$${key}: ${type}`);
+      mediaArgs.push(`${argName}: $${key}`);
       vars[key] = variables[key];
     }
   }
   if (variables.genre) {
     defs.push(`$genre: String`);
-    args.push(`genre_in: [$genre]`);
+    mediaArgs.push(`genre_in: [$genre]`);
     vars.genre = variables.genre;
   }
   const gql = `
-    query (${defs.join(", ")}) {
-      Page(page: $page, perPage: $perPage) {
-        media(${args.join(", ")}) {
+    query${defs.length ? ` (${defs.join(", ")})` : ""} {
+      Page(${pageArgs.join(", ")}) {
+        media(${mediaArgs.join(", ")}) {
           ${MEDIA_FIELDS}
         }
       }
