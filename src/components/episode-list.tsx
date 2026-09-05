@@ -4,9 +4,10 @@ import { FALLBACK_EP_IMAGE } from "./player";
 
 interface Props {
   episodes: MappingEpisode[];
-  totalPlanned?: number | null;
   currentEp: number;
   onSelect: (ep: number) => void;
+  /** If true, upcoming/unaired episodes are excluded entirely. */
+  airedOnly?: boolean;
 }
 
 function formatDate(raw?: string): string {
@@ -21,49 +22,54 @@ function formatDate(raw?: string): string {
 }
 
 /**
- * Renders the episode list. Includes placeholder tiles for episodes that
- * are planned by AniList but not yet in the mapping, so users can see
- * upcoming counts.
+ * Renders the episode list. When `airedOnly` is true, only episodes whose
+ * airDate is on/before today are shown — nothing in the future leaks in.
  */
 export function EpisodeList({
   episodes,
-  totalPlanned,
   currentEp,
   onSelect,
+  airedOnly = true,
 }: Props) {
-  const byNumber = new Map<number, MappingEpisode>();
-  for (const ep of episodes) {
-    if (ep.episodeNumber != null) byNumber.set(ep.episodeNumber, ep);
-  }
+  const filtered = airedOnly
+    ? episodes.filter((e) => {
+        // If no airdate metadata, assume the episode is available.
+        if (!e.airDate && !e.airdate) return true;
+        return isAired(e);
+      })
+    : episodes;
 
-  const highest = Math.max(
-    ...episodes.map((e) => e.episodeNumber ?? 0),
-    totalPlanned ?? 0,
-    1,
-  );
-  const count = totalPlanned && totalPlanned > highest ? totalPlanned : highest;
+  const rows = filtered
+    .filter((e) => e.episodeNumber != null)
+    .sort((a, b) => (a.episodeNumber! - b.episodeNumber!));
 
-  const rows: { num: number; ep: MappingEpisode | null }[] = [];
-  for (let i = 1; i <= count; i++) {
-    rows.push({ num: i, ep: byNumber.get(i) ?? null });
+  if (rows.length === 0) {
+    return (
+      <div className="border border-dashed border-border px-4 py-10 text-center">
+        <div className="mb-1 font-mono text-[0.65rem] uppercase tracking-widest text-muted-foreground">
+          ~$ ls episodes/
+        </div>
+        <div className="text-xs text-muted-foreground">
+          no aired episodes yet — check back soon
+        </div>
+      </div>
+    );
   }
 
   return (
     <div className="flex flex-col gap-2">
-      {rows.map(({ num, ep }) => {
-        const aired = ep ? isAired(ep) : false;
+      {rows.map((ep) => {
+        const num = ep.episodeNumber!;
+        const aired = isAired(ep) || !(ep.airDate || ep.airdate);
         const active = num === currentEp;
-        const canPlay = aired || !ep;
-        const img = ep?.image || FALLBACK_EP_IMAGE;
-        const title =
-          ep?.title?.en || ep?.nameTvdb || `Episode ${num}`;
-        const date = formatDate(ep?.airDate || ep?.airdate);
+        const img = ep.image || FALLBACK_EP_IMAGE;
+        const title = ep.title?.en || ep.nameTvdb || `Episode ${num}`;
+        const date = formatDate(ep.airDate || ep.airdate);
 
         return (
           <button
             key={num}
-            onClick={() => canPlay && onSelect(num)}
-            disabled={!canPlay && !!ep && !aired}
+            onClick={() => onSelect(num)}
             className={
               "group flex items-stretch gap-3 border text-left transition-colors " +
               (active
@@ -93,7 +99,7 @@ export function EpisodeList({
                 {title}
               </div>
               <div className="flex flex-wrap items-center gap-2 text-[0.6rem] uppercase tracking-widest text-muted-foreground">
-                {ep?.runtime && <span>{ep.runtime}m</span>}
+                {ep.runtime && <span>{ep.runtime}m</span>}
                 {date && <span>· {date}</span>}
                 <span className="ml-auto inline-flex items-center gap-1">
                   {aired ? (
@@ -104,12 +110,12 @@ export function EpisodeList({
                   ) : (
                     <>
                       <Clock className="h-3 w-3" />
-                      {ep ? "upcoming" : "unlisted"}
+                      tba
                     </>
                   )}
                 </span>
               </div>
-              {ep?.overview && (
+              {ep.overview && (
                 <p className="line-clamp-2 hidden text-xs text-card-foreground sm:block">
                   {ep.overview}
                 </p>
