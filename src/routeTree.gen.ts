@@ -9,38 +9,167 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as WishlistRouteImport } from './routes/wishlist'
+import { Route as SearchRouteImport } from './routes/search'
+import { Route as ProfileRouteImport } from './routes/profile'
+import { Route as MoviesRouteImport } from './routes/movies'
+import { Route as AnimeRouteImport } from './routes/anime'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuthCallbackRouteImport } from './routes/auth.callback'
+import { Route as AnimeIdRouteImport } from './routes/anime.$id'
 
+const WishlistRoute = WishlistRouteImport.update({
+  id: '/wishlist',
+  path: '/wishlist',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SearchRoute = SearchRouteImport.update({
+  id: '/search',
+  path: '/search',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProfileRoute = ProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MoviesRoute = MoviesRouteImport.update({
+  id: '/movies',
+  path: '/movies',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AnimeRoute = AnimeRouteImport.update({
+  id: '/anime',
+  path: '/anime',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthCallbackRoute = AuthCallbackRouteImport.update({
+  id: '/auth/callback',
+  path: '/auth/callback',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AnimeIdRoute = AnimeIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => AnimeRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/anime': typeof AnimeRouteWithChildren
+  '/movies': typeof MoviesRoute
+  '/profile': typeof ProfileRoute
+  '/search': typeof SearchRoute
+  '/wishlist': typeof WishlistRoute
+  '/anime/$id': typeof AnimeIdRoute
+  '/auth/callback': typeof AuthCallbackRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/anime': typeof AnimeRouteWithChildren
+  '/movies': typeof MoviesRoute
+  '/profile': typeof ProfileRoute
+  '/search': typeof SearchRoute
+  '/wishlist': typeof WishlistRoute
+  '/anime/$id': typeof AnimeIdRoute
+  '/auth/callback': typeof AuthCallbackRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/anime': typeof AnimeRouteWithChildren
+  '/movies': typeof MoviesRoute
+  '/profile': typeof ProfileRoute
+  '/search': typeof SearchRoute
+  '/wishlist': typeof WishlistRoute
+  '/anime/$id': typeof AnimeIdRoute
+  '/auth/callback': typeof AuthCallbackRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/anime'
+    | '/movies'
+    | '/profile'
+    | '/search'
+    | '/wishlist'
+    | '/anime/$id'
+    | '/auth/callback'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/anime'
+    | '/movies'
+    | '/profile'
+    | '/search'
+    | '/wishlist'
+    | '/anime/$id'
+    | '/auth/callback'
+  id:
+    | '__root__'
+    | '/'
+    | '/anime'
+    | '/movies'
+    | '/profile'
+    | '/search'
+    | '/wishlist'
+    | '/anime/$id'
+    | '/auth/callback'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AnimeRoute: typeof AnimeRouteWithChildren
+  MoviesRoute: typeof MoviesRoute
+  ProfileRoute: typeof ProfileRoute
+  SearchRoute: typeof SearchRoute
+  WishlistRoute: typeof WishlistRoute
+  AuthCallbackRoute: typeof AuthCallbackRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/wishlist': {
+      id: '/wishlist'
+      path: '/wishlist'
+      fullPath: '/wishlist'
+      preLoaderRoute: typeof WishlistRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/search': {
+      id: '/search'
+      path: '/search'
+      fullPath: '/search'
+      preLoaderRoute: typeof SearchRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/profile': {
+      id: '/profile'
+      path: '/profile'
+      fullPath: '/profile'
+      preLoaderRoute: typeof ProfileRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/movies': {
+      id: '/movies'
+      path: '/movies'
+      fullPath: '/movies'
+      preLoaderRoute: typeof MoviesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/anime': {
+      id: '/anime'
+      path: '/anime'
+      fullPath: '/anime'
+      preLoaderRoute: typeof AnimeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -48,11 +177,41 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/auth/callback': {
+      id: '/auth/callback'
+      path: '/auth/callback'
+      fullPath: '/auth/callback'
+      preLoaderRoute: typeof AuthCallbackRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/anime/$id': {
+      id: '/anime/$id'
+      path: '/$id'
+      fullPath: '/anime/$id'
+      preLoaderRoute: typeof AnimeIdRouteImport
+      parentRoute: typeof AnimeRoute
+    }
   }
 }
 
+interface AnimeRouteChildren {
+  AnimeIdRoute: typeof AnimeIdRoute
+}
+
+const AnimeRouteChildren: AnimeRouteChildren = {
+  AnimeIdRoute: AnimeIdRoute,
+}
+
+const AnimeRouteWithChildren = AnimeRoute._addFileChildren(AnimeRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AnimeRoute: AnimeRouteWithChildren,
+  MoviesRoute: MoviesRoute,
+  ProfileRoute: ProfileRoute,
+  SearchRoute: SearchRoute,
+  WishlistRoute: WishlistRoute,
+  AuthCallbackRoute: AuthCallbackRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
