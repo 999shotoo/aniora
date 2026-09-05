@@ -13,7 +13,7 @@ export function Hero({ media }: { media: AniListMedia | null }) {
 
   if (!media) {
     return (
-      <div className="mx-auto h-[52vh] max-w-7xl animate-pulse border-b border-border bg-card px-4" />
+      <div className="mx-auto h-[52vh] max-w-none animate-pulse border-b border-border bg-card px-6 lg:px-10" />
     );
   }
 
@@ -44,7 +44,7 @@ export function Hero({ media }: { media: AniListMedia | null }) {
         <div className="absolute inset-0 bg-gradient-to-r from-background/95 via-background/60 to-transparent" />
       </div>
 
-      <div className="relative mx-auto flex min-h-[62vh] max-w-7xl flex-col gap-6 px-4 py-10 sm:min-h-[68vh] sm:py-16 md:flex-row md:items-end">
+      <div className="relative mx-auto flex min-h-[62vh] max-w-none flex-col gap-6 px-6 lg:px-10 py-10 sm:min-h-[68vh] sm:py-16 md:flex-row md:items-end">
         <img
           src={media.coverImage?.large || FALLBACK_COVER}
           alt={title}
@@ -77,14 +77,14 @@ export function Hero({ media }: { media: AniListMedia | null }) {
             <Link
               to="/anime/$id"
               params={{ id: String(media.id) }}
-              className="inline-flex items-center gap-2 border border-foreground bg-foreground px-4 py-2 text-[0.7rem] font-medium uppercase tracking-widest text-background transition-opacity hover:opacity-90"
+              className="inline-flex items-center gap-2 border border-foreground bg-foreground px-6 lg:px-10 py-2 text-[0.7rem] font-medium uppercase tracking-widest text-background transition-opacity hover:opacity-90"
             >
               <Play className="h-3.5 w-3.5 fill-current" />
               watch now
             </Link>
             <button
               onClick={() => toggle(media)}
-              className="inline-flex items-center gap-2 border border-border bg-background/60 px-4 py-2 text-[0.7rem] font-medium uppercase tracking-widest text-foreground backdrop-blur hover:bg-accent"
+              className="inline-flex items-center gap-2 border border-border bg-background/60 px-6 lg:px-10 py-2 text-[0.7rem] font-medium uppercase tracking-widest text-foreground backdrop-blur hover:bg-accent"
             >
               {saved ? (
                 <>

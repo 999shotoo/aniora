@@ -10,7 +10,7 @@ interface Props {
 
 export function AnimeRow({ title, hint, media, loading }: Props) {
   return (
-    <section className="mx-auto max-w-7xl px-4 py-6">
+    <section className="mx-auto max-w-none px-6 lg:px-10 py-6">
       <div className="mb-3 flex items-baseline justify-between border-b border-border pb-2">
         <h2 className="font-mono text-xs uppercase tracking-widest text-muted-foreground">
           ~$ {title}
@@ -32,7 +32,7 @@ export function AnimeRow({ title, hint, media, loading }: Props) {
           ))}
         </div>
       ) : media.length === 0 ? (
-        <div className="border border-dashed border-border px-4 py-8 text-center text-xs uppercase tracking-widest text-muted-foreground">
+        <div className="border border-dashed border-border px-6 lg:px-10 py-8 text-center text-xs uppercase tracking-widest text-muted-foreground">
           no results
         </div>
       ) : (

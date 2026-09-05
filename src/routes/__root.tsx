@@ -15,7 +15,7 @@ import { SiteHeader } from "@/components/site-header";
 
 function NotFoundComponent() {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background px-4">
+    <div className="flex min-h-screen items-center justify-center bg-background px-6 lg:px-10">
       <div className="max-w-md text-center font-mono">
         <div className="text-xs uppercase tracking-widest text-muted-foreground">
           ~$ cat /dev/null
@@ -26,7 +26,7 @@ function NotFoundComponent() {
         </p>
         <Link
           to="/"
-          className="mt-6 inline-flex items-center border border-foreground bg-foreground px-4 py-2 text-[0.7rem] uppercase tracking-widest text-background"
+          className="mt-6 inline-flex items-center border border-foreground bg-foreground px-6 lg:px-10 py-2 text-[0.7rem] uppercase tracking-widest text-background"
         >
           return home
         </Link>
@@ -42,7 +42,7 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
   }, [error]);
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background px-4">
+    <div className="flex min-h-screen items-center justify-center bg-background px-6 lg:px-10">
       <div className="max-w-md text-center font-mono">
         <div className="text-xs uppercase tracking-widest text-destructive">
           ~$ ./run — exit 1
@@ -57,13 +57,13 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
               router.invalidate();
               reset();
             }}
-            className="border border-foreground bg-foreground px-4 py-2 text-[0.7rem] uppercase tracking-widest text-background"
+            className="border border-foreground bg-foreground px-6 lg:px-10 py-2 text-[0.7rem] uppercase tracking-widest text-background"
           >
             retry
           </button>
           <Link
             to="/"
-            className="border border-border px-4 py-2 text-[0.7rem] uppercase tracking-widest text-foreground"
+            className="border border-border px-6 lg:px-10 py-2 text-[0.7rem] uppercase tracking-widest text-foreground"
           >
             home
           </Link>
@@ -130,7 +130,7 @@ function RootComponent() {
           <Outlet />
         </main>
         <footer className="mt-16 border-t border-border">
-          <div className="mx-auto flex max-w-7xl flex-col gap-2 px-4 py-6 text-[0.65rem] uppercase tracking-widest text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
+          <div className="mx-auto flex max-w-none flex-col gap-2 px-6 lg:px-10 py-6 text-[0.65rem] uppercase tracking-widest text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
             <span>~// zen.stream · terminal for anime</span>
             <span>data · anilist · mappings · zenshin</span>
             <span>© {new Date().getFullYear()}</span>

@@ -57,7 +57,7 @@ function HomePage() {
     <>
       <Hero media={featured} />
 
-      <div className="mx-auto max-w-7xl px-4 pt-6">
+      <div className="mx-auto max-w-none px-6 lg:px-10 pt-6">
         <div className="flex items-center justify-between border border-border bg-card px-3 py-2 text-[0.65rem] uppercase tracking-widest">
           <span className="flex items-center gap-2 text-muted-foreground">
             <span className="inline-block h-2 w-2 rounded-full bg-chart-1" />

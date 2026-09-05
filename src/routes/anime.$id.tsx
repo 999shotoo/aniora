@@ -41,7 +41,7 @@ function AnimeDetailPage() {
 
   if (anime.isLoading) {
     return (
-      <div className="mx-auto max-w-7xl px-4 py-10">
+      <div className="mx-auto max-w-none px-6 lg:px-10 py-10">
         <div className="h-72 w-full animate-pulse border border-border bg-card" />
       </div>
     );
@@ -49,8 +49,8 @@ function AnimeDetailPage() {
 
   if (anime.isError || !anime.data) {
     return (
-      <div className="mx-auto max-w-7xl px-4 py-10">
-        <div className="border border-destructive/50 bg-card px-4 py-6 text-xs text-destructive">
+      <div className="mx-auto max-w-none px-6 lg:px-10 py-10">
+        <div className="border border-destructive/50 bg-card px-6 lg:px-10 py-6 text-xs text-destructive">
           could not load anime. {(anime.error as Error | null)?.message}
         </div>
         <Link
@@ -94,7 +94,7 @@ function AnimeDetailPage() {
           />
           <div className="absolute inset-0 bg-gradient-to-b from-transparent via-background/70 to-background" />
         </div>
-        <div className="relative mx-auto flex max-w-7xl flex-col gap-6 px-4 py-10 md:flex-row">
+        <div className="relative mx-auto flex max-w-none flex-col gap-6 px-6 lg:px-10 py-10 md:flex-row">
           <img
             src={media.coverImage?.large || FALLBACK_COVER}
             alt={title}
@@ -141,13 +141,13 @@ function AnimeDetailPage() {
             <div className="mt-4 flex flex-wrap gap-2">
               <button
                 onClick={() => setEpisode(1)}
-                className="inline-flex items-center gap-2 border border-foreground bg-foreground px-4 py-2 text-[0.7rem] uppercase tracking-widest text-background"
+                className="inline-flex items-center gap-2 border border-foreground bg-foreground px-6 lg:px-10 py-2 text-[0.7rem] uppercase tracking-widest text-background"
               >
                 <Play className="h-3.5 w-3.5 fill-current" /> watch ep 1
               </button>
               <button
                 onClick={() => toggle(media)}
-                className="inline-flex items-center gap-2 border border-border bg-background/60 px-4 py-2 text-[0.7rem] uppercase tracking-widest text-foreground hover:bg-accent"
+                className="inline-flex items-center gap-2 border border-border bg-background/60 px-6 lg:px-10 py-2 text-[0.7rem] uppercase tracking-widest text-foreground hover:bg-accent"
               >
                 {saved ? (
                   <>
@@ -165,7 +165,7 @@ function AnimeDetailPage() {
       </div>
 
       {/* player + episodes */}
-      <div className="mx-auto grid max-w-7xl grid-cols-1 gap-6 px-4 py-8 lg:grid-cols-[minmax(0,1fr)_360px]">
+      <div className="mx-auto grid max-w-none grid-cols-1 gap-6 px-6 lg:px-10 py-8 lg:grid-cols-[minmax(0,1fr)_360px]">
         <div className="min-w-0">
           <Player
             malId={malId}
@@ -210,7 +210,7 @@ function AnimeDetailPage() {
               ))}
             </div>
           ) : regular.length === 0 && !media.episodes ? (
-            <div className="border border-dashed border-border px-4 py-6 text-center text-xs uppercase tracking-widest text-muted-foreground">
+            <div className="border border-dashed border-border px-6 lg:px-10 py-6 text-center text-xs uppercase tracking-widest text-muted-foreground">
               no episode data
             </div>
           ) : (
