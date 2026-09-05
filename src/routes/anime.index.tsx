@@ -4,7 +4,7 @@ import { useState } from "react";
 import { browseAnime } from "@/lib/anilist";
 import { AnimeCard } from "@/components/anime-card";
 
-export const Route = createFileRoute("/anime")({
+export const Route = createFileRoute("/anime/")({
   component: AnimePage,
   head: () => ({
     meta: [
