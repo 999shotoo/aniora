@@ -82,8 +82,24 @@ function WatchPage() {
 
   if (anime.isLoading) {
     return (
-      <div className="mx-auto max-w-none px-6 lg:px-10 py-8">
-        <div className="aspect-video w-full animate-pulse border border-border bg-card" />
+      <div className="pb-16">
+        <div className="border-b border-border bg-card/40">
+          <div className="mx-auto flex max-w-none items-center gap-3 px-6 lg:px-10 py-4">
+            <Skeleton className="h-12 w-9" />
+            <div className="flex-1 space-y-2">
+              <Skeleton className="h-2 w-20 border-0 bg-muted" />
+              <Skeleton className="h-3 w-56 border-0 bg-muted" />
+            </div>
+          </div>
+        </div>
+        <div className="mx-auto grid max-w-none grid-cols-1 gap-6 px-6 lg:px-10 py-6 lg:grid-cols-[minmax(0,1fr)_380px]">
+          <PlayerSkeleton />
+          <div className="flex flex-col gap-2">
+            {Array.from({ length: 6 }).map((_, i) => (
+              <EpisodeRowSkeleton key={i} />
+            ))}
+          </div>
+        </div>
       </div>
     );
   }
@@ -91,18 +107,17 @@ function WatchPage() {
   if (anime.isError || !anime.data) {
     return (
       <div className="mx-auto max-w-none px-6 lg:px-10 py-10">
-        <div className="border border-destructive/50 bg-card px-6 py-6 text-xs text-destructive">
-          could not load anime.
-        </div>
-        <Link
-          to="/"
-          className="mt-4 inline-block text-xs uppercase tracking-widest text-muted-foreground hover:text-foreground"
-        >
-          ← back home
-        </Link>
+        <EmptyState
+          variant="large"
+          hint="~$ fetch --error"
+          title="Couldn't load this title"
+          message="AniList didn't answer. Check the id or your connection and try again."
+          actions={<BackHomeAction />}
+        />
       </div>
     );
   }
+
 
   const media = anime.data;
   const title = pickTitle(media.title);
