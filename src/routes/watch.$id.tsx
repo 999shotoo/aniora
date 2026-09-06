@@ -300,9 +300,10 @@ function WatchPage() {
                 </div>
               </>
             )}
-
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }
+
