@@ -41,7 +41,7 @@ function SearchPage() {
     const t = setTimeout(() => {
       if (q !== qParam) {
         navigate({
-          search: (prev) => ({ ...prev, q }),
+          search: ((prev: { q: string; format: string; genre: string }) => ({ ...prev, q })),
           replace: true,
         }).catch(() => {});
       }
@@ -106,7 +106,7 @@ function SearchPage() {
               <button
                 key={f}
                 onClick={() =>
-                  navigate({ search: (prev) => ({ ...prev, format: f }), replace: true })
+                  navigate({ search: ((prev: { q: string; format: string; genre: string }) => ({ ...prev, format: f })), replace: true })
                 }
                 className={
                   "px-3 py-1.5 text-[0.6rem] uppercase tracking-widest transition-colors " +
@@ -123,7 +123,7 @@ function SearchPage() {
             value={gParam}
             onChange={(e) =>
               navigate({
-                search: (prev) => ({ ...prev, genre: e.target.value }),
+                search: ((prev: { q: string; format: string; genre: string }) => ({ ...prev, genre: e.target.value })),
                 replace: true,
               })
             }
