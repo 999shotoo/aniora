@@ -53,21 +53,7 @@ export function SiteHeader() {
         </nav>
 
         <div className="ml-auto flex items-center gap-2">
-          <Link
-            to="/search"
-            className="hidden h-8 items-center gap-2 border border-border bg-input px-3 text-xs text-muted-foreground transition-colors hover:text-foreground sm:flex"
-            aria-label="Search"
-          >
-            <Search className="h-3.5 w-3.5" />
-            <span>search anime...</span>
-          </Link>
-          <Link
-            to="/search"
-            className="flex h-8 w-8 items-center justify-center border border-border sm:hidden"
-            aria-label="Search"
-          >
-            <Search className="h-4 w-4" />
-          </Link>
+          <HeaderSearch />
           <Link
             to="/wishlist"
             className="flex h-8 w-8 items-center justify-center border border-border text-muted-foreground hover:text-foreground"
