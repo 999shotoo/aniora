@@ -1,5 +1,8 @@
 import type { AniListMedia } from "@/lib/anilist";
 import { AnimeCard } from "./anime-card";
+import { GridSkeleton } from "./skeleton";
+import { EmptyState } from "./empty-state";
+import { SearchX } from "lucide-react";
 
 interface Props {
   title: string;
@@ -17,28 +20,30 @@ export function AnimeRow({ title, hint, media, loading }: Props) {
         </h2>
         {hint && (
           <span className="text-[0.6rem] uppercase tracking-widest text-muted-foreground/70">
-            {hint}
+            {loading ? "loading..." : hint}
           </span>
         )}
       </div>
 
       {loading ? (
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
-          {Array.from({ length: 6 }).map((_, i) => (
-            <div
-              key={i}
-              className="aspect-[2/3] w-full animate-pulse border border-border bg-card"
-            />
-          ))}
-        </div>
+        <GridSkeleton count={12} />
       ) : media.length === 0 ? (
-        <div className="border border-dashed border-border px-6 lg:px-10 py-8 text-center text-xs uppercase tracking-widest text-muted-foreground">
-          no results
-        </div>
+        <EmptyState
+          hint="~$ query --empty"
+          icon={<SearchX className="h-5 w-5" />}
+          title="Nothing here yet"
+          message="AniList returned no results for this shelf. Try again in a bit."
+        />
       ) : (
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
-          {media.map((m) => (
-            <AnimeCard key={m.id} media={m} />
+          {media.map((m, i) => (
+            <div
+              key={m.id}
+              className="rise-in"
+              style={{ animationDelay: `${Math.min(i, 12) * 25}ms` }}
+            >
+              <AnimeCard media={m} />
+            </div>
           ))}
         </div>
       )}
