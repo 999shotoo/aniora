@@ -19,6 +19,9 @@ import {
   pickTitle,
 } from "@/lib/anilist";
 import { useWishlist } from "@/lib/wishlist";
+import { EmptyState, BackHomeAction } from "@/components/empty-state";
+import { InfoHeaderSkeleton, Skeleton } from "@/components/skeleton";
+
 
 export const Route = createFileRoute("/anime/$id")({
   component: AnimeInfoPage,
