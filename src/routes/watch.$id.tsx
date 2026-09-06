@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useMemo, useState } from "react";
-import { ArrowLeft, CalendarClock, Info, Search, TvMinimal } from "lucide-react";
+import { ArrowLeft, CalendarClock, Info, TvMinimal } from "lucide-react";
 import {
   getAnimeById,
   FALLBACK_COVER,
@@ -9,7 +9,7 @@ import {
 } from "@/lib/anilist";
 import { fetchMapping, splitEpisodes, isAired } from "@/lib/mappings";
 import { Player } from "@/components/player";
-import { EpisodeList } from "@/components/episode-list";
+import { EpisodesPanel } from "@/components/episodes-panel";
 import { EmptyState, BackHomeAction } from "@/components/empty-state";
 import { EpisodeRowSkeleton, PlayerSkeleton, Skeleton } from "@/components/skeleton";
 
