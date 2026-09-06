@@ -1,6 +1,6 @@
-import { Link, useRouterState } from "@tanstack/react-router";
+import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import { Search, User, LogOut, Bookmark, Menu, X } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useAniListViewer, useAniListLogout } from "@/lib/anilist-auth";
 import { getAniListAuthUrl } from "@/lib/anilist-config";
 
