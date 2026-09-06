@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useMemo, useState } from "react";
-import { ArrowLeft, Info, Search } from "lucide-react";
+import { ArrowLeft, CalendarClock, Info, Search, TvMinimal } from "lucide-react";
 import {
   getAnimeById,
   FALLBACK_COVER,
@@ -10,6 +10,9 @@ import {
 import { fetchMapping, splitEpisodes, isAired } from "@/lib/mappings";
 import { Player } from "@/components/player";
 import { EpisodeList } from "@/components/episode-list";
+import { EmptyState, BackHomeAction } from "@/components/empty-state";
+import { EpisodeRowSkeleton, PlayerSkeleton, Skeleton } from "@/components/skeleton";
+
 
 export const Route = createFileRoute("/watch/$id")({
   component: WatchPage,
