@@ -217,3 +217,37 @@ body::before {
 @keyframes term-blink {
   to { visibility: hidden; }
 }
+
+@utility shimmer {
+  position: relative;
+  overflow: hidden;
+  background: var(--color-card);
+}
+@utility shimmer {
+  &::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    transform: translateX(-100%);
+    background: linear-gradient(
+      90deg,
+      transparent,
+      color-mix(in oklab, var(--color-foreground) 6%, transparent),
+      transparent
+    );
+    animation: shimmer-sweep 1.6s infinite;
+  }
+}
+
+@keyframes shimmer-sweep {
+  100% { transform: translateX(100%); }
+}
+
+@utility rise-in {
+  animation: rise-in 0.35s ease-out both;
+}
+@keyframes rise-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+

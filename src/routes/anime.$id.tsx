@@ -19,6 +19,9 @@ import {
   pickTitle,
 } from "@/lib/anilist";
 import { useWishlist } from "@/lib/wishlist";
+import { EmptyState, BackHomeAction } from "@/components/empty-state";
+import { InfoHeaderSkeleton, Skeleton } from "@/components/skeleton";
+
 
 export const Route = createFileRoute("/anime/$id")({
   component: AnimeInfoPage,
@@ -73,12 +76,18 @@ function AnimeInfoPage() {
 
   if (anime.isLoading) {
     return (
-      <div className="mx-auto max-w-none px-6 lg:px-10 py-10">
-        <div className="h-72 w-full animate-pulse border border-border bg-card" />
-        <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-          {Array.from({ length: 4 }).map((_, i) => (
-            <div key={i} className="h-20 animate-pulse border border-border bg-card" />
-          ))}
+      <div className="pb-16">
+        <InfoHeaderSkeleton />
+        <div className="mx-auto max-w-none px-6 lg:px-10 py-8">
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            {Array.from({ length: 8 }).map((_, i) => (
+              <Skeleton key={i} className="h-16" />
+            ))}
+          </div>
+          <div className="mt-8 grid gap-6 lg:grid-cols-[minmax(0,1fr)_320px]">
+            <Skeleton className="h-64" />
+            <Skeleton className="h-64" />
+          </div>
         </div>
       </div>
     );
@@ -87,18 +96,20 @@ function AnimeInfoPage() {
   if (anime.isError || !anime.data) {
     return (
       <div className="mx-auto max-w-none px-6 lg:px-10 py-10">
-        <div className="border border-destructive/50 bg-card px-6 py-6 text-xs text-destructive">
-          could not load anime. {(anime.error as Error | null)?.message ?? "unknown error"}
-        </div>
-        <Link
-          to="/"
-          className="mt-4 inline-block text-xs uppercase tracking-widest text-muted-foreground hover:text-foreground"
-        >
-          ← back home
-        </Link>
+        <EmptyState
+          variant="large"
+          hint="~$ fetch --error"
+          title="Couldn't load this title"
+          message={
+            (anime.error as Error | null)?.message ??
+            "AniList didn't answer. Try again in a moment."
+          }
+          actions={<BackHomeAction />}
+        />
       </div>
     );
   }
+
 
   const media = anime.data;
   const title = pickTitle(media.title);

@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useMemo, useState } from "react";
-import { ArrowLeft, Info, Search } from "lucide-react";
+import { ArrowLeft, CalendarClock, Info, Search, TvMinimal } from "lucide-react";
 import {
   getAnimeById,
   FALLBACK_COVER,
@@ -10,6 +10,9 @@ import {
 import { fetchMapping, splitEpisodes, isAired } from "@/lib/mappings";
 import { Player } from "@/components/player";
 import { EpisodeList } from "@/components/episode-list";
+import { EmptyState, BackHomeAction } from "@/components/empty-state";
+import { EpisodeRowSkeleton, PlayerSkeleton, Skeleton } from "@/components/skeleton";
+
 
 export const Route = createFileRoute("/watch/$id")({
   component: WatchPage,
@@ -79,8 +82,24 @@ function WatchPage() {
 
   if (anime.isLoading) {
     return (
-      <div className="mx-auto max-w-none px-6 lg:px-10 py-8">
-        <div className="aspect-video w-full animate-pulse border border-border bg-card" />
+      <div className="pb-16">
+        <div className="border-b border-border bg-card/40">
+          <div className="mx-auto flex max-w-none items-center gap-3 px-6 lg:px-10 py-4">
+            <Skeleton className="h-12 w-9" />
+            <div className="flex-1 space-y-2">
+              <Skeleton className="h-2 w-20 border-0 bg-muted" />
+              <Skeleton className="h-3 w-56 border-0 bg-muted" />
+            </div>
+          </div>
+        </div>
+        <div className="mx-auto grid max-w-none grid-cols-1 gap-6 px-6 lg:px-10 py-6 lg:grid-cols-[minmax(0,1fr)_380px]">
+          <PlayerSkeleton />
+          <div className="flex flex-col gap-2">
+            {Array.from({ length: 6 }).map((_, i) => (
+              <EpisodeRowSkeleton key={i} />
+            ))}
+          </div>
+        </div>
       </div>
     );
   }
@@ -88,18 +107,17 @@ function WatchPage() {
   if (anime.isError || !anime.data) {
     return (
       <div className="mx-auto max-w-none px-6 lg:px-10 py-10">
-        <div className="border border-destructive/50 bg-card px-6 py-6 text-xs text-destructive">
-          could not load anime.
-        </div>
-        <Link
-          to="/"
-          className="mt-4 inline-block text-xs uppercase tracking-widest text-muted-foreground hover:text-foreground"
-        >
-          ← back home
-        </Link>
+        <EmptyState
+          variant="large"
+          hint="~$ fetch --error"
+          title="Couldn't load this title"
+          message="AniList didn't answer. Check the id or your connection and try again."
+          actions={<BackHomeAction />}
+        />
       </div>
     );
   }
+
 
   const media = anime.data;
   const title = pickTitle(media.title);
@@ -148,105 +166,144 @@ function WatchPage() {
         </div>
       </div>
 
-      <div className="mx-auto grid max-w-none grid-cols-1 gap-6 px-6 lg:px-10 py-6 lg:grid-cols-[minmax(0,1fr)_380px]">
-        <div className="min-w-0">
-          {airedEpisodes.length === 0 && !mapping.isLoading ? (
-            <div className="flex aspect-video w-full flex-col items-center justify-center gap-2 border border-dashed border-border bg-card text-center">
-              <div className="font-mono text-[0.65rem] uppercase tracking-widest text-muted-foreground">
-                stream unavailable
-              </div>
-              <div className="max-w-sm px-6 text-sm text-muted-foreground">
-                {media.status === "NOT_YET_RELEASED"
-                  ? "this title hasn't aired yet."
-                  : "no episodes have aired yet — check back once episodes drop."}
-              </div>
-              <Link
-                to="/anime/$id"
-                params={{ id: String(media.id) }}
-                className="mt-3 border border-border bg-background px-4 py-2 text-[0.65rem] uppercase tracking-widest text-foreground hover:bg-accent"
-              >
-                view details
-              </Link>
-            </div>
-          ) : (
-            <Player
-              malId={malId}
-              episode={episode}
-              ep={currentEp}
-              fallbackTitle={title}
-            />
-          )}
+      {/* No episodes at all → full-width big empty card */}
+      {!mapping.isLoading && airedEpisodes.length === 0 && specials.length === 0 ? (
+        <div className="mx-auto max-w-none px-6 lg:px-10 py-10">
+          <EmptyState
+            variant="large"
+            hint="~$ ls episodes/ → 0 results"
+            icon={
+              media.status === "NOT_YET_RELEASED" ? (
+                <CalendarClock className="h-7 w-7" />
+              ) : (
+                <TvMinimal className="h-7 w-7" />
+              )
+            }
+            title={
+              media.status === "NOT_YET_RELEASED"
+                ? "This title hasn't premiered yet"
+                : "No episodes are available"
+            }
+            message={
+              media.status === "NOT_YET_RELEASED"
+                ? "Nothing has aired. Bookmark it and we'll surface episodes the moment they drop."
+                : "We couldn't find any aired episodes for this title. Try again later or explore something else."
+            }
+            actions={
+              <>
+                <Link
+                  to="/anime/$id"
+                  params={{ id: String(media.id) }}
+                  className="border border-border bg-background px-4 py-2 text-[0.65rem] uppercase tracking-widest text-foreground hover:bg-accent"
+                >
+                  view details
+                </Link>
+                <BackHomeAction />
+              </>
+            }
+          />
         </div>
-
-        <div className="min-w-0">
-          <div className="mb-3 flex items-baseline justify-between border-b border-border pb-2">
-            <h2 className="font-mono text-xs uppercase tracking-widest text-muted-foreground">
-              ~$ ls episodes/
-            </h2>
-            <span className="text-[0.6rem] uppercase tracking-widest text-muted-foreground/70">
-              {mapping.isLoading
-                ? "loading..."
-                : `${totalAired}${totalPlanned ? ` / ${totalPlanned}` : ""} aired`}
-            </span>
+      ) : (
+        <div className="mx-auto grid max-w-none grid-cols-1 gap-6 px-6 lg:px-10 py-6 lg:grid-cols-[minmax(0,1fr)_380px]">
+          <div className="min-w-0">
+            {mapping.isLoading ? (
+              <PlayerSkeleton />
+            ) : airedEpisodes.length === 0 ? (
+              <EmptyState
+                variant="large"
+                hint="~$ stream --unavailable"
+                icon={<TvMinimal className="h-6 w-6" />}
+                title="No aired episodes yet"
+                message="Episodes will appear here as soon as they air."
+              />
+            ) : (
+              <div className="rise-in">
+                <Player
+                  malId={malId}
+                  episode={episode}
+                  ep={currentEp}
+                  fallbackTitle={title}
+                />
+              </div>
+            )}
           </div>
 
-          {airedEpisodes.length > 4 && (
-            <div className="mb-3 flex items-center gap-2 border border-border bg-card px-3 py-2">
-              <Search className="h-3.5 w-3.5 text-muted-foreground" />
-              <input
-                type="text"
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-                placeholder="filter episodes..."
-                className="w-full bg-transparent text-xs text-foreground outline-none placeholder:text-muted-foreground"
-              />
+          <div className="min-w-0">
+            <div className="mb-3 flex items-baseline justify-between border-b border-border pb-2">
+              <h2 className="font-mono text-xs uppercase tracking-widest text-muted-foreground">
+                ~$ ls episodes/
+              </h2>
+              <span className="text-[0.6rem] uppercase tracking-widest text-muted-foreground/70">
+                {mapping.isLoading
+                  ? "loading..."
+                  : `${totalAired}${totalPlanned ? ` / ${totalPlanned}` : ""} aired`}
+              </span>
             </div>
-          )}
 
-          {mapping.isLoading ? (
-            <div className="flex flex-col gap-2">
-              {Array.from({ length: 6 }).map((_, i) => (
-                <div
-                  key={i}
-                  className="h-20 animate-pulse border border-border bg-card"
+            {!mapping.isLoading && airedEpisodes.length > 4 && (
+              <div className="mb-3 flex items-center gap-2 border border-border bg-card px-3 py-2 focus-within:border-foreground">
+                <Search className="h-3.5 w-3.5 text-muted-foreground" />
+                <input
+                  type="text"
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
+                  placeholder="filter episodes..."
+                  className="w-full bg-transparent text-xs text-foreground outline-none placeholder:text-muted-foreground"
                 />
-              ))}
-            </div>
-          ) : filteredEpisodes.length === 0 && query ? (
-            <div className="border border-dashed border-border px-4 py-8 text-center text-xs text-muted-foreground">
-              no episodes match "{query}"
-            </div>
-          ) : (
-            <EpisodeList
-              episodes={filteredEpisodes}
-              currentEp={episode}
-              onSelect={setEpisode}
-              airedOnly
-            />
-          )}
-
-          {specials.length > 0 && (
-            <>
-              <div className="mb-2 mt-6 border-b border-border pb-2 font-mono text-xs uppercase tracking-widest text-muted-foreground">
-                ~$ ls extras/
-              </div>
-              <div className="grid gap-2">
-                {specials.map((s) => (
-                  <div
-                    key={s.episode}
-                    className="border border-border bg-card px-3 py-2 text-xs text-card-foreground"
+                {query && (
+                  <button
+                    onClick={() => setQuery("")}
+                    className="text-[0.6rem] uppercase tracking-widest text-muted-foreground hover:text-foreground"
                   >
-                    <div className="text-[0.55rem] uppercase tracking-widest text-muted-foreground">
-                      {s.type} · {s.episode}
-                    </div>
-                    <div>{s.title?.en || s.nameTvdb || "Extra"}</div>
-                  </div>
+                    clear
+                  </button>
+                )}
+              </div>
+            )}
+
+            {mapping.isLoading ? (
+              <div className="flex flex-col gap-2">
+                {Array.from({ length: 6 }).map((_, i) => (
+                  <EpisodeRowSkeleton key={i} />
                 ))}
               </div>
-            </>
-          )}
+            ) : filteredEpisodes.length === 0 && query ? (
+              <div className="border border-dashed border-border px-4 py-8 text-center text-xs text-muted-foreground">
+                no episodes match "{query}"
+              </div>
+            ) : (
+              <EpisodeList
+                episodes={filteredEpisodes}
+                currentEp={episode}
+                onSelect={setEpisode}
+                airedOnly
+              />
+            )}
+
+            {specials.length > 0 && (
+              <>
+                <div className="mb-2 mt-6 border-b border-border pb-2 font-mono text-xs uppercase tracking-widest text-muted-foreground">
+                  ~$ ls extras/
+                </div>
+                <div className="grid gap-2">
+                  {specials.map((s) => (
+                    <div
+                      key={s.episode}
+                      className="border border-border bg-card px-3 py-2 text-xs text-card-foreground transition-colors hover:border-muted-foreground"
+                    >
+                      <div className="text-[0.55rem] uppercase tracking-widest text-muted-foreground">
+                        {s.type} · {s.episode}
+                      </div>
+                      <div>{s.title?.en || s.nameTvdb || "Extra"}</div>
+                    </div>
+                  ))}
+                </div>
+              </>
+            )}
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }
+
