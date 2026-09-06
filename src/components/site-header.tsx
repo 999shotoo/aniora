@@ -150,3 +150,87 @@ export function SiteHeader() {
     </header>
   );
 }
+
+function HeaderSearch() {
+  const navigate = useNavigate();
+  const routeQ = useRouterState({
+    select: (s) => {
+      const m = s.matches.find((x) => x.routeId === "/search");
+      const sp = (m?.search as { q?: string } | undefined) ?? {};
+      return sp.q ?? "";
+    },
+  });
+  const [value, setValue] = useState(routeQ);
+  const [open, setOpen] = useState(false);
+
+  // Sync when route changes externally.
+  useEffect(() => setValue(routeQ), [routeQ]);
+
+  // Debounced live navigation into /search?q=...
+  useEffect(() => {
+    const v = value.trim();
+    const t = setTimeout(() => {
+      if (v.length === 0) return;
+      navigate({
+        to: "/search",
+        search: (prev: Record<string, unknown>) => ({ ...prev, q: v }),
+      }).catch(() => {});
+    }, 280);
+    return () => clearTimeout(t);
+  }, [value, navigate]);
+
+  return (
+    <>
+      {/* Desktop: inline live search */}
+      <div className="relative hidden sm:block">
+        <div className="flex h-8 w-56 items-center gap-2 border border-border bg-input px-2 text-xs focus-within:border-foreground md:w-72">
+          <Search className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
+          <input
+            value={value}
+            onChange={(e) => setValue(e.target.value)}
+            onFocus={() => setOpen(true)}
+            onBlur={() => setTimeout(() => setOpen(false), 120)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                navigate({
+                  to: "/search",
+                  search: { q: value, format: "ANY", genre: "" },
+                }).catch(() => {});
+              }
+              if (e.key === "Escape") setValue("");
+            }}
+            placeholder="search anime..."
+            className="w-full bg-transparent font-mono text-xs text-foreground placeholder:text-muted-foreground focus:outline-none"
+            aria-label="Search anime"
+          />
+          {value && (
+            <button
+              onMouseDown={(e) => {
+                e.preventDefault();
+                setValue("");
+              }}
+              className="text-muted-foreground hover:text-foreground"
+              aria-label="Clear"
+            >
+              <X className="h-3 w-3" />
+            </button>
+          )}
+        </div>
+        {open && value.trim() && (
+          <div className="pointer-events-none absolute right-0 top-full mt-1 border border-border bg-background px-2 py-1 text-[0.55rem] uppercase tracking-widest text-muted-foreground">
+            enter ↵ to jump to results
+          </div>
+        )}
+      </div>
+
+      {/* Mobile: icon → /search */}
+      <Link
+        to="/search"
+        className="flex h-8 w-8 items-center justify-center border border-border sm:hidden"
+        aria-label="Search"
+      >
+        <Search className="h-4 w-4" />
+      </Link>
+    </>
+  );
+}
