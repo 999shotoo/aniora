@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useMemo, useState } from "react";
-import { ArrowLeft, CalendarClock, Info, Search, TvMinimal } from "lucide-react";
+import { ArrowLeft, CalendarClock, Info, TvMinimal } from "lucide-react";
 import {
   getAnimeById,
   FALLBACK_COVER,
@@ -9,7 +9,7 @@ import {
 } from "@/lib/anilist";
 import { fetchMapping, splitEpisodes, isAired } from "@/lib/mappings";
 import { Player } from "@/components/player";
-import { EpisodeList } from "@/components/episode-list";
+import { EpisodesPanel } from "@/components/episodes-panel";
 import { EmptyState, BackHomeAction } from "@/components/empty-state";
 import { EpisodeRowSkeleton, PlayerSkeleton, Skeleton } from "@/components/skeleton";
 
@@ -27,7 +27,6 @@ function WatchPage() {
   const navigate = Route.useNavigate();
   const anilistId = Number(id);
   const [episode, setEpisode] = useState<number>(epParam ?? 1);
-  const [query, setQuery] = useState("");
 
   const anime = useQuery({
     queryKey: ["anime", anilistId],
@@ -57,14 +56,6 @@ function WatchPage() {
     [regular],
   );
 
-  const filteredEpisodes = useMemo(() => {
-    const q = query.trim().toLowerCase();
-    if (!q) return airedEpisodes;
-    return airedEpisodes.filter((e) => {
-      const t = (e.title?.en || e.nameTvdb || "").toLowerCase();
-      return t.includes(q) || String(e.episodeNumber).includes(q);
-    });
-  }, [airedEpisodes, query]);
 
   // Once episodes load, snap to a valid one.
   useEffect(() => {
@@ -124,8 +115,8 @@ function WatchPage() {
   const currentEp = airedEpisodes.find((e) => e.episodeNumber === episode);
   const malId = mapping.data?.mappings?.mal_id ?? media.idMal ?? null;
 
-  const totalAired = airedEpisodes.length;
-  const totalPlanned = media.episodes ?? null;
+
+
 
   return (
     <div className="pb-16">
@@ -229,54 +220,27 @@ function WatchPage() {
           </div>
 
           <div className="min-w-0">
-            <div className="mb-3 flex items-baseline justify-between border-b border-border pb-2">
-              <h2 className="font-mono text-xs uppercase tracking-widest text-muted-foreground">
-                ~$ ls episodes/
-              </h2>
-              <span className="text-[0.6rem] uppercase tracking-widest text-muted-foreground/70">
-                {mapping.isLoading
-                  ? "loading..."
-                  : `${totalAired}${totalPlanned ? ` / ${totalPlanned}` : ""} aired`}
-              </span>
-            </div>
-
-            {!mapping.isLoading && airedEpisodes.length > 4 && (
-              <div className="mb-3 flex items-center gap-2 border border-border bg-card px-3 py-2 focus-within:border-foreground">
-                <Search className="h-3.5 w-3.5 text-muted-foreground" />
-                <input
-                  type="text"
-                  value={query}
-                  onChange={(e) => setQuery(e.target.value)}
-                  placeholder="filter episodes..."
-                  className="w-full bg-transparent text-xs text-foreground outline-none placeholder:text-muted-foreground"
-                />
-                {query && (
-                  <button
-                    onClick={() => setQuery("")}
-                    className="text-[0.6rem] uppercase tracking-widest text-muted-foreground hover:text-foreground"
-                  >
-                    clear
-                  </button>
-                )}
-              </div>
-            )}
-
             {mapping.isLoading ? (
-              <div className="flex flex-col gap-2">
-                {Array.from({ length: 6 }).map((_, i) => (
-                  <EpisodeRowSkeleton key={i} />
-                ))}
-              </div>
-            ) : filteredEpisodes.length === 0 && query ? (
-              <div className="border border-dashed border-border px-4 py-8 text-center text-xs text-muted-foreground">
-                no episodes match "{query}"
-              </div>
+              <>
+                <div className="mb-3 flex items-baseline justify-between border-b border-border pb-2">
+                  <span className="font-mono text-xs uppercase tracking-widest text-muted-foreground">
+                    ~$ ls episodes/
+                  </span>
+                  <span className="text-[0.6rem] uppercase tracking-widest text-muted-foreground/70">
+                    loading…
+                  </span>
+                </div>
+                <div className="flex flex-col gap-2">
+                  {Array.from({ length: 6 }).map((_, i) => (
+                    <EpisodeRowSkeleton key={i} />
+                  ))}
+                </div>
+              </>
             ) : (
-              <EpisodeList
-                episodes={filteredEpisodes}
+              <EpisodesPanel
+                episodes={airedEpisodes}
                 currentEp={episode}
                 onSelect={setEpisode}
-                airedOnly
               />
             )}
 
