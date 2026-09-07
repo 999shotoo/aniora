@@ -27,7 +27,6 @@ function WatchPage() {
   const navigate = Route.useNavigate();
   const anilistId = Number(id);
   const [episode, setEpisode] = useState<number>(epParam ?? 1);
-  const [query, setQuery] = useState("");
 
   const anime = useQuery({
     queryKey: ["anime", anilistId],
