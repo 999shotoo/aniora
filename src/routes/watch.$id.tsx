@@ -202,7 +202,7 @@ function AnimeInfoCard({
   media,
 }: {
   isLoading: boolean;
-  media: ReturnType<typeof useQuery<Awaited<ReturnType<typeof getAnimeById>>>>["data"] | undefined;
+  media: AniListMedia | undefined;
 }) {
   if (isLoading || !media) {
     return (
