@@ -57,14 +57,6 @@ function WatchPage() {
     [regular],
   );
 
-  const filteredEpisodes = useMemo(() => {
-    const q = query.trim().toLowerCase();
-    if (!q) return airedEpisodes;
-    return airedEpisodes.filter((e) => {
-      const t = (e.title?.en || e.nameTvdb || "").toLowerCase();
-      return t.includes(q) || String(e.episodeNumber).includes(q);
-    });
-  }, [airedEpisodes, query]);
 
   // Once episodes load, snap to a valid one.
   useEffect(() => {
