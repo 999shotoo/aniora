@@ -153,11 +153,3 @@ function RouteLoadingBar() {
   );
 }
 
-function PageTransition({ children }: { children: ReactNode }) {
-  const pathname = useRouterState({ select: (s) => s.location.pathname });
-  return (
-    <div key={pathname} className="page-fade">
-      {children}
-    </div>
-  );
-}
