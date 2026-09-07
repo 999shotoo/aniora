@@ -65,8 +65,13 @@ export function splitEpisodes(mapping: Mapping | null): {
   const regular: MappingEpisode[] = [];
   const specials: MappingEpisode[] = [];
   for (const [key, ep] of Object.entries(mapping.episodes)) {
-    if (/^\d+$/.test(key)) regular.push(ep);
-    else specials.push(ep);
+    if (/^\d+$/.test(key)) {
+      // Ensure numeric episodeNumber is always populated from the key.
+      const num = ep.episodeNumber ?? Number(key);
+      regular.push({ ...ep, episodeNumber: num });
+    } else {
+      specials.push(ep);
+    }
   }
   regular.sort(
     (a, b) => (a.episodeNumber ?? 0) - (b.episodeNumber ?? 0),
