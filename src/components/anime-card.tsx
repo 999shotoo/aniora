@@ -2,6 +2,7 @@ import { Link } from "@tanstack/react-router";
 import { Bookmark, BookmarkCheck, Star } from "lucide-react";
 import { type AniListMedia, FALLBACK_COVER, pickTitle } from "@/lib/anilist";
 import { useWishlist } from "@/lib/wishlist";
+import { SmartImage } from "./smart-image";
 
 export function AnimeCard({ media }: { media: AniListMedia }) {
   const { has, toggle } = useWishlist();
