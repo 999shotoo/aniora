@@ -6,6 +6,7 @@ import {
   getAnimeById,
   FALLBACK_COVER,
   pickTitle,
+  type AniListMedia,
 } from "@/lib/anilist";
 import { fetchMapping, splitEpisodes, isAired } from "@/lib/mappings";
 import { Player } from "@/components/player";
