@@ -152,12 +152,33 @@ function WatchPage() {
             {mapping.isLoading ? (
               <EpisodesPanelSkeleton view="thumbnail" count={6} />
             ) : (
-              <EpisodesPanel
-                episodes={airedEpisodes}
-                specials={specials}
-                currentEp={episode}
-                onSelect={handleSelect}
-              />
+              <>
+                <EpisodesPanel
+                  episodes={airedEpisodes}
+                  currentEp={episode}
+                  onSelect={handleSelect}
+                />
+                {specials.length > 0 && (
+                  <div className="mt-4">
+                    <div className="mb-2 border-b border-border pb-2 font-mono text-xs uppercase tracking-widest text-muted-foreground">
+                      ~$ ls extras/
+                    </div>
+                    <div className="grid gap-2">
+                      {specials.map((s) => (
+                        <div
+                          key={s.episode}
+                          className="border border-border bg-card px-3 py-2 text-xs text-card-foreground"
+                        >
+                          <div className="text-[0.55rem] uppercase tracking-widest text-muted-foreground">
+                            {s.type} · {s.episode}
+                          </div>
+                          <div>{s.title?.en || s.nameTvdb || "Extra"}</div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </>
             )}
           </div>
         </div>
