@@ -115,8 +115,8 @@ function WatchPage() {
   const currentEp = airedEpisodes.find((e) => e.episodeNumber === episode);
   const malId = mapping.data?.mappings?.mal_id ?? media.idMal ?? null;
 
-  const totalAired = airedEpisodes.length;
-  const totalPlanned = media.episodes ?? null;
+
+
 
   return (
     <div className="pb-16">
