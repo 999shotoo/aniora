@@ -129,9 +129,7 @@ function RootComponent() {
         <RouteLoadingBar />
         <SiteHeader />
         <main className="flex-1">
-          <PageTransition>
-            <Outlet />
-          </PageTransition>
+          <Outlet />
         </main>
         <footer className="mt-16 border-t border-border">
           <div className="mx-auto flex max-w-none flex-col gap-2 px-6 lg:px-10 py-6 text-[0.65rem] uppercase tracking-widest text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
