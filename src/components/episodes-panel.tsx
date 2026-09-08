@@ -95,7 +95,8 @@ export function EpisodesPanel({
   }, [aired, activeRange, query]);
 
   return (
-    <div className="flex flex-col gap-3">
+    <div className="flex h-full min-h-0 flex-col gap-3">
+
       {/* Header: range + view + counts */}
       <div className="flex items-baseline justify-between border-b border-border pb-2">
         <h2 className="font-mono text-xs uppercase tracking-widest text-muted-foreground">
@@ -161,7 +162,7 @@ export function EpisodesPanel({
       </div>
 
       {/* Scrollable list body */}
-      <div className="max-h-[70vh] overflow-y-auto pr-1">
+      <div className="min-h-0 flex-1 overflow-y-auto pr-1 max-h-[70vh] lg:max-h-none">
         {filtered.length === 0 ? (
           <div className="border border-dashed border-border px-4 py-10 text-center text-xs text-muted-foreground">
             {query ? `no episodes match "${query}"` : "no episodes in this range"}
