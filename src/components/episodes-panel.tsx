@@ -95,7 +95,8 @@ export function EpisodesPanel({
   }, [aired, activeRange, query]);
 
   return (
-    <div className="flex flex-col gap-3">
+    <div className="flex h-full min-h-0 flex-col gap-3">
+
       {/* Header: range + view + counts */}
       <div className="flex items-baseline justify-between border-b border-border pb-2">
         <h2 className="font-mono text-xs uppercase tracking-widest text-muted-foreground">
