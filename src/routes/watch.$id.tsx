@@ -133,9 +133,9 @@ function WatchPage() {
           />
         </div>
       ) : (
-        <div className="mx-auto grid max-w-none grid-cols-1 gap-6 px-6 lg:px-10 py-6 lg:grid-cols-[minmax(0,1fr)_380px]">
+        <div className="mx-auto grid max-w-none grid-cols-1 items-stretch gap-4 px-4 py-4 sm:px-6 lg:grid-cols-[minmax(0,1fr)_minmax(300px,380px)] lg:gap-6 lg:px-10 lg:py-6">
           {/* Player column — waits for mapping first */}
-          <div className="min-w-0">
+          <div className="flex min-w-0 flex-col">
             {mapping.isLoading || !mapping.data ? (
               <PlayerSkeleton />
             ) : (
@@ -148,8 +148,8 @@ function WatchPage() {
             )}
           </div>
 
-          {/* Episodes column — fixed height, scrolls internally */}
-          <div className="min-w-0">
+          {/* Episodes column — matches player height on lg, scrolls internally */}
+          <div className="flex min-w-0 flex-col lg:h-full lg:max-h-full lg:min-h-0">
             {mapping.isLoading ? (
               <EpisodesPanelSkeleton view="thumbnail" count={6} />
             ) : (
