@@ -89,7 +89,7 @@ function WatchPage() {
   const currentEp = airedEpisodes.find((e) => e.episodeNumber === episode);
   const malId = mapping.data?.mappings?.mal_id ?? media?.idMal ?? null;
   const showEmpty =
-    !mapping.isLoading && airedEpisodes.length === 0 && specials.length === 0;
+    !mapping.isLoading && airedEpisodes.length === 0;
 
   return (
     <div className="pb-16">
