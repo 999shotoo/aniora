@@ -3,6 +3,7 @@ import { CheckCircle2, Clock, LayoutGrid, List, Play, Rows, Search, X } from "lu
 import type { MappingEpisode } from "@/lib/mappings";
 import { isAired } from "@/lib/mappings";
 import { FALLBACK_EP_IMAGE } from "./player";
+import { SmartImage } from "./smart-image";
 
 type ViewMode = "thumb" | "row" | "grid";
 
@@ -11,6 +12,8 @@ interface Props {
   currentEp: number;
   onSelect: (ep: number) => void;
   chunkSize?: number;
+  /** Poster/banner to use when an episode has no thumbnail. */
+  fallbackImage?: string;
 }
 
 function formatDate(raw?: string): string {
