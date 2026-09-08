@@ -167,7 +167,7 @@ export function EpisodesPanel({
             {query ? `no episodes match "${query}"` : "no episodes in this range"}
           </div>
         ) : view === "thumb" ? (
-          <ThumbView items={filtered} currentEp={currentEp} onSelect={onSelect} />
+          <ThumbView items={filtered} currentEp={currentEp} onSelect={onSelect} fallbackImage={fallbackImage} />
         ) : view === "row" ? (
           <RowView items={filtered} currentEp={currentEp} onSelect={onSelect} />
         ) : (
