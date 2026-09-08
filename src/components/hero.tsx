@@ -1,4 +1,6 @@
+import { useEffect, useState } from "react";
 import { Link } from "@tanstack/react-router";
+import { AnimatePresence, motion } from "framer-motion";
 import { Play, Bookmark, BookmarkCheck } from "lucide-react";
 import {
   type AniListMedia,
@@ -7,21 +9,40 @@ import {
   pickTitle,
 } from "@/lib/anilist";
 import { useWishlist } from "@/lib/wishlist";
+import { SmartImage } from "./smart-image";
 
-export function Hero({ media }: { media: AniListMedia | null }) {
+interface Props {
+  items: AniListMedia[];
+  intervalMs?: number;
+}
+
+export function Hero({ items, intervalMs = 6500 }: Props) {
   const { has, toggle } = useWishlist();
+  const [index, setIndex] = useState(0);
+  const valid = items.filter(Boolean);
 
-  if (!media) {
+  useEffect(() => {
+    if (valid.length < 2) return;
+    const id = window.setInterval(
+      () => setIndex((i) => (i + 1) % valid.length),
+      intervalMs,
+    );
+    return () => window.clearInterval(id);
+  }, [valid.length, intervalMs]);
+
+  if (valid.length === 0) {
     return (
       <div className="mx-auto h-[52vh] max-w-none animate-pulse border-b border-border bg-card px-6 lg:px-10" />
     );
   }
 
+  const media = valid[index % valid.length];
   const banner =
     media.bannerImage ||
     media.coverImage?.extraLarge ||
     media.coverImage?.large ||
     FALLBACK_BANNER;
+  const cover = media.coverImage?.large || FALLBACK_COVER;
   const saved = has(media.id);
   const title = pickTitle(media.title);
   const desc = (media.description || "")
@@ -31,74 +52,108 @@ export function Hero({ media }: { media: AniListMedia | null }) {
 
   return (
     <section className="relative w-full overflow-hidden border-b border-border">
+      {/* Crossfading banner layer */}
       <div className="absolute inset-0">
-        <img
-          src={banner}
-          alt=""
-          onError={(e) => {
-            (e.currentTarget as HTMLImageElement).src = FALLBACK_BANNER;
-          }}
-          className="h-full w-full object-cover"
-        />
+        <AnimatePresence mode="sync">
+          <motion.img
+            key={banner}
+            src={banner}
+            alt=""
+            onError={(e) => {
+              (e.currentTarget as HTMLImageElement).src = FALLBACK_BANNER;
+            }}
+            initial={{ opacity: 0, scale: 1.06 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ opacity: { duration: 1.2 }, scale: { duration: 6, ease: "easeOut" } }}
+            className="absolute inset-0 h-full w-full object-cover"
+          />
+        </AnimatePresence>
         <div className="absolute inset-0 bg-gradient-to-t from-background via-background/80 to-background/20" />
         <div className="absolute inset-0 bg-gradient-to-r from-background/95 via-background/60 to-transparent" />
       </div>
 
       <div className="relative mx-auto flex min-h-[62vh] max-w-none flex-col gap-6 px-6 lg:px-10 py-10 sm:min-h-[68vh] sm:py-16 md:flex-row md:items-end">
-        <img
-          src={media.coverImage?.large || FALLBACK_COVER}
-          alt={title}
-          onError={(e) => {
-            (e.currentTarget as HTMLImageElement).src = FALLBACK_COVER;
-          }}
-          className="hidden aspect-[2/3] w-40 shrink-0 border border-border object-cover shadow-2xl md:block lg:w-48"
-        />
-        <div className="flex-1">
-          <div className="mb-3 flex flex-wrap items-center gap-2 text-[0.6rem] uppercase tracking-widest text-muted-foreground">
-            <span className="border border-border bg-background/50 px-2 py-1 backdrop-blur">
-              ~$ ./featured
-            </span>
-            {media.format && <span>{media.format}</span>}
-            {media.seasonYear && <span>· {media.seasonYear}</span>}
-            {media.episodes && <span>· {media.episodes} ep</span>}
-            {media.averageScore && (
-              <span>· {(media.averageScore / 10).toFixed(1)}★</span>
-            )}
-          </div>
-          <h1 className="mb-4 max-w-3xl text-3xl font-medium leading-tight sm:text-4xl md:text-5xl">
-            {title}
-          </h1>
-          {desc && (
-            <p className="mb-6 line-clamp-3 max-w-2xl text-sm leading-relaxed text-muted-foreground sm:line-clamp-4">
-              {desc}
-            </p>
-          )}
-          <div className="flex flex-wrap gap-2">
-            <Link
-              to="/anime/$id"
-              params={{ id: String(media.id) }}
-              className="inline-flex items-center gap-2 border border-foreground bg-foreground px-6 lg:px-10 py-2 text-[0.7rem] font-medium uppercase tracking-widest text-background transition-opacity hover:opacity-90"
-            >
-              <Play className="h-3.5 w-3.5 fill-current" />
-              watch now
-            </Link>
-            <button
-              onClick={() => toggle(media)}
-              className="inline-flex items-center gap-2 border border-border bg-background/60 px-6 lg:px-10 py-2 text-[0.7rem] font-medium uppercase tracking-widest text-foreground backdrop-blur hover:bg-accent"
-            >
-              {saved ? (
-                <>
-                  <BookmarkCheck className="h-3.5 w-3.5" /> saved
-                </>
-              ) : (
-                <>
-                  <Bookmark className="h-3.5 w-3.5" /> wishlist
-                </>
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={media.id}
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -16 }}
+            transition={{ duration: 0.55, ease: "easeOut" }}
+            className="flex w-full flex-col gap-6 md:flex-row md:items-end"
+          >
+            <SmartImage
+              src={cover}
+              fallback={FALLBACK_COVER}
+              alt={title}
+              className="hidden aspect-[2/3] w-40 shrink-0 border border-border shadow-2xl md:block lg:w-48"
+            />
+            <div className="flex-1">
+              <div className="mb-3 flex flex-wrap items-center gap-2 text-[0.6rem] uppercase tracking-widest text-muted-foreground">
+                <span className="border border-border bg-background/50 px-2 py-1 backdrop-blur">
+                  ~$ ./featured
+                </span>
+                {media.format && <span>{media.format}</span>}
+                {media.seasonYear && <span>· {media.seasonYear}</span>}
+                {media.episodes && <span>· {media.episodes} ep</span>}
+                {media.averageScore && (
+                  <span>· {(media.averageScore / 10).toFixed(1)}★</span>
+                )}
+              </div>
+              <h1 className="mb-4 max-w-3xl text-3xl font-medium leading-tight sm:text-4xl md:text-5xl">
+                {title}
+              </h1>
+              {desc && (
+                <p className="mb-6 line-clamp-3 max-w-2xl text-sm leading-relaxed text-muted-foreground sm:line-clamp-4">
+                  {desc}
+                </p>
               )}
-            </button>
-          </div>
-        </div>
+              <div className="flex flex-wrap gap-2">
+                <Link
+                  to="/anime/$id"
+                  params={{ id: String(media.id) }}
+                  className="inline-flex items-center gap-2 border border-foreground bg-foreground px-6 lg:px-10 py-2 text-[0.7rem] font-medium uppercase tracking-widest text-background transition-opacity hover:opacity-90"
+                >
+                  <Play className="h-3.5 w-3.5 fill-current" />
+                  watch now
+                </Link>
+                <button
+                  onClick={() => toggle(media)}
+                  className="inline-flex items-center gap-2 border border-border bg-background/60 px-6 lg:px-10 py-2 text-[0.7rem] font-medium uppercase tracking-widest text-foreground backdrop-blur hover:bg-accent"
+                >
+                  {saved ? (
+                    <>
+                      <BookmarkCheck className="h-3.5 w-3.5" /> saved
+                    </>
+                  ) : (
+                    <>
+                      <Bookmark className="h-3.5 w-3.5" /> wishlist
+                    </>
+                  )}
+                </button>
+              </div>
+            </div>
+          </motion.div>
+        </AnimatePresence>
       </div>
+
+      {/* Dots */}
+      {valid.length > 1 && (
+        <div className="absolute bottom-4 left-1/2 z-10 flex -translate-x-1/2 gap-1.5">
+          {valid.map((_, i) => (
+            <span
+              key={i}
+              className={
+                "h-1.5 rounded-full transition-all " +
+                (i === index % valid.length
+                  ? "w-6 bg-foreground"
+                  : "w-1.5 bg-foreground/30")
+              }
+            />
+          ))}
+        </div>
+      )}
     </section>
   );
 }

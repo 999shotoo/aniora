@@ -50,12 +50,12 @@ function HomePage() {
     staleTime: 5 * 60_000,
   });
 
-  const featured: AniListMedia | null =
-    trending.data?.[0] ?? popular.data?.[0] ?? null;
+  const featured: AniListMedia[] =
+    (trending.data ?? popular.data ?? []).slice(0, 6);
 
   return (
     <>
-      <Hero media={featured} />
+      <Hero items={featured} />
 
       <div className="mx-auto max-w-none px-6 lg:px-10 pt-6">
         <div className="flex items-center justify-between border border-border bg-card px-3 py-2 text-[0.65rem] uppercase tracking-widest">
