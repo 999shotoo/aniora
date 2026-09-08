@@ -109,34 +109,34 @@ export function EpisodesPanel({
       </div>
 
       {/* Toolbar */}
-      <div className="flex flex-wrap items-center gap-2">
+      <div className="flex items-center gap-2">
         {ranges.length > 1 && (
           <select
             value={rangeIdx}
             onChange={(e) => setRangeIdx(Number(e.target.value))}
-            className="h-8 border border-border bg-input px-2 font-mono text-xs text-foreground focus:border-foreground focus:outline-none"
+            className="h-8 shrink-0 border border-border bg-input px-2 font-mono text-[0.65rem] text-foreground focus:border-foreground focus:outline-none"
             aria-label="Episode range"
           >
             {ranges.map((r, i) => (
               <option key={i} value={i}>
-                {String(r.start).padStart(3, "0")} – {String(r.end).padStart(3, "0")}
+                {String(r.start).padStart(3, "0")}–{String(r.end).padStart(3, "0")}
               </option>
             ))}
           </select>
         )}
 
-        <div className="flex h-8 items-center gap-2 border border-border bg-input px-2 focus-within:border-foreground sm:min-w-[220px] sm:flex-1">
-          <Search className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
+        <div className="flex h-8 min-w-0 flex-1 items-center gap-1.5 border border-border bg-input px-2 focus-within:border-foreground">
+          <Search className="h-3 w-3 shrink-0 text-muted-foreground" />
           <input
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="filter episodes..."
-            className="w-full bg-transparent font-mono text-xs text-foreground placeholder:text-muted-foreground focus:outline-none"
+            placeholder="filter..."
+            className="w-full min-w-0 bg-transparent font-mono text-[0.7rem] text-foreground placeholder:text-muted-foreground focus:outline-none"
           />
           {query && (
             <button
               onClick={() => setQuery("")}
-              className="text-muted-foreground hover:text-foreground"
+              className="shrink-0 text-muted-foreground hover:text-foreground"
               aria-label="Clear filter"
             >
               <X className="h-3 w-3" />
@@ -144,22 +144,26 @@ export function EpisodesPanel({
           )}
         </div>
 
-        <div className="flex border border-border">
-          <ViewBtn
-            active={view === "thumb"}
-            onClick={() => setView("thumb")}
-            label="Thumbnail"
-          >
+        <button
+          onClick={() => {
+            const order: ViewMode[] = ["thumb", "row", "grid"];
+            const next = order[(order.indexOf(view) + 1) % order.length];
+            setView(next);
+          }}
+          aria-label={`View: ${view}. Click to cycle.`}
+          title={`View: ${view} — click to cycle`}
+          className="flex h-8 w-8 shrink-0 items-center justify-center border border-border bg-input text-muted-foreground transition-colors hover:border-foreground hover:text-foreground"
+        >
+          {view === "thumb" ? (
             <LayoutGrid className="h-3.5 w-3.5" />
-          </ViewBtn>
-          <ViewBtn active={view === "row"} onClick={() => setView("row")} label="Rows">
+          ) : view === "row" ? (
             <Rows className="h-3.5 w-3.5" />
-          </ViewBtn>
-          <ViewBtn active={view === "grid"} onClick={() => setView("grid")} label="Numbers">
+          ) : (
             <List className="h-3.5 w-3.5" />
-          </ViewBtn>
-        </div>
+          )}
+        </button>
       </div>
+
 
       {/* Scrollable list body */}
       <div className="min-h-0 flex-1 overflow-y-auto pr-1 max-h-[70vh] lg:max-h-none">
