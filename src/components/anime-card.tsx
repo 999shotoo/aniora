@@ -20,14 +20,12 @@ export function AnimeCard({ media }: { media: AniListMedia }) {
         params={{ id: String(media.id) }}
         className="relative block aspect-[2/3] w-full overflow-hidden border border-border bg-card"
       >
-        <img
+        <SmartImage
           src={cover}
+          fallback={FALLBACK_COVER}
           alt={pickTitle(media.title)}
-          loading="lazy"
-          onError={(e) => {
-            (e.currentTarget as HTMLImageElement).src = FALLBACK_COVER;
-          }}
-          className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+          className="h-full w-full"
+          imgClassName="transition-transform duration-500 group-hover:scale-105"
         />
         <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/85 via-black/10 to-transparent opacity-0 transition-opacity group-hover:opacity-100" />
         <div className="pointer-events-none absolute inset-x-0 bottom-0 p-2 opacity-0 transition-opacity group-hover:opacity-100">
