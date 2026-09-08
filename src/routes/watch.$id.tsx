@@ -52,7 +52,7 @@ function WatchPage() {
     enabled: Number.isFinite(anilistId),
   });
 
-  const { regular, specials } = useMemo(
+  const { regular } = useMemo(
     () => splitEpisodes(mapping.data ?? null),
     [mapping.data],
   );
