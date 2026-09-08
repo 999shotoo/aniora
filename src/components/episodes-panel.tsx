@@ -212,10 +212,12 @@ function ThumbView({
   items,
   currentEp,
   onSelect,
+  fallbackImage,
 }: {
   items: MappingEpisode[];
   currentEp: number;
   onSelect: (n: number) => void;
+  fallbackImage?: string;
 }) {
   return (
     <div className="flex flex-col gap-2">
@@ -223,7 +225,7 @@ function ThumbView({
         const num = ep.episodeNumber!;
         const active = num === currentEp;
         const aired = isAired(ep) || !(ep.airDate || ep.airdate);
-        const img = ep.image || FALLBACK_EP_IMAGE;
+        const img = ep.image || fallbackImage || FALLBACK_EP_IMAGE;
         const title = ep.title?.en || ep.nameTvdb || `Episode ${num}`;
         const date = formatDate(ep.airDate || ep.airdate);
         return (
@@ -238,14 +240,11 @@ function ThumbView({
             }
           >
             <div className="relative aspect-video w-32 shrink-0 overflow-hidden bg-background sm:w-40">
-              <img
+              <SmartImage
                 src={img}
+                fallback={fallbackImage || FALLBACK_EP_IMAGE}
                 alt=""
-                loading="lazy"
-                onError={(e) => {
-                  (e.currentTarget as HTMLImageElement).src = FALLBACK_EP_IMAGE;
-                }}
-                className="h-full w-full object-cover"
+                className="h-full w-full"
               />
               <div className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 transition-opacity group-hover:opacity-100">
                 <Play className="h-6 w-6 fill-current text-white" />
