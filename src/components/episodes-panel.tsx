@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { CheckCircle2, Clock, LayoutGrid, List, Play, Rows, Search, X } from "lucide-react";
+import { Check, CheckCircle2, Clock, LayoutGrid, List, Play, Rows, Search, X } from "lucide-react";
 import type { MappingEpisode } from "@/lib/mappings";
 import { isAired } from "@/lib/mappings";
 import { FALLBACK_EP_IMAGE } from "./player";
@@ -14,6 +14,10 @@ interface Props {
   chunkSize?: number;
   /** Poster/banner to use when an episode has no thumbnail. */
   fallbackImage?: string;
+  /** Returns whether an episode number is already watched. */
+  isWatched?: (n: number) => boolean;
+  /** Toggle the watched flag from the panel (checkbox on cards). */
+  onToggleWatched?: (n: number) => void;
 }
 
 function formatDate(raw?: string): string {
