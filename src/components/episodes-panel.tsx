@@ -166,7 +166,7 @@ export function EpisodesPanel({
 
 
       {/* Scrollable list body */}
-      <div className="min-h-0 flex-1 overflow-y-auto pr-1 max-h-[70vh] lg:max-h-none">
+      <div className="min-h-0 flex-1 overflow-y-auto pr-1 max-h-[60vh] sm:max-h-[65vh] lg:max-h-[calc(100vh-14rem)]">
         {filtered.length === 0 ? (
           <div className="border border-dashed border-border px-4 py-10 text-center text-xs text-muted-foreground">
             {query ? `no episodes match "${query}"` : "no episodes in this range"}
