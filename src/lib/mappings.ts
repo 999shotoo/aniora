@@ -66,8 +66,10 @@ export function splitEpisodes(mapping: Mapping | null): {
   const specials: MappingEpisode[] = [];
   for (const [key, ep] of Object.entries(mapping.episodes)) {
     if (/^\d+$/.test(key)) {
-      // Ensure numeric episodeNumber is always populated from the key.
-      const num = ep.episodeNumber ?? Number(key);
+      // Prefer absoluteEpisodeNumber (correct across seasons), then the
+      // numeric key, then the season-scoped episodeNumber as a last resort.
+      const num =
+        ep.absoluteEpisodeNumber ?? Number(key) || ep.episodeNumber || 0;
       regular.push({ ...ep, episodeNumber: num });
     } else {
       specials.push(ep);
