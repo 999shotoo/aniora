@@ -167,6 +167,8 @@ function WatchPage() {
                   media?.coverImage?.large ||
                   undefined
                 }
+                isWatched={watched.has}
+                onToggleWatched={watched.toggle}
               />
             )}
           </div>
