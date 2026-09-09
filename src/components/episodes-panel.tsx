@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { CheckCircle2, Clock, LayoutGrid, List, Play, Rows, Search, X } from "lucide-react";
+import { Check, CheckCircle2, Clock, LayoutGrid, List, Play, Rows, Search, X } from "lucide-react";
 import type { MappingEpisode } from "@/lib/mappings";
 import { isAired } from "@/lib/mappings";
 import { FALLBACK_EP_IMAGE } from "./player";
@@ -14,6 +14,10 @@ interface Props {
   chunkSize?: number;
   /** Poster/banner to use when an episode has no thumbnail. */
   fallbackImage?: string;
+  /** Returns whether an episode number is already watched. */
+  isWatched?: (n: number) => boolean;
+  /** Toggle the watched flag from the panel (checkbox on cards). */
+  onToggleWatched?: (n: number) => void;
 }
 
 function formatDate(raw?: string): string {
@@ -38,6 +42,8 @@ export function EpisodesPanel({
   onSelect,
   chunkSize = 100,
   fallbackImage,
+  isWatched,
+  onToggleWatched,
 }: Props) {
   const aired = useMemo(
     () =>
@@ -172,11 +178,11 @@ export function EpisodesPanel({
             {query ? `no episodes match "${query}"` : "no episodes in this range"}
           </div>
         ) : view === "thumb" ? (
-          <ThumbView items={filtered} currentEp={currentEp} onSelect={onSelect} fallbackImage={fallbackImage} />
+          <ThumbView items={filtered} currentEp={currentEp} onSelect={onSelect} fallbackImage={fallbackImage} isWatched={isWatched} onToggleWatched={onToggleWatched} />
         ) : view === "row" ? (
-          <RowView items={filtered} currentEp={currentEp} onSelect={onSelect} />
+          <RowView items={filtered} currentEp={currentEp} onSelect={onSelect} isWatched={isWatched} />
         ) : (
-          <GridView items={filtered} currentEp={currentEp} onSelect={onSelect} />
+          <GridView items={filtered} currentEp={currentEp} onSelect={onSelect} isWatched={isWatched} />
         )}
       </div>
     </div>
@@ -218,38 +224,47 @@ function ThumbView({
   currentEp,
   onSelect,
   fallbackImage,
+  isWatched,
+  onToggleWatched,
 }: {
   items: MappingEpisode[];
   currentEp: number;
   onSelect: (n: number) => void;
   fallbackImage?: string;
+  isWatched?: (n: number) => boolean;
+  onToggleWatched?: (n: number) => void;
 }) {
   return (
     <div className="flex flex-col gap-2">
       {items.map((ep) => {
         const num = ep.episodeNumber!;
         const active = num === currentEp;
-        const aired = isAired(ep) || !(ep.airDate || ep.airdate);
+        const watched = isWatched?.(num) ?? false;
         const img = ep.image || fallbackImage || FALLBACK_EP_IMAGE;
         const title = ep.title?.en || ep.nameTvdb || `Episode ${num}`;
         const date = formatDate(ep.airDate || ep.airdate);
         return (
-          <button
+          <div
             key={num}
-            onClick={() => onSelect(num)}
             className={
-              "group flex items-stretch gap-3 border text-left transition-colors " +
+              "group relative flex h-24 items-stretch gap-3 border text-left transition-colors " +
               (active
                 ? "border-foreground bg-accent"
-                : "border-border bg-card hover:border-muted-foreground")
+                : watched
+                  ? "border-chart-1/50 bg-chart-1/5 hover:border-chart-1"
+                  : "border-border bg-card hover:border-muted-foreground")
             }
           >
-            <div className="relative aspect-video w-32 shrink-0 overflow-hidden bg-background sm:w-40">
+            <button
+              onClick={() => onSelect(num)}
+              className="relative aspect-video h-full w-32 shrink-0 overflow-hidden bg-background sm:w-40"
+              aria-label={`Play episode ${num}`}
+            >
               <SmartImage
                 src={img}
                 fallback={fallbackImage || FALLBACK_EP_IMAGE}
                 alt=""
-                className="h-full w-full"
+                className={"h-full w-full " + (watched && !active ? "opacity-60" : "")}
               />
               <div className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 transition-opacity group-hover:opacity-100">
                 <Play className="h-6 w-6 fill-current text-white" />
@@ -257,33 +272,46 @@ function ThumbView({
               <span className="absolute left-1 top-1 border border-border bg-background/85 px-1.5 py-0.5 font-mono text-[0.55rem] tracking-widest text-foreground">
                 {String(num).padStart(2, "0")}
               </span>
-            </div>
-            <div className="flex flex-1 flex-col justify-center gap-1 py-2 pr-3">
-              <div className="line-clamp-1 text-xs font-medium text-foreground sm:text-sm">
-                {title}
+            </button>
+            <button
+              onClick={() => onSelect(num)}
+              className="flex min-w-0 flex-1 flex-col justify-center gap-0.5 py-2 pr-9 text-left"
+            >
+              <div className="flex items-center gap-1.5">
+                {watched && <Check className="h-3 w-3 shrink-0 text-chart-1" />}
+                <div className={"truncate text-xs font-medium sm:text-sm " + (watched && !active ? "text-muted-foreground" : "text-foreground")}>
+                  {title}
+                </div>
               </div>
-              <div className="flex flex-wrap items-center gap-2 text-[0.6rem] uppercase tracking-widest text-muted-foreground">
+              <div className="flex items-center gap-2 text-[0.55rem] uppercase tracking-widest text-muted-foreground">
                 {ep.runtime && <span>{ep.runtime}m</span>}
                 {date && <span>· {date}</span>}
-                <span className="ml-auto inline-flex items-center gap-1">
-                  {aired ? (
-                    <>
-                      <CheckCircle2 className="h-3 w-3 text-chart-1" /> aired
-                    </>
-                  ) : (
-                    <>
-                      <Clock className="h-3 w-3" /> tba
-                    </>
-                  )}
-                </span>
               </div>
               {ep.overview && (
-                <p className="line-clamp-2 hidden text-xs text-card-foreground sm:block">
+                <p className="truncate text-[0.65rem] text-card-foreground/80">
                   {ep.overview}
                 </p>
               )}
-            </div>
-          </button>
+            </button>
+            {onToggleWatched && (
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onToggleWatched(num);
+                }}
+                title={watched ? "Mark as unwatched" : "Mark as watched"}
+                aria-label={watched ? "Mark as unwatched" : "Mark as watched"}
+                className={
+                  "absolute right-1.5 top-1.5 flex h-6 w-6 items-center justify-center border transition-colors " +
+                  (watched
+                    ? "border-chart-1 bg-chart-1/20 text-chart-1"
+                    : "border-border bg-background/70 text-muted-foreground hover:text-foreground")
+                }
+              >
+                {watched ? <CheckCircle2 className="h-3.5 w-3.5" /> : <Clock className="h-3.5 w-3.5" />}
+              </button>
+            )}
+          </div>
         );
       })}
     </div>
@@ -294,32 +322,38 @@ function RowView({
   items,
   currentEp,
   onSelect,
+  isWatched,
 }: {
   items: MappingEpisode[];
   currentEp: number;
   onSelect: (n: number) => void;
+  isWatched?: (n: number) => boolean;
 }) {
   return (
     <div className="flex flex-col gap-1">
       {items.map((ep) => {
         const num = ep.episodeNumber!;
         const active = num === currentEp;
+        const watched = isWatched?.(num) ?? false;
         const title = ep.title?.en || ep.nameTvdb || `Episode ${num}`;
         return (
           <button
             key={num}
             onClick={() => onSelect(num)}
             className={
-              "flex items-center gap-3 border px-3 py-2 text-left text-xs transition-colors " +
+              "flex h-10 items-center gap-3 border px-3 text-left text-xs transition-colors " +
               (active
                 ? "border-foreground bg-accent text-foreground"
-                : "border-border bg-card text-card-foreground hover:border-muted-foreground hover:text-foreground")
+                : watched
+                  ? "border-chart-1/50 bg-chart-1/5 text-muted-foreground hover:text-foreground"
+                  : "border-border bg-card text-card-foreground hover:border-muted-foreground hover:text-foreground")
             }
           >
             <span className="w-12 shrink-0 font-mono text-[0.65rem] tracking-widest text-muted-foreground">
               EP {String(num).padStart(3, "0")}
             </span>
             <span className="min-w-0 flex-1 truncate">{title}</span>
+            {watched && !active && <Check className="h-3 w-3 shrink-0 text-chart-1" />}
             {active && <Play className="h-3 w-3 shrink-0 fill-current" />}
           </button>
         );
@@ -332,16 +366,19 @@ function GridView({
   items,
   currentEp,
   onSelect,
+  isWatched,
 }: {
   items: MappingEpisode[];
   currentEp: number;
   onSelect: (n: number) => void;
+  isWatched?: (n: number) => boolean;
 }) {
   return (
     <div className="grid grid-cols-4 gap-1.5 sm:grid-cols-5">
       {items.map((ep) => {
         const num = ep.episodeNumber!;
         const active = num === currentEp;
+        const watched = isWatched?.(num) ?? false;
         return (
           <button
             key={num}
@@ -351,7 +388,9 @@ function GridView({
               "flex h-10 items-center justify-center border font-mono text-xs transition-colors " +
               (active
                 ? "border-foreground bg-foreground text-background"
-                : "border-border bg-card text-muted-foreground hover:border-muted-foreground hover:text-foreground")
+                : watched
+                  ? "border-chart-1/60 bg-chart-1/10 text-chart-1 hover:border-chart-1"
+                  : "border-border bg-card text-muted-foreground hover:border-muted-foreground hover:text-foreground")
             }
           >
             {num}

@@ -13,6 +13,7 @@ import { Player } from "@/components/player";
 import { EpisodesPanel } from "@/components/episodes-panel";
 import { EmptyState, BackHomeAction } from "@/components/empty-state";
 import { EpisodesPanelSkeleton, PlayerSkeleton } from "@/components/skeleton";
+import { useWatched } from "@/lib/watched";
 
 export const Route = createFileRoute("/watch/$id")({
   component: WatchPage,
@@ -81,7 +82,10 @@ function WatchPage() {
     navigate({ search: { ep: first }, replace: true }).catch(() => {});
   }, [airedEpisodes, episode, epParam, navigate]);
 
+  const watched = useWatched(anilistId);
+
   const handleSelect = (n: number) => {
+    watched.mark(n);
     navigate({ search: { ep: n } }).catch(() => {});
   };
 
@@ -163,6 +167,8 @@ function WatchPage() {
                   media?.coverImage?.large ||
                   undefined
                 }
+                isWatched={watched.has}
+                onToggleWatched={watched.toggle}
               />
             )}
           </div>

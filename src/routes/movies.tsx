@@ -1,8 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useQuery } from "@tanstack/react-query";
-import { useState } from "react";
+import { useInfiniteQuery } from "@tanstack/react-query";
+import { useEffect, useRef, useState } from "react";
 import { browseAnime } from "@/lib/anilist";
 import { AnimeCard } from "@/components/anime-card";
+import { GridSkeleton } from "@/components/skeleton";
 
 export const Route = createFileRoute("/movies")({
   component: MoviesPage,
@@ -21,15 +22,30 @@ const TABS = [
   { key: "recent", label: "recent", sort: ["START_DATE_DESC"] },
 ] as const;
 
+const PER_PAGE = 32;
+
 function MoviesPage() {
   const [tab, setTab] = useState<(typeof TABS)[number]["key"]>("popular");
   const current = TABS.find((t) => t.key === tab)!;
 
-  const list = useQuery({
-    queryKey: ["movies", tab],
-    queryFn: () =>
-      browseAnime({ sort: current.sort, format: "MOVIE", perPage: 40 }),
+  const q = useInfiniteQuery({
+    queryKey: ["movies-infinite", tab],
+    initialPageParam: 1,
+    queryFn: ({ pageParam }) =>
+      browseAnime({
+        sort: current.sort,
+        format: "MOVIE",
+        page: pageParam,
+        perPage: PER_PAGE,
+      }),
+    getNextPageParam: (lastPage, allPages) =>
+      lastPage.length < PER_PAGE ? undefined : allPages.length + 1,
     staleTime: 5 * 60_000,
+  });
+
+  const items = q.data?.pages.flat() ?? [];
+  const sentinel = useSentinel(() => {
+    if (q.hasNextPage && !q.isFetchingNextPage) q.fetchNextPage();
   });
 
   return (
@@ -39,7 +55,7 @@ function MoviesPage() {
           ~$ ls movies/
         </h1>
         <span className="text-[0.6rem] uppercase tracking-widest text-muted-foreground/70">
-          {list.data?.length ?? 0} results
+          {items.length} loaded
         </span>
       </div>
 
@@ -60,22 +76,41 @@ function MoviesPage() {
         ))}
       </div>
 
-      {list.isLoading ? (
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
-          {Array.from({ length: 18 }).map((_, i) => (
-            <div
-              key={i}
-              className="aspect-[2/3] w-full animate-pulse border border-border bg-card"
-            />
-          ))}
-        </div>
+      {q.isLoading ? (
+        <GridSkeleton count={21} />
       ) : (
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
-          {(list.data ?? []).map((m) => (
-            <AnimeCard key={m.id} media={m} />
-          ))}
-        </div>
+        <>
+          <div className="grid grid-cols-3 gap-2 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-7 xl:grid-cols-8">
+            {items.map((m) => (
+              <AnimeCard key={m.id} media={m} />
+            ))}
+          </div>
+          <div ref={sentinel} className="h-16" />
+          {q.isFetchingNextPage && <GridSkeleton count={14} />}
+          {!q.hasNextPage && items.length > 0 && (
+            <p className="mt-6 text-center font-mono text-[0.6rem] uppercase tracking-widest text-muted-foreground/70">
+              ~$ end of stream
+            </p>
+          )}
+        </>
       )}
     </div>
   );
+}
+
+function useSentinel(onHit: () => void) {
+  const ref = useRef<HTMLDivElement | null>(null);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const obs = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((e) => e.isIntersecting)) onHit();
+      },
+      { rootMargin: "600px" },
+    );
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, [onHit]);
+  return ref;
 }
