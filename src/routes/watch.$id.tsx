@@ -13,6 +13,7 @@ import { Player } from "@/components/player";
 import { EpisodesPanel } from "@/components/episodes-panel";
 import { EmptyState, BackHomeAction } from "@/components/empty-state";
 import { EpisodesPanelSkeleton, PlayerSkeleton } from "@/components/skeleton";
+import { useWatched } from "@/lib/watched";
 
 export const Route = createFileRoute("/watch/$id")({
   component: WatchPage,
