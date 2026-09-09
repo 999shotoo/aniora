@@ -69,84 +69,98 @@ export function RowSkeleton({ count = 6, label = true }: { count?: number; label
 
 export function EpisodeRowSkeleton() {
   return (
-    <div className="flex items-stretch gap-3 border border-border bg-card">
-      <div className="relative aspect-video w-32 shrink-0 sm:w-40">
+    <div className="flex h-24 items-stretch gap-3 border border-border bg-card overflow-hidden">
+      <div className="relative aspect-video h-full w-32 shrink-0 sm:w-40">
         <Skeleton className="absolute inset-0" />
-        <div className="absolute left-1.5 top-1.5 h-3 w-6 bg-background/80" />
-        <div className="absolute bottom-1.5 right-1.5 h-3 w-10 bg-background/80" />
-      </div>
-      <div className="flex flex-1 flex-col justify-center gap-2 py-2 pr-3">
-        <Bar className="h-3 w-3/4" />
-        <Bar className="h-2 w-1/2" />
-        <Bar className="h-2 w-2/3" />
-        <div className="flex gap-2 pt-1">
-          <Bar className="h-2 w-10" />
-          <Bar className="h-2 w-14" />
+        <div className="absolute left-1 top-1 h-4 w-8 border border-border bg-background/85" />
+        <div className="absolute inset-0 flex items-center justify-center">
+          <div className="h-8 w-8 rounded-full border border-border bg-background/40" />
         </div>
       </div>
+      <div className="flex min-w-0 flex-1 flex-col justify-center gap-1.5 py-2 pr-3">
+        <Bar className="h-3 w-3/4" />
+        <div className="flex items-center gap-2">
+          <Bar className="h-2 w-8" />
+          <Bar className="h-2 w-1 rounded-full" />
+          <Bar className="h-2 w-16" />
+        </div>
+        <Bar className="h-2 w-11/12" />
+      </div>
+      <div className="mr-1.5 mt-1.5 h-6 w-6 shrink-0 border border-border bg-background/70" />
     </div>
   );
 }
 
-export function EpisodeThumbSkeleton() {
+export function EpisodeCompactSkeleton() {
   return (
-    <div className="flex flex-col gap-2 border border-border bg-card p-2">
-      <div className="relative aspect-video w-full">
-        <Skeleton className="absolute inset-0" />
-        <div className="absolute left-1.5 top-1.5 h-4 w-8 bg-background/80" />
-      </div>
-      <Bar className="h-3 w-3/4" />
-      <Bar className="h-2 w-1/2" />
+    <div className="flex h-10 items-center gap-3 border border-border bg-card px-3">
+      <Bar className="h-2 w-10" />
+      <Bar className="h-2 flex-1 max-w-[60%]" />
     </div>
   );
 }
 
 export function EpisodeNumSkeleton() {
-  return <Skeleton className="aspect-square w-full border border-border" />;
+  return (
+    <div className="flex h-10 items-center justify-center border border-border bg-card">
+      <Bar className="h-2 w-4" />
+    </div>
+  );
 }
 
-/** Skeleton for the whole episodes panel: toolbar + list. */
+/** Skeleton for the whole episodes panel: header + toolbar + list. */
 export function EpisodesPanelSkeleton({
   view = "thumbnail",
-  count = 8,
+  count = 6,
 }: {
   view?: "thumbnail" | "row" | "grid";
   count?: number;
 }) {
   return (
-    <div className="space-y-3">
-      {/* toolbar */}
-      <div className="flex flex-wrap items-center gap-2 border border-border bg-card p-2">
-        <Bar className="h-8 w-32" />
-        <Bar className="h-8 flex-1 min-w-[8rem]" />
-        <div className="flex gap-1">
-          <Bar className="h-8 w-8" />
-          <Bar className="h-8 w-8" />
-          <Bar className="h-8 w-8" />
+    <div className="flex h-full min-h-0 flex-col gap-3">
+      {/* header */}
+      <div className="flex items-baseline justify-between border-b border-border pb-2">
+        <div className="flex items-center gap-2">
+          <Bar className="h-2 w-2" />
+          <Bar className="h-3 w-32" />
         </div>
+        <Bar className="h-2 w-16" />
       </div>
+
+      {/* toolbar */}
+      <div className="flex items-center gap-2">
+        <Bar className="h-8 w-24 border border-border" />
+        <div className="flex h-8 min-w-0 flex-1 items-center gap-1.5 border border-border bg-input px-2">
+          <div className="h-3 w-3 rounded-sm bg-muted" />
+          <Bar className="h-2 flex-1" />
+        </div>
+        <Bar className="h-8 w-8 border border-border" />
+      </div>
+
       {/* list */}
-      {view === "thumbnail" && (
-        <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
-          {Array.from({ length: count }).map((_, i) => (
-            <EpisodeThumbSkeleton key={i} />
-          ))}
-        </div>
-      )}
-      {view === "row" && (
-        <div className="space-y-2">
-          {Array.from({ length: count }).map((_, i) => (
-            <EpisodeRowSkeleton key={i} />
-          ))}
-        </div>
-      )}
-      {view === "grid" && (
-        <div className="grid grid-cols-6 gap-2 sm:grid-cols-8 md:grid-cols-10 lg:grid-cols-12">
-          {Array.from({ length: count * 2 }).map((_, i) => (
-            <EpisodeNumSkeleton key={i} />
-          ))}
-        </div>
-      )}
+      <div className="min-h-0 flex-1 pr-1 max-h-[60vh] sm:max-h-[65vh] lg:max-h-[calc(100vh-14rem)] overflow-hidden">
+        {view === "thumbnail" && (
+          <div className="flex flex-col gap-2">
+            {Array.from({ length: count }).map((_, i) => (
+              <EpisodeRowSkeleton key={i} />
+            ))}
+          </div>
+        )}
+        {view === "row" && (
+          <div className="flex flex-col gap-1">
+            {Array.from({ length: count + 4 }).map((_, i) => (
+              <EpisodeCompactSkeleton key={i} />
+            ))}
+          </div>
+        )}
+        {view === "grid" && (
+          <div className="grid grid-cols-4 gap-1.5 sm:grid-cols-5">
+            {Array.from({ length: count * 4 }).map((_, i) => (
+              <EpisodeNumSkeleton key={i} />
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   );
 }
