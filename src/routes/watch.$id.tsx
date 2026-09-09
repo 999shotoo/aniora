@@ -82,7 +82,10 @@ function WatchPage() {
     navigate({ search: { ep: first }, replace: true }).catch(() => {});
   }, [airedEpisodes, episode, epParam, navigate]);
 
+  const watched = useWatched(anilistId);
+
   const handleSelect = (n: number) => {
+    watched.mark(n);
     navigate({ search: { ep: n } }).catch(() => {});
   };
 
