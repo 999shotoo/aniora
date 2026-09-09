@@ -3,7 +3,7 @@ import { useInfiniteQuery } from "@tanstack/react-query";
 import { useEffect, useRef, useState } from "react";
 import { browseAnime } from "@/lib/anilist";
 import { AnimeCard } from "@/components/anime-card";
-import { GridSkeleton } from "@/components/skeleton";
+import { CardSkeleton, GridSkeleton } from "@/components/skeleton";
 
 export const Route = createFileRoute("/movies")({
   component: MoviesPage,
