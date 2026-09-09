@@ -42,6 +42,8 @@ export function EpisodesPanel({
   onSelect,
   chunkSize = 100,
   fallbackImage,
+  isWatched,
+  onToggleWatched,
 }: Props) {
   const aired = useMemo(
     () =>
