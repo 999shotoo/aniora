@@ -77,16 +77,19 @@ function MoviesPage() {
       </div>
 
       {q.isLoading ? (
-        <GridSkeleton count={21} />
+        <GridSkeleton count={24} />
       ) : (
         <>
           <div className="grid grid-cols-3 gap-2 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-7 xl:grid-cols-8">
             {items.map((m) => (
               <AnimeCard key={m.id} media={m} />
             ))}
+            {q.isFetchingNextPage &&
+              Array.from({ length: 16 }).map((_, i) => (
+                <CardSkeleton key={`sk-${i}`} />
+              ))}
           </div>
-          <div ref={sentinel} className="h-16" />
-          {q.isFetchingNextPage && <GridSkeleton count={14} />}
+          {q.hasNextPage && <div ref={sentinel} className="h-16" />}
           {!q.hasNextPage && items.length > 0 && (
             <p className="mt-6 text-center font-mono text-[0.6rem] uppercase tracking-widest text-muted-foreground/70">
               ~$ end of stream
