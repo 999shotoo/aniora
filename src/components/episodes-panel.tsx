@@ -322,32 +322,38 @@ function RowView({
   items,
   currentEp,
   onSelect,
+  isWatched,
 }: {
   items: MappingEpisode[];
   currentEp: number;
   onSelect: (n: number) => void;
+  isWatched?: (n: number) => boolean;
 }) {
   return (
     <div className="flex flex-col gap-1">
       {items.map((ep) => {
         const num = ep.episodeNumber!;
         const active = num === currentEp;
+        const watched = isWatched?.(num) ?? false;
         const title = ep.title?.en || ep.nameTvdb || `Episode ${num}`;
         return (
           <button
             key={num}
             onClick={() => onSelect(num)}
             className={
-              "flex items-center gap-3 border px-3 py-2 text-left text-xs transition-colors " +
+              "flex h-10 items-center gap-3 border px-3 text-left text-xs transition-colors " +
               (active
                 ? "border-foreground bg-accent text-foreground"
-                : "border-border bg-card text-card-foreground hover:border-muted-foreground hover:text-foreground")
+                : watched
+                  ? "border-chart-1/50 bg-chart-1/5 text-muted-foreground hover:text-foreground"
+                  : "border-border bg-card text-card-foreground hover:border-muted-foreground hover:text-foreground")
             }
           >
             <span className="w-12 shrink-0 font-mono text-[0.65rem] tracking-widest text-muted-foreground">
               EP {String(num).padStart(3, "0")}
             </span>
             <span className="min-w-0 flex-1 truncate">{title}</span>
+            {watched && !active && <Check className="h-3 w-3 shrink-0 text-chart-1" />}
             {active && <Play className="h-3 w-3 shrink-0 fill-current" />}
           </button>
         );
@@ -360,16 +366,19 @@ function GridView({
   items,
   currentEp,
   onSelect,
+  isWatched,
 }: {
   items: MappingEpisode[];
   currentEp: number;
   onSelect: (n: number) => void;
+  isWatched?: (n: number) => boolean;
 }) {
   return (
     <div className="grid grid-cols-4 gap-1.5 sm:grid-cols-5">
       {items.map((ep) => {
         const num = ep.episodeNumber!;
         const active = num === currentEp;
+        const watched = isWatched?.(num) ?? false;
         return (
           <button
             key={num}
@@ -379,7 +388,9 @@ function GridView({
               "flex h-10 items-center justify-center border font-mono text-xs transition-colors " +
               (active
                 ? "border-foreground bg-foreground text-background"
-                : "border-border bg-card text-muted-foreground hover:border-muted-foreground hover:text-foreground")
+                : watched
+                  ? "border-chart-1/60 bg-chart-1/10 text-chart-1 hover:border-chart-1"
+                  : "border-border bg-card text-muted-foreground hover:border-muted-foreground hover:text-foreground")
             }
           >
             {num}
