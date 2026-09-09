@@ -55,8 +55,7 @@ export function SideCard({
                   <Bar className="h-2 w-8 border border-border" />
                   <Bar className="h-2 w-10 border border-border" />
                   <Bar className="h-2 w-6 border border-border" />
-                </div>
-              </ul>
+              </div>
             </li>
           ))}
 
