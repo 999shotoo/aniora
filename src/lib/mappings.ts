@@ -53,6 +53,19 @@ export async function fetchMapping(
   }
 }
 
+function resolvePlayableEpisodeNumber(key: string, ep: MappingEpisode): number {
+  const keyNumber = /^\d+$/.test(key) ? Number(key) : 0;
+  const absolute = ep.absoluteEpisodeNumber ?? 0;
+  const scoped = ep.episodeNumber ?? 0;
+
+  // Some movie mappings report absoluteEpisodeNumber: 0 even though the
+  // playable stream episode is key "1". Only trust positive numbers.
+  if (absolute > 0) return absolute;
+  if (keyNumber > 0) return keyNumber;
+  if (scoped > 0) return scoped;
+  return 0;
+}
+
 /**
  * Split episode keys into regular numbered episodes and specials (C1, S1, etc).
  * Regular episodes have numeric string keys, specials have letter-prefixed keys.
@@ -68,8 +81,8 @@ export function splitEpisodes(mapping: Mapping | null): {
     if (/^\d+$/.test(key)) {
       // Prefer absoluteEpisodeNumber (correct across seasons), then the
       // numeric key, then the season-scoped episodeNumber as a last resort.
-      const num =
-        ep.absoluteEpisodeNumber ?? (Number(key) || ep.episodeNumber || 0);
+      // Important: absoluteEpisodeNumber can be 0 for movies; 0 is not playable.
+      const num = resolvePlayableEpisodeNumber(key, ep);
       regular.push({ ...ep, episodeNumber: num });
     } else {
       specials.push(ep);
