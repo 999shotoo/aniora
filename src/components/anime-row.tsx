@@ -13,7 +13,7 @@ interface Props {
 
 export function AnimeRow({ title, hint, media, loading }: Props) {
   return (
-    <section className="mx-auto max-w-none px-6 lg:px-10 py-6">
+    <section className="w-full">
       <div className="mb-3 flex items-baseline justify-between border-b border-border pb-2">
         <h2 className="font-mono text-xs uppercase tracking-widest text-muted-foreground">
           ~$ {title}
