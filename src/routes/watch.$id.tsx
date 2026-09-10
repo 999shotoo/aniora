@@ -61,13 +61,17 @@ function WatchPage() {
   const airedEpisodes = useMemo(
     () =>
       regular.filter((e) => {
+        if (!e.episodeNumber || e.episodeNumber < 1) return false;
         if (!e.airDate && !e.airdate) return true;
         return isAired(e);
       }),
     [regular],
   );
 
-  const episode = epParam ?? airedEpisodes[0]?.episodeNumber ?? 1;
+  const requestedEpisode =
+    epParam && Number.isFinite(epParam) && epParam > 0 ? epParam : undefined;
+  const fallbackEpisode = airedEpisodes[0]?.episodeNumber;
+  const episode = requestedEpisode ?? fallbackEpisode;
 
   // Snap URL to a valid episode once we have data.
   useEffect(() => {
@@ -92,6 +96,7 @@ function WatchPage() {
   const media = anime.data;
   const currentEp = airedEpisodes.find((e) => e.episodeNumber === episode);
   const malId = mapping.data?.mappings?.mal_id ?? media?.idMal ?? null;
+  const canShowPlayer = Boolean(mapping.data && currentEp && episode);
   const showEmpty =
     !mapping.isLoading && airedEpisodes.length === 0;
 
@@ -140,12 +145,12 @@ function WatchPage() {
         <div className="mx-auto grid max-w-none grid-cols-1 items-stretch gap-4 px-4 py-4 sm:px-6 lg:grid-cols-[minmax(0,1fr)_minmax(300px,380px)] lg:gap-6 lg:px-10 lg:py-6">
           {/* Player column — waits for mapping first */}
           <div className="flex min-w-0 flex-col">
-            {mapping.isLoading || !mapping.data ? (
+            {mapping.isLoading || !mapping.data || !canShowPlayer ? (
               <PlayerSkeleton />
             ) : (
               <Player
                 malId={malId}
-                episode={episode}
+                episode={episode!}
                 ep={currentEp}
                 fallbackTitle={media ? pickTitle(media.title) : `Episode ${episode}`}
               />
@@ -159,7 +164,7 @@ function WatchPage() {
             ) : (
               <EpisodesPanel
                 episodes={airedEpisodes}
-                currentEp={episode}
+                currentEp={episode ?? 0}
                 onSelect={handleSelect}
                 fallbackImage={
                   media?.bannerImage ||
