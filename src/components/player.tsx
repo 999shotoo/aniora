@@ -43,6 +43,7 @@ export function Player({ malId, episode, ep, fallbackTitle }: Props) {
           src={src}
           title={`Ep ${episode} — ${mode}`}
           className="h-full w-full"
+          allow="autoplay; fullscreen; picture-in-picture; encrypted-media"
           allowFullScreen
           scrolling="no"
           frameBorder={0}
@@ -81,6 +82,14 @@ export function Player({ malId, episode, ep, fallbackTitle }: Props) {
           {ep.overview}
         </p>
       )}
+    </div>
+  );
+}
+
+export function PlayerPlaceholder({ message = "select an episode to start watching" }: { message?: string }) {
+  return (
+    <div className="flex aspect-video w-full items-center justify-center border border-border bg-card text-xs uppercase tracking-widest text-muted-foreground">
+      {message}
     </div>
   );
 }
