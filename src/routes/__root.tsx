@@ -126,7 +126,6 @@ function RootComponent() {
   return (
     <QueryClientProvider client={queryClient}>
       <div className="flex min-h-screen flex-col bg-background">
-        <RouteLoadingBar />
         <SiteHeader />
         <main className="flex-1">
           <Outlet />
@@ -140,16 +139,6 @@ function RootComponent() {
         </footer>
       </div>
     </QueryClientProvider>
-  );
-}
-
-function RouteLoadingBar() {
-  const isLoading = useRouterState({
-    select: (s) => s.status === "pending" || s.isLoading || s.isTransitioning,
-  });
-  if (!isLoading) return null;
-  return (
-    <div className="top-loader" role="status" aria-label="Loading route" />
   );
 }
 
