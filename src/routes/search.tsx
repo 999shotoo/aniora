@@ -155,7 +155,7 @@ function SearchPage() {
           message="Try a different query, format, or genre."
         />
       ) : (
-        <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
+        <div className="grid grid-cols-3 gap-2 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-7 2xl:grid-cols-8">
           {(results.data ?? []).map((m, i) => (
             <div key={m.id} className="rise-in" style={{ animationDelay: `${Math.min(i, 12) * 20}ms` }}>
               <AnimeCard media={m} />
