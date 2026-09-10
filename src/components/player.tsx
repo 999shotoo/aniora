@@ -22,10 +22,12 @@ export function Player({ malId, episode, ep, fallbackTitle }: Props) {
   const [mode, setMode] = useState<"sub" | "dub">("sub");
 
   const validEp = Number.isFinite(episode) && episode > 0;
-  if (!malId || !validEp) {
+  if (!malId || !validEp || !ep) {
     return (
       <div className="flex aspect-video w-full items-center justify-center border border-border bg-card text-xs uppercase tracking-widest text-muted-foreground">
-        {!malId ? "stream unavailable · no mal id" : "select an episode to start watching"}
+        {!malId
+          ? "stream unavailable · no mal id"
+          : "waiting for episode mapping"}
       </div>
     );
   }
