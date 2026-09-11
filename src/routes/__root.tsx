@@ -122,6 +122,34 @@ function RootShell({ children }: { children: ReactNode }) {
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
 
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+    let frame = 0;
+    let cleanup: (() => void) | undefined;
+    let cancelled = false;
+
+    import("lenis").then(({ default: Lenis }) => {
+      if (cancelled) return;
+      const lenis = new Lenis({ lerp: 0.11, wheelMultiplier: 0.9 });
+      const raf = (time: number) => {
+        lenis.raf(time);
+        frame = window.requestAnimationFrame(raf);
+      };
+      frame = window.requestAnimationFrame(raf);
+      cleanup = () => {
+        window.cancelAnimationFrame(frame);
+        lenis.destroy();
+      };
+    });
+
+    return () => {
+      cancelled = true;
+      cleanup?.();
+    };
+  }, []);
+
   return (
     <QueryClientProvider client={queryClient}>
       <div className="flex min-h-screen flex-col bg-background">

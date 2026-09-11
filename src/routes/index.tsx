@@ -5,6 +5,7 @@ import { anilistFetch, browseAnime, type AniListMedia } from "@/lib/anilist";
 import { Hero } from "@/components/hero";
 import { AnimeRow } from "@/components/anime-row";
 import { SideCard } from "@/components/side-card";
+import { WatchHistoryRow } from "@/components/watch-history-row";
 
 export const Route = createFileRoute("/")({
   component: HomePage,
@@ -127,6 +128,7 @@ function HomePage() {
       {/* Main + Sidebar layout */}
       <div className="mx-auto grid max-w-none gap-6 px-6 lg:px-10 py-6 lg:grid-cols-[minmax(0,1fr)_300px] xl:grid-cols-[minmax(0,1fr)_340px]">
         <div className="min-w-0 space-y-8">
+          <WatchHistoryRow />
           <AnimeRow
             title="ls trending/"
             hint={`${trending.data?.length ?? 0} results`}
