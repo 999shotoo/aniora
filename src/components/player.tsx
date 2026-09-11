@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { MappingEpisode } from "@/lib/mappings";
 
 interface Props {
@@ -7,6 +7,8 @@ interface Props {
   onEpisodeChange?: (ep: number) => void;
   ep?: MappingEpisode;
   fallbackTitle?: string;
+  onSlowLoad?: () => void;
+  reloadKey?: number;
 }
 
 const FALLBACK_EP_IMAGE =
@@ -18,12 +20,34 @@ const FALLBACK_EP_IMAGE =
     </svg>`,
   );
 
-export function Player({ malId, episode, ep, fallbackTitle }: Props) {
+export function Player({ malId, episode, ep, fallbackTitle, onSlowLoad, reloadKey = 0 }: Props) {
   const [mode, setMode] = useState<"sub" | "dub">("sub");
+  const [readySrc, setReadySrc] = useState<string | null>(null);
   const [loaded, setLoaded] = useState(false);
-  const [slow, setSlow] = useState(false);
+  const onSlowLoadRef = useRef(onSlowLoad);
+
+  useEffect(() => {
+    onSlowLoadRef.current = onSlowLoad;
+  }, [onSlowLoad]);
 
   const validEp = Number.isFinite(episode) && episode > 0;
+  const src = malId && validEp && ep
+    ? `https://megaplay.buzz/stream/mal/${malId}/${episode}/${mode}`
+    : "";
+  const title = ep?.title?.en || ep?.nameTvdb || fallbackTitle || `Episode ${episode}`;
+
+  useEffect(() => {
+    setReadySrc(null);
+    setLoaded(false);
+    if (!src) return;
+    const mountTimer = window.setTimeout(() => setReadySrc(src), 180);
+    const slowTimer = window.setTimeout(() => onSlowLoadRef.current?.(), 7000);
+    return () => {
+      window.clearTimeout(mountTimer);
+      window.clearTimeout(slowTimer);
+    };
+  }, [src, reloadKey]);
+
   if (!malId || !validEp || !ep) {
     return (
       <div className="flex aspect-video w-full items-center justify-center border border-border bg-card text-xs uppercase tracking-widest text-muted-foreground">
@@ -34,20 +58,10 @@ export function Player({ malId, episode, ep, fallbackTitle }: Props) {
     );
   }
 
-  const src = `https://megaplay.buzz/stream/mal/${malId}/${episode}/${mode}`;
-  const title = ep?.title?.en || ep?.nameTvdb || fallbackTitle || `Episode ${episode}`;
-
-  useEffect(() => {
-    setLoaded(false);
-    setSlow(false);
-    const timer = window.setTimeout(() => setSlow(true), 6000);
-    return () => window.clearTimeout(timer);
-  }, [src]);
-
   return (
     <div className="flex flex-col gap-3">
       <div className="relative aspect-video w-full overflow-hidden border border-border bg-black">
-        {!loaded && (
+        {(!readySrc || !loaded) && (
           <div className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-3 bg-card text-center">
             <div className="h-10 w-10 border border-border shimmer" />
             <div className="font-mono text-xs uppercase tracking-widest text-muted-foreground">
@@ -55,22 +69,19 @@ export function Player({ malId, episode, ep, fallbackTitle }: Props) {
             </div>
           </div>
         )}
-        {loaded && slow && (
-          <div className="pointer-events-none absolute inset-x-3 top-3 z-10 border border-border bg-background/90 px-3 py-2 text-[0.65rem] uppercase tracking-widest text-muted-foreground backdrop-blur">
-            If the player stays black, this stream host returned no playable video for this episode.
-          </div>
+        {readySrc && (
+          <iframe
+            key={`${readySrc}-${reloadKey}`}
+            src={readySrc}
+            title={`Ep ${episode} — ${mode}`}
+            className="h-full w-full"
+            allow="autoplay; fullscreen; picture-in-picture; encrypted-media"
+            allowFullScreen
+            scrolling="no"
+            frameBorder={0}
+            onLoad={() => setLoaded(true)}
+          />
         )}
-        <iframe
-          key={`${malId}-${episode}-${mode}`}
-          src={src}
-          title={`Ep ${episode} — ${mode}`}
-          className="h-full w-full"
-          allow="autoplay; fullscreen; picture-in-picture; encrypted-media"
-          allowFullScreen
-          scrolling="no"
-          frameBorder={0}
-          onLoad={() => setLoaded(true)}
-        />
       </div>
 
       <div className="flex flex-wrap items-center gap-3 border border-border bg-card px-3 py-2">
