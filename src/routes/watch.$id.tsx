@@ -1,19 +1,19 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { useEffect, useMemo } from "react";
-import { CalendarClock, Info, TvMinimal } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import { AlertTriangle, CalendarClock, Info, TvMinimal, X } from "lucide-react";
 import {
   getAnimeById,
   FALLBACK_COVER,
   pickTitle,
   type AniListMedia,
 } from "@/lib/anilist";
-import { fetchMapping, splitEpisodes, isAired } from "@/lib/mappings";
+import { fetchMapping, splitEpisodes, isAired, type MappingEpisode } from "@/lib/mappings";
 import { Player, PlayerPlaceholder } from "@/components/player";
 import { EpisodesPanel } from "@/components/episodes-panel";
 import { EmptyState, BackHomeAction } from "@/components/empty-state";
 import { EpisodesPanelSkeleton, PlayerSkeleton } from "@/components/skeleton";
-import { useWatched } from "@/lib/watched";
+import { pickDefaultEpisodeFromHistory, useWatched } from "@/lib/watched";
 
 export const Route = createFileRoute("/watch/$id")({
   component: WatchPage,
@@ -38,6 +38,8 @@ function WatchPage() {
   const { ep: epParam } = Route.useSearch();
   const navigate = Route.useNavigate();
   const anilistId = Number(id);
+  const [streamWarningKey, setStreamWarningKey] = useState<string | null>(null);
+  const [dismissedWarningKey, setDismissedWarningKey] = useState<string | null>(null);
 
   const mapping = useQuery({
     queryKey: ["mapping", anilistId],
@@ -69,7 +71,7 @@ function WatchPage() {
   );
 
   const requestedEpisode =
-    epParam && Number.isFinite(epParam) && epParam > 0 ? epParam : undefined;
+    epParam && Number.isFinite(epParam) && epParam > 0 ? Math.floor(epParam) : undefined;
   const episode = requestedEpisode;
 
   // Snap URL to a valid episode once we have data.
@@ -83,17 +85,61 @@ function WatchPage() {
 
   const watched = useWatched(anilistId);
 
-  const handleSelect = (n: number) => {
-    watched.mark(n);
-    navigate({ search: { ep: n } }).catch(() => {});
-  };
+  useEffect(() => {
+    if (!watched.ready) return;
+    if (mapping.isLoading || !mapping.data) return;
+    if (airedEpisodes.length === 0) return;
+    if (episode) return;
+
+    const nextEpisode =
+      pickDefaultEpisodeFromHistory(watched.entries, airedEpisodes) ?? 1;
+    navigate({ search: { ep: nextEpisode }, replace: true }).catch(() => {});
+  }, [airedEpisodes, episode, mapping.data, mapping.isLoading, navigate, watched.entries, watched.ready]);
+
+  useEffect(() => {
+    setStreamWarningKey(null);
+    setDismissedWarningKey(null);
+  }, [episode]);
 
   const media = anime.data;
   const currentEp = airedEpisodes.find((e) => e.episodeNumber === episode);
   const malId = mapping.data?.mappings?.mal_id ?? media?.idMal ?? null;
+
+  const buildWatchEntry = (n: number, epData?: MappingEpisode) => {
+    const title = media ? pickTitle(media.title) : "Unknown title";
+    const cover =
+      media?.bannerImage ||
+      media?.coverImage?.extraLarge ||
+      media?.coverImage?.large ||
+      null;
+    const poster =
+      media?.coverImage?.extraLarge || media?.coverImage?.large || cover;
+
+    return {
+      animeId: anilistId,
+      animeTitle: title,
+      animeCover: cover,
+      animePoster: poster,
+      episode: n,
+      episodeTitle: epData?.title?.en || epData?.nameTvdb || `Episode ${n}`,
+      episodeImage: epData?.image || cover || poster,
+      malId,
+      runtime: epData?.runtime ?? null,
+    };
+  };
+
+  const handleSelect = (n: number) => {
+    const epData = airedEpisodes.find((e) => e.episodeNumber === n);
+    watched.markEpisode(buildWatchEntry(n, epData));
+    navigate({ search: { ep: n } }).catch(() => {});
+  };
+
   const canShowPlayer = Boolean(mapping.data && currentEp && episode && malId);
   const showEmpty =
     !mapping.isLoading && airedEpisodes.length === 0;
+  const warningVisible = Boolean(
+    streamWarningKey && streamWarningKey !== dismissedWarningKey,
+  );
 
   return (
     <div className="pb-16">
@@ -140,6 +186,26 @@ function WatchPage() {
         <div className="mx-auto grid max-w-none grid-cols-1 items-stretch gap-4 px-4 py-4 sm:px-6 lg:grid-cols-[minmax(0,1fr)_minmax(300px,380px)] lg:gap-6 lg:px-10 lg:py-6">
           {/* Player column — waits for mapping first */}
           <div className="flex min-w-0 flex-col">
+            {warningVisible && (
+              <div className="mb-3 flex items-start gap-3 border border-chart-3/60 bg-chart-3/10 px-3 py-2 text-xs text-muted-foreground">
+                <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-chart-3" />
+                <div className="min-w-0 flex-1">
+                  <p className="font-mono text-[0.65rem] uppercase tracking-widest text-foreground">
+                    stream taking longer than usual
+                  </p>
+                  <p className="mt-1 leading-relaxed">
+                    If video stays black, switch sub/dub or reload this episode. The player is loaded only after the mapped episode is ready.
+                  </p>
+                </div>
+                <button
+                  onClick={() => setDismissedWarningKey(streamWarningKey)}
+                  aria-label="Dismiss stream warning"
+                  className="flex h-6 w-6 shrink-0 items-center justify-center border border-border bg-background/70 text-muted-foreground hover:text-foreground"
+                >
+                  <X className="h-3.5 w-3.5" />
+                </button>
+              </div>
+            )}
             {mapping.isLoading || !mapping.data ? (
               <PlayerSkeleton />
             ) : !episode ? (
@@ -152,6 +218,7 @@ function WatchPage() {
                 episode={episode!}
                 ep={currentEp}
                 fallbackTitle={media ? pickTitle(media.title) : `Episode ${episode}`}
+                onSlowLoad={() => setStreamWarningKey(`${malId}-${episode}`)}
               />
             )}
           </div>
@@ -172,7 +239,10 @@ function WatchPage() {
                   undefined
                 }
                 isWatched={watched.has}
-                onToggleWatched={watched.toggle}
+                onToggleWatched={(n) => {
+                  const epData = airedEpisodes.find((e) => e.episodeNumber === n);
+                  watched.toggleEpisode(buildWatchEntry(n, epData));
+                }}
               />
             )}
           </div>
