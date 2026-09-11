@@ -60,7 +60,7 @@ export function EpisodeList({
     <div className="flex flex-col gap-2">
       {rows.map((ep) => {
         const num = ep.episodeNumber!;
-        const aired = isAired(ep) || !(ep.airDate || ep.airdate);
+        const aired = isAired(ep);
         const active = num === currentEp;
         const img = ep.image || FALLBACK_EP_IMAGE;
         const title = ep.title?.en || ep.nameTvdb || `Episode ${num}`;
