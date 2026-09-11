@@ -25,6 +25,23 @@ export function Player({ malId, episode, ep, fallbackTitle, onSlowLoad }: Props)
   const [loaded, setLoaded] = useState(false);
 
   const validEp = Number.isFinite(episode) && episode > 0;
+  const src = malId && validEp && ep
+    ? `https://megaplay.buzz/stream/mal/${malId}/${episode}/${mode}`
+    : "";
+  const title = ep?.title?.en || ep?.nameTvdb || fallbackTitle || `Episode ${episode}`;
+
+  useEffect(() => {
+    setReadySrc(null);
+    setLoaded(false);
+    if (!src) return;
+    const mountTimer = window.setTimeout(() => setReadySrc(src), 180);
+    const slowTimer = window.setTimeout(() => onSlowLoad?.(), 7000);
+    return () => {
+      window.clearTimeout(mountTimer);
+      window.clearTimeout(slowTimer);
+    };
+  }, [src, onSlowLoad]);
+
   if (!malId || !validEp || !ep) {
     return (
       <div className="flex aspect-video w-full items-center justify-center border border-border bg-card text-xs uppercase tracking-widest text-muted-foreground">
@@ -34,20 +51,6 @@ export function Player({ malId, episode, ep, fallbackTitle, onSlowLoad }: Props)
       </div>
     );
   }
-
-  const src = `https://megaplay.buzz/stream/mal/${malId}/${episode}/${mode}`;
-  const title = ep?.title?.en || ep?.nameTvdb || fallbackTitle || `Episode ${episode}`;
-
-  useEffect(() => {
-    setReadySrc(null);
-    setLoaded(false);
-    const mountTimer = window.setTimeout(() => setReadySrc(src), 180);
-    const slowTimer = window.setTimeout(() => onSlowLoad?.(), 7000);
-    return () => {
-      window.clearTimeout(mountTimer);
-      window.clearTimeout(slowTimer);
-    };
-  }, [src]);
 
   return (
     <div className="flex flex-col gap-3">
