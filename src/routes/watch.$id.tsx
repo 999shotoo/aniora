@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { AlertTriangle, CalendarClock, Info, TvMinimal, X } from "lucide-react";
 import {
   getAnimeById,
@@ -107,7 +107,7 @@ function WatchPage() {
   const currentEp = airedEpisodes.find((e) => e.episodeNumber === episode);
   const malId = mapping.data?.mappings?.mal_id ?? media?.idMal ?? null;
 
-  const buildWatchEntry = (n: number, epData?: MappingEpisode) => {
+  const buildWatchEntry = useCallback((n: number, epData?: MappingEpisode) => {
     const title = media ? pickTitle(media.title) : "Unknown title";
     const cover =
       media?.bannerImage ||
@@ -128,7 +128,7 @@ function WatchPage() {
       malId,
       runtime: epData?.runtime ?? null,
     };
-  };
+  }, [anilistId, malId, media]);
 
   const handleSelect = (n: number) => {
     const epData = airedEpisodes.find((e) => e.episodeNumber === n);
@@ -146,7 +146,7 @@ function WatchPage() {
   useEffect(() => {
     if (!canShowPlayer || !episode || !currentEp) return;
     watched.markEpisode(buildWatchEntry(episode, currentEp));
-  }, [canShowPlayer, episode, currentEp?.episodeNumber]);
+  }, [buildWatchEntry, canShowPlayer, currentEp, episode, watched.markEpisode]);
 
   return (
     <div className="pb-16">
