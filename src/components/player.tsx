@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { MappingEpisode } from "@/lib/mappings";
 
 interface Props {
@@ -23,6 +23,11 @@ export function Player({ malId, episode, ep, fallbackTitle, onSlowLoad }: Props)
   const [mode, setMode] = useState<"sub" | "dub">("sub");
   const [readySrc, setReadySrc] = useState<string | null>(null);
   const [loaded, setLoaded] = useState(false);
+  const onSlowLoadRef = useRef(onSlowLoad);
+
+  useEffect(() => {
+    onSlowLoadRef.current = onSlowLoad;
+  }, [onSlowLoad]);
 
   const validEp = Number.isFinite(episode) && episode > 0;
   const src = malId && validEp && ep
@@ -35,12 +40,12 @@ export function Player({ malId, episode, ep, fallbackTitle, onSlowLoad }: Props)
     setLoaded(false);
     if (!src) return;
     const mountTimer = window.setTimeout(() => setReadySrc(src), 180);
-    const slowTimer = window.setTimeout(() => onSlowLoad?.(), 7000);
+    const slowTimer = window.setTimeout(() => onSlowLoadRef.current?.(), 7000);
     return () => {
       window.clearTimeout(mountTimer);
       window.clearTimeout(slowTimer);
     };
-  }, [src, onSlowLoad]);
+  }, [src]);
 
   if (!malId || !validEp || !ep) {
     return (
