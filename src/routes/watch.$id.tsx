@@ -143,6 +143,11 @@ function WatchPage() {
     streamWarningKey && streamWarningKey !== dismissedWarningKey,
   );
 
+  useEffect(() => {
+    if (!canShowPlayer || !episode || !currentEp) return;
+    watched.markEpisode(buildWatchEntry(episode, currentEp));
+  }, [canShowPlayer, episode, currentEp?.episodeNumber]);
+
   return (
     <div className="pb-16">
       {/* Zero-episode empty state */}
