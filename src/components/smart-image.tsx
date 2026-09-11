@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 
@@ -26,10 +26,10 @@ export function SmartImage({
   const [loaded, setLoaded] = useState(false);
   const [current, setCurrent] = useState(src || fallback);
 
-  // If src changes, reset.
-  if (src && src !== current && !loaded) {
-    // no-op, handled by key below
-  }
+  useEffect(() => {
+    setLoaded(false);
+    setCurrent(src || fallback);
+  }, [src, fallback]);
 
   return (
     <div className={cn("relative overflow-hidden bg-muted/40", className)}>
