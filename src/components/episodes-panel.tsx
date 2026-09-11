@@ -49,10 +49,7 @@ export function EpisodesPanel({
     () =>
       episodes
         .filter((e) => e.episodeNumber != null)
-        .filter((e) => {
-          if (!e.airDate && !e.airdate) return true;
-          return isAired(e);
-        })
+        .filter((e) => isAired(e))
         .sort((a, b) => (a.episodeNumber! - b.episodeNumber!)),
     [episodes],
   );
