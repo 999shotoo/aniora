@@ -9,7 +9,7 @@ import {
   type AniListMedia,
 } from "@/lib/anilist";
 import { fetchMapping, splitEpisodes, isAired } from "@/lib/mappings";
-import { Player } from "@/components/player";
+import { Player, PlayerPlaceholder } from "@/components/player";
 import { EpisodesPanel } from "@/components/episodes-panel";
 import { EmptyState, BackHomeAction } from "@/components/empty-state";
 import { EpisodesPanelSkeleton, PlayerSkeleton } from "@/components/skeleton";
@@ -70,20 +70,15 @@ function WatchPage() {
 
   const requestedEpisode =
     epParam && Number.isFinite(epParam) && epParam > 0 ? epParam : undefined;
-  const fallbackEpisode = airedEpisodes[0]?.episodeNumber;
-  const episode = requestedEpisode ?? fallbackEpisode;
+  const episode = requestedEpisode;
 
   // Snap URL to a valid episode once we have data.
   useEffect(() => {
     if (airedEpisodes.length === 0) return;
-    if (airedEpisodes.some((e) => e.episodeNumber === episode)) {
-      if (epParam !== episode) {
-        navigate({ search: { ep: episode }, replace: true }).catch(() => {});
-      }
-      return;
-    }
-    const first = airedEpisodes[0].episodeNumber ?? 1;
-    navigate({ search: { ep: first }, replace: true }).catch(() => {});
+    if (!episode) return;
+    if (airedEpisodes.some((e) => e.episodeNumber === episode)) return;
+
+    navigate({ search: {}, replace: true }).catch(() => {});
   }, [airedEpisodes, episode, epParam, navigate]);
 
   const watched = useWatched(anilistId);
@@ -96,7 +91,7 @@ function WatchPage() {
   const media = anime.data;
   const currentEp = airedEpisodes.find((e) => e.episodeNumber === episode);
   const malId = mapping.data?.mappings?.mal_id ?? media?.idMal ?? null;
-  const canShowPlayer = Boolean(mapping.data && currentEp && episode);
+  const canShowPlayer = Boolean(mapping.data && currentEp && episode && malId);
   const showEmpty =
     !mapping.isLoading && airedEpisodes.length === 0;
 
@@ -145,8 +140,12 @@ function WatchPage() {
         <div className="mx-auto grid max-w-none grid-cols-1 items-stretch gap-4 px-4 py-4 sm:px-6 lg:grid-cols-[minmax(0,1fr)_minmax(300px,380px)] lg:gap-6 lg:px-10 lg:py-6">
           {/* Player column — waits for mapping first */}
           <div className="flex min-w-0 flex-col">
-            {mapping.isLoading || !mapping.data || !canShowPlayer ? (
+            {mapping.isLoading || !mapping.data ? (
               <PlayerSkeleton />
+            ) : !episode ? (
+              <PlayerPlaceholder />
+            ) : !canShowPlayer ? (
+              <PlayerPlaceholder message="episode stream is not ready" />
             ) : (
               <Player
                 malId={malId}
