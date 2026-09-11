@@ -8,6 +8,7 @@ interface Props {
   ep?: MappingEpisode;
   fallbackTitle?: string;
   onSlowLoad?: () => void;
+  reloadKey?: number;
 }
 
 const FALLBACK_EP_IMAGE =
@@ -19,7 +20,7 @@ const FALLBACK_EP_IMAGE =
     </svg>`,
   );
 
-export function Player({ malId, episode, ep, fallbackTitle, onSlowLoad }: Props) {
+export function Player({ malId, episode, ep, fallbackTitle, onSlowLoad, reloadKey = 0 }: Props) {
   const [mode, setMode] = useState<"sub" | "dub">("sub");
   const [readySrc, setReadySrc] = useState<string | null>(null);
   const [loaded, setLoaded] = useState(false);
@@ -45,7 +46,7 @@ export function Player({ malId, episode, ep, fallbackTitle, onSlowLoad }: Props)
       window.clearTimeout(mountTimer);
       window.clearTimeout(slowTimer);
     };
-  }, [src]);
+  }, [src, reloadKey]);
 
   if (!malId || !validEp || !ep) {
     return (
@@ -70,7 +71,7 @@ export function Player({ malId, episode, ep, fallbackTitle, onSlowLoad }: Props)
         )}
         {readySrc && (
           <iframe
-            key={readySrc}
+            key={`${readySrc}-${reloadKey}`}
             src={readySrc}
             title={`Ep ${episode} — ${mode}`}
             className="h-full w-full"

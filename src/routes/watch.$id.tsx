@@ -40,6 +40,7 @@ function WatchPage() {
   const anilistId = Number(id);
   const [streamWarningKey, setStreamWarningKey] = useState<string | null>(null);
   const [dismissedWarningKey, setDismissedWarningKey] = useState<string | null>(null);
+  const [streamReloadKey, setStreamReloadKey] = useState(0);
 
   const mapping = useQuery({
     queryKey: ["mapping", anilistId],
@@ -99,6 +100,7 @@ function WatchPage() {
   useEffect(() => {
     setStreamWarningKey(null);
     setDismissedWarningKey(null);
+    setStreamReloadKey(0);
   }, [episode]);
 
   const media = anime.data;
@@ -198,6 +200,15 @@ function WatchPage() {
                   </p>
                 </div>
                 <button
+                  onClick={() => {
+                    setStreamReloadKey((n) => n + 1);
+                    setDismissedWarningKey(streamWarningKey);
+                  }}
+                  className="shrink-0 border border-border bg-background/70 px-3 py-1.5 font-mono text-[0.6rem] uppercase tracking-widest text-foreground hover:bg-accent"
+                >
+                  reload
+                </button>
+                <button
                   onClick={() => setDismissedWarningKey(streamWarningKey)}
                   aria-label="Dismiss stream warning"
                   className="flex h-6 w-6 shrink-0 items-center justify-center border border-border bg-background/70 text-muted-foreground hover:text-foreground"
@@ -219,6 +230,7 @@ function WatchPage() {
                 ep={currentEp}
                 fallbackTitle={media ? pickTitle(media.title) : `Episode ${episode}`}
                 onSlowLoad={() => setStreamWarningKey(`${malId}-${episode}`)}
+                reloadKey={streamReloadKey}
               />
             )}
           </div>
