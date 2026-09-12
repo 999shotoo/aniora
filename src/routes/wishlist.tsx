@@ -42,41 +42,41 @@ function WishlistPage() {
           </Link>
         </div>
       ) : (
-        <div className="grid grid-cols-3 gap-2 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-7 2xl:grid-cols-8">
+        <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7">
           {items.map((item) => (
-            <div key={item.id} className="group relative flex flex-col">
+            <div key={item.id} className="group relative border border-border bg-card">
               <Link
                 to="/anime/$id"
                 params={{ id: String(item.id) }}
-                className="relative aspect-[2/3] overflow-hidden border border-border bg-card"
+                className="relative block aspect-[2/3] overflow-hidden bg-background"
               >
-                <img
+                <SmartImage
                   src={item.cover || FALLBACK_COVER}
+                  fallback={FALLBACK_COVER}
                   alt={item.title}
-                  loading="lazy"
-                  onError={(e) => {
-                    (e.currentTarget as HTMLImageElement).src = FALLBACK_COVER;
-                  }}
-                  className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                  className="h-full w-full"
                 />
               </Link>
               <button
                 onClick={() => remove(item.id)}
                 aria-label="Remove"
-                className="absolute left-1 top-1 flex h-7 w-7 items-center justify-center border border-border bg-background/85 text-muted-foreground backdrop-blur hover:text-destructive"
+                className="absolute left-1 top-1 flex h-5 w-5 items-center justify-center border border-border bg-background/85 text-muted-foreground backdrop-blur hover:text-destructive opacity-0 transition-opacity group-hover:opacity-100"
               >
-                <Trash2 className="h-3.5 w-3.5" />
+                <X className="h-3 w-3" />
               </button>
-              <Link
-                to="/anime/$id"
-                params={{ id: String(item.id) }}
-                className="mt-2 line-clamp-2 text-xs font-medium text-foreground hover:underline"
-              >
-                {item.title}
-              </Link>
-              <div className="flex items-center gap-2 text-[0.6rem] uppercase tracking-widest text-muted-foreground">
-                {item.format && <span>{item.format}</span>}
-                {item.year && <span>· {item.year}</span>}
+              <div className="space-y-0.5 p-1.5">
+                <Link
+                  to="/anime/$id"
+                  params={{ id: String(item.id) }}
+                  className="block line-clamp-2 text-[0.7rem] font-semibold text-foreground hover:underline"
+                >
+                  {item.title}
+                </Link>
+                <div className="flex flex-wrap items-center gap-x-1.5 text-[0.6rem] uppercase tracking-widest text-muted-foreground">
+                  {item.format && <span>{item.format}</span>}
+                  {item.format && item.year && <span>·</span>}
+                  {item.year && <span>{item.year}</span>}
+                </div>
               </div>
             </div>
           ))}
