@@ -75,7 +75,7 @@ function HistoryPage() {
           </Link>
         </div>
       ) : (
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7">
           {items.map((item) => {
             const image =
               item.episodeImage ||
@@ -102,18 +102,18 @@ function HistoryPage() {
                       alt={item.episodeTitle}
                       className="h-full w-full"
                     />
-                    <div className="absolute bottom-2 left-2 border border-border bg-background/90 px-2 py-1 font-mono text-[0.6rem] uppercase tracking-widest text-foreground backdrop-blur">
+                    <div className="absolute bottom-1 left-1 border border-border bg-background/90 px-1.5 py-0.5 font-mono text-[0.55rem] uppercase tracking-widest text-foreground backdrop-blur">
                       ep {item.episode}
                     </div>
-                    <div className="absolute right-2 top-2 border border-border bg-background/90 px-2 py-1 font-mono text-[0.55rem] uppercase tracking-widest text-muted-foreground backdrop-blur">
+                    <div className="absolute right-1 top-1 border border-border bg-background/90 px-1.5 py-0.5 font-mono text-[0.5rem] uppercase tracking-widest text-muted-foreground backdrop-blur">
                       {relativeTime(item.watchedAt)}
                     </div>
                   </div>
-                  <div className="space-y-1 p-2">
-                    <p className="line-clamp-1 text-xs font-semibold text-foreground">
+                  <div className="space-y-0.5 p-1.5">
+                    <p className="line-clamp-1 text-[0.7rem] font-semibold text-foreground">
                       {item.animeTitle}
                     </p>
-                    <p className="line-clamp-1 text-[0.65rem] text-muted-foreground">
+                    <p className="line-clamp-1 text-[0.6rem] text-muted-foreground">
                       {item.episodeTitle}
                     </p>
                   </div>
@@ -121,9 +121,9 @@ function HistoryPage() {
                 <button
                   onClick={() => remove(item.animeId, item.episode)}
                   aria-label="Remove from watch history"
-                  className="absolute right-1.5 top-1.5 flex h-6 w-6 items-center justify-center border border-border bg-background/85 text-muted-foreground opacity-0 backdrop-blur transition-opacity hover:text-foreground group-hover:opacity-100"
+                  className="absolute right-1 top-1 flex h-5 w-5 items-center justify-center border border-border bg-background/85 text-muted-foreground opacity-0 backdrop-blur transition-opacity hover:text-foreground group-hover:opacity-100"
                 >
-                  <X className="h-3.5 w-3.5" />
+                  <X className="h-3 w-3" />
                 </button>
               </div>
             );
