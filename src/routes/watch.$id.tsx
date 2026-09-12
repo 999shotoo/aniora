@@ -14,6 +14,7 @@ import { EpisodesPanel } from "@/components/episodes-panel";
 import { EmptyState, BackHomeAction } from "@/components/empty-state";
 import { EpisodesPanelSkeleton, PlayerSkeleton } from "@/components/skeleton";
 import { pickDefaultEpisodeFromHistory, useWatched } from "@/lib/watched";
+import { syncAniListProgress } from "@/lib/anilist-sync";
 
 export const Route = createFileRoute("/watch/$id")({
   component: WatchPage,
@@ -146,7 +147,12 @@ function WatchPage() {
   useEffect(() => {
     if (!canShowPlayer || !episode || !currentEp) return;
     watched.markEpisode(buildWatchEntry(episode, currentEp));
-  }, [buildWatchEntry, canShowPlayer, currentEp, episode, watched.markEpisode]);
+    void syncAniListProgress({
+      mediaId: anilistId,
+      progress: episode,
+      totalEpisodes: media?.episodes ?? null,
+    });
+  }, [anilistId, buildWatchEntry, canShowPlayer, currentEp, episode, media?.episodes, watched.markEpisode]);
 
   return (
     <div className="pb-16">
@@ -193,15 +199,31 @@ function WatchPage() {
         <div className="mx-auto grid max-w-none grid-cols-1 items-stretch gap-4 px-4 py-4 sm:px-6 lg:grid-cols-[minmax(0,1fr)_minmax(300px,380px)] lg:gap-6 lg:px-10 lg:py-6">
           {/* Player column — waits for mapping first */}
           <div className="flex min-w-0 flex-col">
+            {mapping.isLoading || !mapping.data ? (
+              <PlayerSkeleton />
+            ) : !episode ? (
+              <PlayerPlaceholder />
+            ) : !canShowPlayer ? (
+              <PlayerPlaceholder message="episode stream is not ready" />
+            ) : (
+              <Player
+                malId={malId}
+                episode={episode!}
+                ep={currentEp}
+                fallbackTitle={media ? pickTitle(media.title) : `Episode ${episode}`}
+                onSlowLoad={() => setStreamWarningKey(`${malId}-${episode}`)}
+                reloadKey={streamReloadKey}
+              />
+            )}
             {warningVisible && (
-              <div className="mb-3 flex items-start gap-3 border border-chart-3/60 bg-chart-3/10 px-3 py-2 text-xs text-muted-foreground">
+              <div className="mt-3 flex items-start gap-3 border border-chart-3/60 bg-chart-3/10 px-3 py-2 text-xs text-muted-foreground">
                 <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-chart-3" />
                 <div className="min-w-0 flex-1">
                   <p className="font-mono text-[0.65rem] uppercase tracking-widest text-foreground">
                     stream taking longer than usual
                   </p>
                   <p className="mt-1 leading-relaxed">
-                    If video stays black, switch sub/dub or reload this episode. The player is loaded only after the mapped episode is ready.
+                    If the video stays black, reload this episode or switch sub/dub. Provider host may be slow.
                   </p>
                 </div>
                 <button
@@ -221,22 +243,6 @@ function WatchPage() {
                   <X className="h-3.5 w-3.5" />
                 </button>
               </div>
-            )}
-            {mapping.isLoading || !mapping.data ? (
-              <PlayerSkeleton />
-            ) : !episode ? (
-              <PlayerPlaceholder />
-            ) : !canShowPlayer ? (
-              <PlayerPlaceholder message="episode stream is not ready" />
-            ) : (
-              <Player
-                malId={malId}
-                episode={episode!}
-                ep={currentEp}
-                fallbackTitle={media ? pickTitle(media.title) : `Episode ${episode}`}
-                onSlowLoad={() => setStreamWarningKey(`${malId}-${episode}`)}
-                reloadKey={streamReloadKey}
-              />
             )}
           </div>
 

@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { ImageOff } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface Props {
@@ -12,8 +13,9 @@ interface Props {
 }
 
 /**
- * Image with a shimmer placeholder that fades in smoothly when loaded,
- * and swaps to a fallback on error. Uses framer-motion for the crossfade.
+ * Image with a shimmer placeholder that fades in when loaded, cross-fades to
+ * a fallback on error, and finally renders a terminal-styled "image not found"
+ * card if both the source and the fallback fail.
  */
 export function SmartImage({
   src,
@@ -25,11 +27,17 @@ export function SmartImage({
 }: Props) {
   const [loaded, setLoaded] = useState(false);
   const [current, setCurrent] = useState(src || fallback);
+  const [broken, setBroken] = useState(false);
 
   useEffect(() => {
     setLoaded(false);
+    setBroken(false);
     setCurrent(src || fallback);
   }, [src, fallback]);
+
+  if (broken) {
+    return <ImageNotFound className={className} label={alt} />;
+  }
 
   return (
     <div className={cn("relative overflow-hidden bg-muted/40", className)}>
@@ -51,11 +59,11 @@ export function SmartImage({
         loading={loading}
         onLoad={() => setLoaded(true)}
         onError={() => {
-          if (current !== fallback) {
+          if (current !== fallback && fallback) {
             setLoaded(false);
             setCurrent(fallback);
           } else {
-            setLoaded(true);
+            setBroken(true);
           }
         }}
         initial={{ opacity: 0, scale: 1.02 }}
@@ -63,6 +71,34 @@ export function SmartImage({
         transition={{ duration: 0.5, ease: "easeOut" }}
         className={cn("h-full w-full object-cover", imgClassName)}
       />
+    </div>
+  );
+}
+
+export function ImageNotFound({
+  className,
+  label,
+}: {
+  className?: string;
+  label?: string;
+}) {
+  return (
+    <div
+      className={cn(
+        "relative flex flex-col items-center justify-center overflow-hidden border border-dashed border-border bg-card text-muted-foreground",
+        className,
+      )}
+    >
+      <div className="pointer-events-none absolute inset-0 opacity-[0.06] [background-image:linear-gradient(to_right,currentColor_1px,transparent_1px),linear-gradient(to_bottom,currentColor_1px,transparent_1px)] [background-size:14px_14px]" />
+      <ImageOff className="h-6 w-6" strokeWidth={1.5} />
+      <div className="mt-2 font-mono text-[0.55rem] uppercase tracking-widest">
+        image_not_found
+      </div>
+      {label && (
+        <div className="mt-1 line-clamp-1 max-w-[85%] px-2 text-center text-[0.55rem] text-muted-foreground/70">
+          {label}
+        </div>
+      )}
     </div>
   );
 }

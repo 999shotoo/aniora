@@ -1,37 +1,49 @@
 import { Link } from "@tanstack/react-router";
-import { X } from "lucide-react";
+import { ArrowRight, History, X } from "lucide-react";
 import { FALLBACK_COVER } from "@/lib/anilist";
 import { useWatchHistory } from "@/lib/watched";
 import { FALLBACK_EP_IMAGE } from "./player";
 import { SmartImage } from "./smart-image";
 
+const HOME_LIMIT = 4;
+
 export function WatchHistoryRow() {
-  const { items, remove } = useWatchHistory(8);
+  const { items, remove } = useWatchHistory(HOME_LIMIT + 4);
 
   if (items.length === 0) return null;
+  const preview = items.slice(0, HOME_LIMIT);
 
   return (
     <section className="w-full">
       <div className="mb-3 flex items-baseline justify-between border-b border-border pb-2">
-        <div>
-          <p className="text-[0.65rem] uppercase tracking-widest text-muted-foreground/70">
-            local watchlist
-          </p>
-          <h2 className="font-mono text-xs uppercase tracking-widest text-foreground">
-            watch history
-          </h2>
+        <div className="flex items-center gap-2">
+          <History className="h-3.5 w-3.5 text-muted-foreground" />
+          <div>
+            <p className="text-[0.65rem] uppercase tracking-widest text-muted-foreground/70">
+              local · continue watching
+            </p>
+            <h2 className="font-mono text-xs uppercase tracking-widest text-foreground">
+              watch history
+            </h2>
+          </div>
         </div>
-        <span className="text-[0.6rem] uppercase tracking-widest text-muted-foreground/70">
-          {items.length} recent
-        </span>
+        <Link
+          to="/history"
+          className="inline-flex items-center gap-1 border border-border bg-background px-2 py-1 text-[0.6rem] uppercase tracking-widest text-muted-foreground hover:text-foreground"
+        >
+          view all <ArrowRight className="h-3 w-3" />
+        </Link>
       </div>
 
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
-        {items.slice(0, 4).map((item) => {
+        {preview.map((item) => {
           const image =
             item.episodeImage || item.animeCover || item.animePoster || FALLBACK_EP_IMAGE;
           return (
-            <div key={`${item.animeId}-${item.episode}`} className="group relative border border-border bg-card">
+            <div
+              key={`${item.animeId}-${item.episode}`}
+              className="group relative border border-border bg-card"
+            >
               <Link
                 to="/watch/$id"
                 params={{ id: String(item.animeId) }}
