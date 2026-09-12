@@ -147,7 +147,12 @@ function WatchPage() {
   useEffect(() => {
     if (!canShowPlayer || !episode || !currentEp) return;
     watched.markEpisode(buildWatchEntry(episode, currentEp));
-  }, [buildWatchEntry, canShowPlayer, currentEp, episode, watched.markEpisode]);
+    void syncAniListProgress({
+      mediaId: anilistId,
+      progress: episode,
+      totalEpisodes: media?.episodes ?? null,
+    });
+  }, [anilistId, buildWatchEntry, canShowPlayer, currentEp, episode, media?.episodes, watched.markEpisode]);
 
   return (
     <div className="pb-16">
