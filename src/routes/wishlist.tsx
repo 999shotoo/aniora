@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Bookmark, Trash2, X } from "lucide-react";
+import { Bookmark, X } from "lucide-react";
 import { useWishlist } from "@/lib/wishlist";
 import { FALLBACK_COVER } from "@/lib/anilist";
 import { SmartImage } from "@/components/smart-image";
