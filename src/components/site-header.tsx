@@ -7,6 +7,13 @@ import { useAniListViewer, useAniListLogout } from "@/lib/anilist-auth";
 import { getAniListAuthUrl } from "@/lib/anilist-config";
 import { searchAnime, FALLBACK_COVER, type AniListMedia } from "@/lib/anilist";
 import { SmartImage } from "@/components/smart-image";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
 
 const LINKS = [
   { to: "/", label: "home" },
