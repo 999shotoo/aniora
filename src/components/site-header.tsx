@@ -9,6 +9,7 @@ const LINKS = [
   { to: "/anime", label: "anime" },
   { to: "/movies", label: "movies" },
   { to: "/search", label: "search" },
+  { to: "/history", label: "history" },
   { to: "/wishlist", label: "wishlist" },
 ] as const;
 
