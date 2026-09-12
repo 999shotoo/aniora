@@ -32,7 +32,7 @@ export function Hero({ items, intervalMs = 6500 }: Props) {
 
   if (valid.length === 0) {
     return (
-      <div className="mx-auto h-[52vh] max-w-none animate-pulse border-b border-border bg-card px-6 lg:px-10" />
+      <div className="h-[60vh] min-h-[420px] w-full animate-pulse border-b border-border bg-card sm:h-[56vh] md:h-[60vh]" />
     );
   }
 
@@ -66,14 +66,15 @@ export function Hero({ items, intervalMs = 6500 }: Props) {
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0 }}
             transition={{ opacity: { duration: 1.2 }, scale: { duration: 6, ease: "easeOut" } }}
-            className="absolute inset-0 h-full w-full object-cover"
+            className="absolute inset-0 h-full w-full object-cover object-center"
           />
         </AnimatePresence>
-        <div className="absolute inset-0 bg-gradient-to-t from-background via-background/80 to-background/20" />
-        <div className="absolute inset-0 bg-gradient-to-r from-background/95 via-background/60 to-transparent" />
+        {/* Mobile: darker bottom fade, lighter top so image is visible */}
+        <div className="absolute inset-0 bg-gradient-to-t from-background via-background/70 to-background/10 md:via-background/80 md:to-background/20" />
+        <div className="absolute inset-0 bg-gradient-to-r from-background/90 via-background/40 to-transparent md:from-background/95 md:via-background/60" />
       </div>
 
-      <div className="relative mx-auto flex min-h-[62vh] max-w-none flex-col gap-6 px-6 lg:px-10 py-10 sm:min-h-[68vh] sm:py-16 md:flex-row md:items-end">
+      <div className="relative mx-auto flex min-h-[520px] w-full max-w-none flex-col justify-end gap-4 px-4 pb-10 pt-24 sm:min-h-[560px] sm:gap-6 sm:px-6 sm:pb-12 sm:pt-28 md:min-h-[62vh] md:flex-row md:items-end md:px-10 md:pb-16 md:pt-16">
         <AnimatePresence mode="wait">
           <motion.div
             key={media.id}
