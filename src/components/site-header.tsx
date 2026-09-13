@@ -108,50 +108,98 @@ export function SiteHeader() {
             </a>
           ) : null}
 
-          <button
-            className="flex h-8 w-8 items-center justify-center border border-border md:hidden"
-            onClick={() => setOpen((v) => !v)}
-            aria-label="Menu"
-          >
-            {open ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
-          </button>
+          <Sheet open={open} onOpenChange={setOpen}>
+            <SheetTrigger asChild>
+              <button
+                className="flex h-8 w-8 items-center justify-center border border-border md:hidden"
+                aria-label="Menu"
+              >
+                <Menu className="h-4 w-4" />
+              </button>
+            </SheetTrigger>
+            <SheetContent
+              side="right"
+              className="w-[86vw] max-w-sm border-l border-border bg-background p-0 font-mono"
+            >
+              <SheetHeader className="border-b border-border px-5 py-4 text-left">
+                <SheetTitle className="flex items-baseline gap-1 text-sm">
+                  <span className="text-muted-foreground">~//</span>
+                  <span className="font-medium text-foreground">zen</span>
+                  <span className="text-muted-foreground">.stream</span>
+                </SheetTitle>
+              </SheetHeader>
+
+              <nav className="flex flex-col px-2 py-2">
+                {LINKS.map((l) => {
+                  const active =
+                    l.to === "/"
+                      ? pathname === "/"
+                      : pathname === l.to || pathname.startsWith(l.to + "/");
+                  return (
+                    <Link
+                      key={l.to}
+                      to={l.to}
+                      onClick={() => setOpen(false)}
+                      className={
+                        "flex items-center justify-between border-b border-border/60 px-3 py-3 text-xs uppercase tracking-widest last:border-b-0 " +
+                        (active
+                          ? "text-foreground"
+                          : "text-muted-foreground hover:text-foreground")
+                      }
+                    >
+                      <span>{l.label}</span>
+                      {active && <span className="text-foreground">·</span>}
+                    </Link>
+                  );
+                })}
+              </nav>
+
+              <div className="mt-auto border-t border-border px-5 py-4">
+                {viewer ? (
+                  <div className="flex items-center gap-3">
+                    {viewer.avatar?.medium ? (
+                      <img
+                        src={viewer.avatar.medium}
+                        alt={viewer.name}
+                        className="h-9 w-9 border border-border object-cover"
+                      />
+                    ) : (
+                      <div className="grid h-9 w-9 place-items-center border border-border">
+                        <User className="h-4 w-4" />
+                      </div>
+                    )}
+                    <div className="min-w-0 flex-1">
+                      <Link
+                        to="/profile"
+                        onClick={() => setOpen(false)}
+                        className="block truncate text-xs uppercase tracking-widest hover:text-foreground"
+                      >
+                        {viewer.name}
+                      </Link>
+                      <button
+                        onClick={() => {
+                          logout();
+                          setOpen(false);
+                        }}
+                        className="mt-0.5 flex items-center gap-1 text-[0.6rem] uppercase tracking-widest text-destructive"
+                      >
+                        <LogOut className="h-3 w-3" /> logout
+                      </button>
+                    </div>
+                  </div>
+                ) : authUrl ? (
+                  <a
+                    href={authUrl}
+                    className="flex h-9 items-center justify-center border border-border bg-foreground px-3 text-[0.65rem] font-medium uppercase tracking-widest text-background"
+                  >
+                    login · anilist
+                  </a>
+                ) : null}
+              </div>
+            </SheetContent>
+          </Sheet>
         </div>
       </div>
-
-      {open && (
-        <div className="border-t border-border bg-background md:hidden">
-          <nav className="mx-auto flex max-w-none flex-col px-6 lg:px-10 py-2">
-            {LINKS.map((l) => (
-              <Link
-                key={l.to}
-                to={l.to}
-                onClick={() => setOpen(false)}
-                className="border-b border-border py-3 text-xs uppercase tracking-widest text-muted-foreground last:border-b-0 hover:text-foreground"
-              >
-                {l.label}
-              </Link>
-            ))}
-            {viewer ? (
-              <button
-                onClick={() => {
-                  logout();
-                  setOpen(false);
-                }}
-                className="py-3 text-left text-xs uppercase tracking-widest text-destructive"
-              >
-                logout · {viewer.name}
-              </button>
-            ) : authUrl ? (
-              <a
-                href={authUrl}
-                className="py-3 text-xs uppercase tracking-widest text-foreground"
-              >
-                login · anilist
-              </a>
-            ) : null}
-          </nav>
-        </div>
-      )}
     </header>
   );
 }
