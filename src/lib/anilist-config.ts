@@ -6,18 +6,20 @@ export const ANILIST_CLIENT_ID: string =
 
 export const ANILIST_REDIRECT_PATH = "/auth/callback";
 
-export function getAniListRedirectUri(): string {
-  return typeof window !== "undefined"
-    ? `${window.location.origin}${ANILIST_REDIRECT_PATH}`
-    : ANILIST_REDIRECT_PATH;
+export function getAniListRedirectUri(): string | null {
+  if (typeof window === "undefined") return null;
+  return `${window.location.origin}${ANILIST_REDIRECT_PATH}`;
 }
 
 export function getAniListAuthUrl(): string | null {
   if (!ANILIST_CLIENT_ID) return null;
+  const redirect = getAniListRedirectUri();
+  if (!redirect) return null;
   const params = new URLSearchParams({
     client_id: ANILIST_CLIENT_ID,
-    redirect_uri: getAniListRedirectUri(),
+    redirect_uri: redirect,
     response_type: "code",
   });
   return `https://anilist.co/api/v2/oauth/authorize?${params.toString()}`;
 }
+
