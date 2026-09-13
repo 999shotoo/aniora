@@ -32,6 +32,7 @@ export function SiteHeader() {
   const [open, setOpen] = useState(false);
 
   const authUrl = hydrated ? getAniListAuthUrl() : null;
+  const tokenLoading = hydrated && hasToken && isLoading;
 
   return (
     <header className="sticky top-0 z-40 border-b border-border bg-background/85 backdrop-blur">
@@ -100,7 +101,7 @@ export function SiteHeader() {
                 <LogOut className="h-3.5 w-3.5" />
               </button>
             </div>
-          ) : hasToken && isLoading ? (
+          ) : tokenLoading ? (
             <div className="hidden h-8 w-24 shimmer border border-border lg:block" />
           ) : authUrl ? (
             <a
@@ -190,7 +191,7 @@ export function SiteHeader() {
                       </button>
                     </div>
                   </div>
-                ) : hasToken && isLoading ? (
+                ) : tokenLoading ? (
                   <div className="h-9 shimmer border border-border" />
                 ) : authUrl ? (
                   <a
