@@ -30,6 +30,14 @@ export const exchangeAniListCode = createServerFn({ method: "POST" })
     });
     const json: any = await res.json().catch(() => ({}));
     if (!res.ok || !json?.access_token) {
+      console.warn("AniList OAuth exchange failed", {
+        status: res.status,
+        error: json?.error,
+        message: json?.message,
+        hint: json?.hint,
+        clientId,
+        redirectUri: data.redirectUri,
+      });
       const providerMsg = json?.hint || json?.message || json?.error;
       const msg = providerMsg
         ? `AniList token exchange failed (${res.status}): ${providerMsg}`
