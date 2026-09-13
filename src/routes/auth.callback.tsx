@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { setAniListToken } from "@/lib/anilist";
 import { exchangeAniListCode } from "@/lib/anilist-oauth.functions";
-import { getAniListRedirectUri } from "@/lib/anilist-config";
+import { ANILIST_CLIENT_ID, getAniListRedirectUri } from "@/lib/anilist-config";
 
 export const Route = createFileRoute("/auth/callback")({
   component: AuthCallback,
@@ -58,7 +58,9 @@ function AuthCallback() {
       try {
         const redirectUri = getAniListRedirectUri();
         if (!redirectUri) throw new Error("Missing redirect URI");
-        const res = await exchange({ data: { code, redirectUri } });
+        const res = await exchange({
+          data: { code, redirectUri, clientId: ANILIST_CLIENT_ID },
+        });
         setAniListToken(res.access_token);
         setStatus("ok");
         window.history.replaceState(null, "", window.location.pathname);
