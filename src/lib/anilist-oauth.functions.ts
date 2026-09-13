@@ -14,26 +14,26 @@ export const exchangeAniListCode = createServerFn({ method: "POST" })
       throw new Error("ANILIST_CLIENT_SECRET is not configured on the server");
     }
 
-    const body = new URLSearchParams({
-      grant_type: "authorization_code",
-      client_id: clientId,
-      client_secret: clientSecret,
-      redirect_uri: data.redirectUri,
-      code: data.code,
-    });
-
     const res = await fetch("https://anilist.co/api/v2/oauth/token", {
       method: "POST",
       headers: {
-        "Content-Type": "application/x-www-form-urlencoded",
+        "Content-Type": "application/json",
         Accept: "application/json",
       },
-      body,
+      body: JSON.stringify({
+        grant_type: "authorization_code",
+        client_id: clientId,
+        client_secret: clientSecret,
+        redirect_uri: data.redirectUri,
+        code: data.code,
+      }),
     });
     const json: any = await res.json().catch(() => ({}));
     if (!res.ok || !json?.access_token) {
-      const msg =
-        json?.hint || json?.message || json?.error || `AniList token exchange failed (${res.status})`;
+      const providerMsg = json?.hint || json?.message || json?.error;
+      const msg = providerMsg
+        ? `AniList token exchange failed (${res.status}): ${providerMsg}`
+        : `AniList token exchange failed (${res.status}). Make sure this exact redirect URL is registered in AniList: ${data.redirectUri}`;
       throw new Error(String(msg));
     }
     return {
