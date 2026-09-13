@@ -1,6 +1,9 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { useServerFn } from "@tanstack/react-start";
 import { setAniListToken } from "@/lib/anilist";
+import { exchangeAniListCode } from "@/lib/anilist-oauth.functions";
+import { getAniListRedirectUri } from "@/lib/anilist-config";
 
 export const Route = createFileRoute("/auth/callback")({
   component: AuthCallback,
@@ -8,43 +11,63 @@ export const Route = createFileRoute("/auth/callback")({
 
 function AuthCallback() {
   const navigate = useNavigate();
+  const exchange = useServerFn(exchangeAniListCode);
   const [status, setStatus] = useState<"working" | "ok" | "fail">("working");
   const [detail, setDetail] = useState<string>("");
+  const ran = useRef(false);
 
   useEffect(() => {
-    // AniList implicit grant returns token in the URL hash (#access_token=...).
-    // Errors can arrive in either the hash or the query string.
+    if (ran.current) return;
+    ran.current = true;
+
     const hash = window.location.hash.replace(/^#/, "");
     const hashParams = new URLSearchParams(hash);
     const queryParams = new URLSearchParams(window.location.search);
-    const token = hashParams.get("access_token");
+
+    // Legacy: implicit-grant token in hash (kept as fallback).
+    const hashToken = hashParams.get("access_token");
+    if (hashToken) {
+      setAniListToken(hashToken);
+      setStatus("ok");
+      window.history.replaceState(null, "", window.location.pathname);
+      const t = setTimeout(() => navigate({ to: "/profile" }), 400);
+      return () => clearTimeout(t);
+    }
+
     const err =
-      hashParams.get("error") ||
       queryParams.get("error") ||
+      hashParams.get("error") ||
       queryParams.get("hint");
     const errDesc =
-      hashParams.get("error_description") ||
       queryParams.get("error_description") ||
+      hashParams.get("error_description") ||
       queryParams.get("message");
     const code = queryParams.get("code");
 
-    if (token) {
-      setAniListToken(token);
-      setStatus("ok");
-      window.history.replaceState(null, "", window.location.pathname);
-      const t = setTimeout(() => navigate({ to: "/profile" }), 500);
-      return () => clearTimeout(t);
-    }
-    if (code) {
+    if (!code) {
       setStatus("fail");
       setDetail(
-        "AniList returned an authorization code (?code=...). This app uses the implicit grant (response_type=token) and can't exchange codes in the browser. In your AniList developer settings, make sure the redirect URL exactly matches this page's URL, then retry.",
+        err
+          ? `${err}${errDesc ? `: ${errDesc}` : ""}`
+          : "no authorization code in redirect",
       );
       return;
     }
-    setStatus("fail");
-    setDetail(err ? `${err}${errDesc ? `: ${errDesc}` : ""}` : "no access_token in redirect");
-  }, [navigate]);
+
+    (async () => {
+      try {
+        const redirectUri = getAniListRedirectUri();
+        const res = await exchange({ data: { code, redirectUri } });
+        setAniListToken(res.access_token);
+        setStatus("ok");
+        window.history.replaceState(null, "", window.location.pathname);
+        setTimeout(() => navigate({ to: "/profile" }), 400);
+      } catch (e) {
+        setStatus("fail");
+        setDetail(e instanceof Error ? e.message : "token exchange failed");
+      }
+    })();
+  }, [navigate, exchange]);
 
   return (
     <div className="mx-auto flex min-h-[60vh] max-w-md flex-col items-center justify-center px-4 text-center font-mono">
@@ -56,9 +79,7 @@ function AuthCallback() {
         {status === "ok" && "signed in"}
         {status === "fail" && "authorization failed"}
       </h1>
-      {detail && (
-        <p className="mt-2 text-xs text-destructive">{detail}</p>
-      )}
+      {detail && <p className="mt-2 text-xs text-destructive">{detail}</p>}
     </div>
   );
 }
