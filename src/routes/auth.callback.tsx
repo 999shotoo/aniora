@@ -57,6 +57,7 @@ function AuthCallback() {
     (async () => {
       try {
         const redirectUri = getAniListRedirectUri();
+        if (!redirectUri) throw new Error("Missing redirect URI");
         const res = await exchange({ data: { code, redirectUri } });
         setAniListToken(res.access_token);
         setStatus("ok");
