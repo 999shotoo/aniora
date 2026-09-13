@@ -32,7 +32,7 @@ export function Hero({ items, intervalMs = 6500 }: Props) {
 
   if (valid.length === 0) {
     return (
-      <div className="mx-auto h-[52vh] max-w-none animate-pulse border-b border-border bg-card px-6 lg:px-10" />
+      <div className="h-[60vh] min-h-[420px] w-full animate-pulse border-b border-border bg-card sm:h-[56vh] md:h-[60vh]" />
     );
   }
 
@@ -66,14 +66,15 @@ export function Hero({ items, intervalMs = 6500 }: Props) {
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0 }}
             transition={{ opacity: { duration: 1.2 }, scale: { duration: 6, ease: "easeOut" } }}
-            className="absolute inset-0 h-full w-full object-cover"
+            className="absolute inset-0 h-full w-full object-cover object-center"
           />
         </AnimatePresence>
-        <div className="absolute inset-0 bg-gradient-to-t from-background via-background/80 to-background/20" />
-        <div className="absolute inset-0 bg-gradient-to-r from-background/95 via-background/60 to-transparent" />
+        {/* Mobile: darker bottom fade, lighter top so image is visible */}
+        <div className="absolute inset-0 bg-gradient-to-t from-background via-background/70 to-background/10 md:via-background/80 md:to-background/20" />
+        <div className="absolute inset-0 bg-gradient-to-r from-background/90 via-background/40 to-transparent md:from-background/95 md:via-background/60" />
       </div>
 
-      <div className="relative mx-auto flex min-h-[62vh] max-w-none flex-col gap-6 px-6 lg:px-10 py-10 sm:min-h-[68vh] sm:py-16 md:flex-row md:items-end">
+      <div className="relative mx-auto flex min-h-[520px] w-full max-w-none flex-col justify-end gap-4 px-4 pb-10 pt-24 sm:min-h-[560px] sm:gap-6 sm:px-6 sm:pb-12 sm:pt-28 md:min-h-[62vh] md:flex-row md:items-end md:px-10 md:pb-16 md:pt-16">
         <AnimatePresence mode="wait">
           <motion.div
             key={media.id}
@@ -89,8 +90,8 @@ export function Hero({ items, intervalMs = 6500 }: Props) {
               alt={title}
               className="hidden aspect-[2/3] w-40 shrink-0 border border-border shadow-2xl md:block lg:w-48"
             />
-            <div className="flex-1">
-              <div className="mb-3 flex flex-wrap items-center gap-2 text-[0.6rem] uppercase tracking-widest text-muted-foreground">
+            <div className="min-w-0 flex-1">
+              <div className="mb-3 flex flex-wrap items-center gap-1.5 text-[0.6rem] uppercase tracking-widest text-muted-foreground sm:gap-2">
                 <span className="border border-border bg-background/50 px-2 py-1 backdrop-blur">
                   ~$ ./featured
                 </span>
@@ -101,11 +102,11 @@ export function Hero({ items, intervalMs = 6500 }: Props) {
                   <span>· {(media.averageScore / 10).toFixed(1)}★</span>
                 )}
               </div>
-              <h1 className="mb-4 max-w-3xl text-3xl font-medium leading-tight sm:text-4xl md:text-5xl">
+              <h1 className="mb-3 max-w-3xl text-2xl font-medium leading-tight sm:mb-4 sm:text-3xl md:text-4xl lg:text-5xl">
                 {title}
               </h1>
               {desc && (
-                <p className="mb-6 line-clamp-3 max-w-2xl text-sm leading-relaxed text-muted-foreground sm:line-clamp-4">
+                <p className="mb-5 line-clamp-3 max-w-2xl text-xs leading-relaxed text-muted-foreground sm:mb-6 sm:text-sm sm:line-clamp-4">
                   {desc}
                 </p>
               )}
@@ -113,14 +114,14 @@ export function Hero({ items, intervalMs = 6500 }: Props) {
                 <Link
                   to="/anime/$id"
                   params={{ id: String(media.id) }}
-                  className="inline-flex items-center gap-2 border border-foreground bg-foreground px-6 lg:px-10 py-2 text-[0.7rem] font-medium uppercase tracking-widest text-background transition-opacity hover:opacity-90"
+                  className="inline-flex items-center gap-2 border border-foreground bg-foreground px-4 py-2 text-[0.7rem] font-medium uppercase tracking-widest text-background transition-opacity hover:opacity-90 sm:px-6"
                 >
                   <Play className="h-3.5 w-3.5 fill-current" />
                   watch now
                 </Link>
                 <button
                   onClick={() => toggle(media)}
-                  className="inline-flex items-center gap-2 border border-border bg-background/60 px-6 lg:px-10 py-2 text-[0.7rem] font-medium uppercase tracking-widest text-foreground backdrop-blur hover:bg-accent"
+                  className="inline-flex items-center gap-2 border border-border bg-background/60 px-4 py-2 text-[0.7rem] font-medium uppercase tracking-widest text-foreground backdrop-blur hover:bg-accent sm:px-6"
                 >
                   {saved ? (
                     <>
