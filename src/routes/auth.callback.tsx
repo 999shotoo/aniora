@@ -1,4 +1,5 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useRef, useState } from "react";
 import { exchangeAniListCode } from "@/lib/anilist-oauth.functions";
 import { getAniListToken, setAniListToken } from "@/lib/anilist";
@@ -14,6 +15,7 @@ export const Route = createFileRoute("/auth/callback")({
 
 function AuthCallback() {
   const navigate = useNavigate();
+  const exchangeCodeForToken = useServerFn(exchangeAniListCode);
   const [status, setStatus] = useState<"working" | "ok" | "fail">("working");
   const [detail, setDetail] = useState<string>("");
   const [retryUrl, setRetryUrl] = useState<string | null>(null);
@@ -99,7 +101,7 @@ function AuthCallback() {
       sessionStorage.setItem(codeKey, "pending");
 
       try {
-        const token = await exchangeAniListCode({
+        const token = await exchangeCodeForToken({
           data: {
             code,
             redirectUri: currentRedirectUri,
@@ -124,7 +126,7 @@ function AuthCallback() {
       if (closeTimer) window.clearTimeout(closeTimer);
       if (navTimer) window.clearTimeout(navTimer);
     };
-  }, [navigate]);
+  }, [exchangeCodeForToken, navigate]);
 
   return (
     <div className="mx-auto flex min-h-[60vh] max-w-md flex-col items-center justify-center px-4 text-center font-mono">
