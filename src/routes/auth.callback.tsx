@@ -93,8 +93,16 @@ function AuthCallback() {
       }
 
       if (sessionStorage.getItem(codeKey) === "pending") {
+        for (let i = 0; i < 30; i += 1) {
+          await new Promise((resolve) => window.setTimeout(resolve, 100));
+          const resolvedToken = sessionStorage.getItem(`${codeKey}:token`);
+          if (resolvedToken) {
+            await finishWithToken(resolvedToken);
+            return;
+          }
+        }
         setStatus("fail");
-        setDetail("This AniList login code was already used. Please try login again.");
+        setDetail("This AniList login code is still being processed. Please wait or try login again.");
         return;
       }
 
@@ -108,8 +116,9 @@ function AuthCallback() {
             clientId: ANILIST_CLIENT_ID,
           },
         });
-        if (cancelled) return;
         sessionStorage.setItem(`${codeKey}:token`, token.access_token);
+        sessionStorage.removeItem(codeKey);
+        if (cancelled) return;
         await finishWithToken(token.access_token);
       } catch (error) {
         if (cancelled) return;
