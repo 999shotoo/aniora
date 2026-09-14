@@ -1,7 +1,12 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
+import { exchangeAniListCode } from "@/lib/anilist-oauth.functions";
 import { getAniListToken, setAniListToken } from "@/lib/anilist";
-import { getAniListAuthUrl, getAniListRedirectUri } from "@/lib/anilist-config";
+import {
+  ANILIST_CLIENT_ID,
+  getAniListAuthUrl,
+  getAniListRedirectUri,
+} from "@/lib/anilist-config";
 
 export const Route = createFileRoute("/auth/callback")({
   component: AuthCallback,
@@ -19,53 +24,106 @@ function AuthCallback() {
     if (ran.current) return;
     ran.current = true;
 
+    let cancelled = false;
+    let closeTimer: number | undefined;
+    let navTimer: number | undefined;
+
     const authUrl = getAniListAuthUrl();
     const currentRedirectUri = getAniListRedirectUri();
     setRetryUrl(authUrl);
     setRedirectUri(currentRedirectUri);
 
-    const hash = window.location.hash.replace(/^#/, "");
-    const hashParams = new URLSearchParams(hash);
     const queryParams = new URLSearchParams(window.location.search);
 
-    const hashToken = hashParams.get("access_token");
-    if (hashToken) {
-      setAniListToken(hashToken);
+    const err =
+      queryParams.get("error") ||
+      queryParams.get("hint");
+    const errDesc =
+      queryParams.get("error_description") ||
+      queryParams.get("message");
+
+    const code = queryParams.get("code");
+
+    async function finishWithToken(token: string) {
+      setAniListToken(token);
       setStatus("ok");
       window.history.replaceState(null, "", window.location.pathname);
       if (window.opener && !window.opener.closed) {
         window.opener.postMessage(
-          { type: "anilist-oauth-token", token: hashToken },
+          { type: "anilist-oauth-token", token },
           window.location.origin,
         );
-        const closeTimer = setTimeout(() => window.close(), 350);
-        return () => clearTimeout(closeTimer);
+        closeTimer = window.setTimeout(() => window.close(), 350);
+        return;
       }
-      const t = setTimeout(() => navigate({ to: "/profile" }), 400);
-      return () => clearTimeout(t);
+      navTimer = window.setTimeout(() => navigate({ to: "/profile" }), 400);
     }
 
-    const err =
-      queryParams.get("error") ||
-      hashParams.get("error") ||
-      queryParams.get("hint");
-    const errDesc =
-      queryParams.get("error_description") ||
-      hashParams.get("error_description") ||
-      queryParams.get("message");
+    async function exchangeCode() {
+      if (err) {
+        setStatus("fail");
+        setDetail(`${err}${errDesc ? `: ${errDesc}` : ""}`);
+        return;
+      }
 
-    if (getAniListToken()) {
-      setStatus("ok");
-      const t = setTimeout(() => navigate({ to: "/profile" }), 250);
-      return () => clearTimeout(t);
+      if (!currentRedirectUri) {
+        setStatus("fail");
+        setDetail("Could not resolve the callback URL for AniList login.");
+        return;
+      }
+
+      if (!code) {
+        if (getAniListToken()) {
+          setStatus("ok");
+          navTimer = window.setTimeout(() => navigate({ to: "/profile" }), 250);
+          return;
+        }
+        setStatus("fail");
+        setDetail("AniList did not return an authorization code. Please try login again.");
+        return;
+      }
+
+      const codeKey = `anilist-code:${code}`;
+      const cachedToken = sessionStorage.getItem(`${codeKey}:token`);
+      if (cachedToken) {
+        await finishWithToken(cachedToken);
+        return;
+      }
+
+      if (sessionStorage.getItem(codeKey) === "pending") {
+        setStatus("fail");
+        setDetail("This AniList login code was already used. Please try login again.");
+        return;
+      }
+
+      sessionStorage.setItem(codeKey, "pending");
+
+      try {
+        const token = await exchangeAniListCode({
+          data: {
+            code,
+            redirectUri: currentRedirectUri,
+            clientId: ANILIST_CLIENT_ID,
+          },
+        });
+        if (cancelled) return;
+        sessionStorage.setItem(`${codeKey}:token`, token.access_token);
+        await finishWithToken(token.access_token);
+      } catch (error) {
+        if (cancelled) return;
+        sessionStorage.removeItem(codeKey);
+        setStatus("fail");
+        setDetail(error instanceof Error ? error.message : "AniList token exchange failed.");
+      }
     }
 
-    setStatus("fail");
-    setDetail(
-      err
-        ? `${err}${errDesc ? `: ${errDesc}` : ""}`
-        : "AniList did not return a client token. Please try login again.",
-    );
+    void exchangeCode();
+
+    return () => {
+      cancelled = true;
+      if (closeTimer) window.clearTimeout(closeTimer);
+      if (navTimer) window.clearTimeout(navTimer);
+    };
   }, [navigate]);
 
   return (
