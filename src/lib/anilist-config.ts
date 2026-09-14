@@ -1,5 +1,5 @@
 // AniList OAuth client config.
-// Uses AniList's implicit flow so login stays fully client-side in the app.
+// Uses Authorization Code Grant: callback receives a code, server exchanges it for a token.
 
 export const ANILIST_CLIENT_ID: string =
   (import.meta.env.VITE_ANILIST_CLIENT_ID as string | undefined) ?? "44825";
@@ -18,7 +18,7 @@ export function getAniListAuthUrl(): string | null {
   const params = new URLSearchParams({
     client_id: ANILIST_CLIENT_ID,
     redirect_uri: redirect,
-    response_type: "token",
+    response_type: "code",
   });
   return `https://anilist.co/api/v2/oauth/authorize?${params.toString()}`;
 }
