@@ -42,7 +42,7 @@ export const exchangeAniListCode = createServerFn({ method: "POST" })
         clientId,
         redirectUri: data.redirectUri,
       });
-      const providerMsg = json?.hint || json?.message || json?.error;
+      const providerMsg = json?.hint || json?.message || json?.error || json?.raw;
       const msg = providerMsg
         ? `AniList token exchange failed (${res.status}): ${providerMsg}`
         : `AniList token exchange failed (${res.status}). Make sure this exact redirect URL is registered in AniList: ${data.redirectUri}`;
