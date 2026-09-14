@@ -33,6 +33,14 @@ function AuthCallback() {
       setAniListToken(hashToken);
       setStatus("ok");
       window.history.replaceState(null, "", window.location.pathname);
+      if (window.opener && !window.opener.closed) {
+        window.opener.postMessage(
+          { type: "anilist-oauth-token", token: hashToken },
+          window.location.origin,
+        );
+        const closeTimer = setTimeout(() => window.close(), 350);
+        return () => clearTimeout(closeTimer);
+      }
       const t = setTimeout(() => navigate({ to: "/profile" }), 400);
       return () => clearTimeout(t);
     }
