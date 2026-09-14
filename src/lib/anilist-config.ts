@@ -1,5 +1,5 @@
-// AniList OAuth (Authorization Code) config.
-// Uses server-side code exchange so the client secret stays on the server.
+// AniList OAuth client config.
+// Uses AniList's implicit flow so login stays fully client-side in the app.
 
 export const ANILIST_CLIENT_ID: string =
   (import.meta.env.VITE_ANILIST_CLIENT_ID as string | undefined) ?? "44825";
@@ -18,7 +18,7 @@ export function getAniListAuthUrl(): string | null {
   const params = new URLSearchParams({
     client_id: ANILIST_CLIENT_ID,
     redirect_uri: redirect,
-    response_type: "code",
+    response_type: "token",
   });
   return `https://anilist.co/api/v2/oauth/authorize?${params.toString()}`;
 }

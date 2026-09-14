@@ -1,4 +1,4 @@
-import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
+import { Link, useHydrated, useNavigate, useRouterState } from "@tanstack/react-router";
 import { Search, User, LogOut, Bookmark, Menu, X, Loader2 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
@@ -25,12 +25,14 @@ const LINKS = [
 ] as const;
 
 export function SiteHeader() {
+  const hydrated = useHydrated();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
-  const { viewer } = useAniListViewer();
+  const { viewer, hasToken, isLoading } = useAniListViewer();
   const logout = useAniListLogout();
   const [open, setOpen] = useState(false);
 
-  const authUrl = getAniListAuthUrl();
+  const authUrl = hydrated ? getAniListAuthUrl() : null;
+  const tokenLoading = hydrated && hasToken && isLoading;
 
   return (
     <header className="sticky top-0 z-40 border-b border-border bg-background/85 backdrop-blur">
@@ -99,6 +101,8 @@ export function SiteHeader() {
                 <LogOut className="h-3.5 w-3.5" />
               </button>
             </div>
+          ) : tokenLoading ? (
+            <div className="hidden h-8 w-24 shimmer border border-border lg:block" />
           ) : authUrl ? (
             <a
               href={authUrl}
@@ -187,6 +191,8 @@ export function SiteHeader() {
                       </button>
                     </div>
                   </div>
+                ) : tokenLoading ? (
+                  <div className="h-9 shimmer border border-border" />
                 ) : authUrl ? (
                   <a
                     href={authUrl}

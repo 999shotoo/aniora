@@ -1,13 +1,7 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
-import { useServerFn } from "@tanstack/react-start";
 import { getAniListToken, setAniListToken } from "@/lib/anilist";
-import { exchangeAniListCode } from "@/lib/anilist-oauth.functions";
-import {
-  ANILIST_CLIENT_ID,
-  getAniListAuthUrl,
-  getAniListRedirectUri,
-} from "@/lib/anilist-config";
+import { getAniListAuthUrl, getAniListRedirectUri } from "@/lib/anilist-config";
 
 export const Route = createFileRoute("/auth/callback")({
   component: AuthCallback,
@@ -15,7 +9,6 @@ export const Route = createFileRoute("/auth/callback")({
 
 function AuthCallback() {
   const navigate = useNavigate();
-  const exchange = useServerFn(exchangeAniListCode);
   const [status, setStatus] = useState<"working" | "ok" | "fail">("working");
   const [detail, setDetail] = useState<string>("");
   const [retryUrl, setRetryUrl] = useState<string | null>(null);
@@ -26,41 +19,15 @@ function AuthCallback() {
     if (ran.current) return;
     ran.current = true;
 
-    const activeKey = "anilist_oauth_code_exchange";
     const authUrl = getAniListAuthUrl();
     const currentRedirectUri = getAniListRedirectUri();
     setRetryUrl(authUrl);
     setRedirectUri(currentRedirectUri);
 
-    const waitForExistingExchange = () => {
-      setStatus("working");
-      setDetail("finishing AniList sign-in...");
-      const interval = window.setInterval(() => {
-        if (getAniListToken()) {
-          window.clearInterval(interval);
-          window.clearTimeout(timeout);
-          sessionStorage.removeItem(activeKey);
-          setStatus("ok");
-          navigate({ to: "/profile" }).catch(() => {});
-        }
-      }, 200);
-      const timeout = window.setTimeout(() => {
-        window.clearInterval(interval);
-        sessionStorage.removeItem(activeKey);
-        setStatus("fail");
-        setDetail("AniList sign-in timed out. Please start login again.");
-      }, 6000);
-      return () => {
-        window.clearInterval(interval);
-        window.clearTimeout(timeout);
-      };
-    };
-
     const hash = window.location.hash.replace(/^#/, "");
     const hashParams = new URLSearchParams(hash);
     const queryParams = new URLSearchParams(window.location.search);
 
-    // Legacy: implicit-grant token in hash (kept as fallback).
     const hashToken = hashParams.get("access_token");
     if (hashToken) {
       setAniListToken(hashToken);
@@ -78,7 +45,6 @@ function AuthCallback() {
       queryParams.get("error_description") ||
       hashParams.get("error_description") ||
       queryParams.get("message");
-    const code = queryParams.get("code");
 
     if (getAniListToken()) {
       setStatus("ok");
@@ -86,46 +52,13 @@ function AuthCallback() {
       return () => clearTimeout(t);
     }
 
-    if (!code) {
-      if (sessionStorage.getItem(activeKey) === "processing") {
-        return waitForExistingExchange();
-      }
-      setStatus("fail");
-      setDetail(
-        err
-          ? `${err}${errDesc ? `: ${errDesc}` : ""}`
-          : "no authorization code in redirect",
-      );
-      return;
-    }
-
-    const activeExchange = sessionStorage.getItem(activeKey);
-    if (activeExchange === code || activeExchange === "processing") {
-      return waitForExistingExchange();
-    }
-
-    sessionStorage.setItem(activeKey, code);
-
-    (async () => {
-      try {
-        const redirectUri = getAniListRedirectUri();
-        if (!redirectUri) throw new Error("Missing redirect URI");
-        const res = await exchange({
-          data: { code, redirectUri, clientId: ANILIST_CLIENT_ID },
-        });
-        setAniListToken(res.access_token);
-        sessionStorage.removeItem(activeKey);
-        setStatus("ok");
-        window.history.replaceState(null, "", window.location.pathname);
-        setTimeout(() => navigate({ to: "/profile" }), 400);
-      } catch (e) {
-        sessionStorage.removeItem(activeKey);
-        window.history.replaceState(null, "", window.location.pathname);
-        setStatus("fail");
-        setDetail(e instanceof Error ? e.message : "token exchange failed");
-      }
-    })();
-  }, [navigate, exchange]);
+    setStatus("fail");
+    setDetail(
+      err
+        ? `${err}${errDesc ? `: ${errDesc}` : ""}`
+        : "AniList did not return a client token. Please try login again.",
+    );
+  }, [navigate]);
 
   return (
     <div className="mx-auto flex min-h-[60vh] max-w-md flex-col items-center justify-center px-4 text-center font-mono">

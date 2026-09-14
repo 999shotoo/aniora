@@ -1,4 +1,5 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useHydrated } from "@tanstack/react-router";
 import {
   clearAniListToken,
   getAniListToken,
@@ -7,17 +8,20 @@ import {
 } from "./anilist";
 
 export function useAniListViewer() {
+  const hydrated = useHydrated();
+  const hasToken = hydrated && !!getAniListToken();
   const query = useQuery<AniListViewer | null>({
     queryKey: ["anilist", "viewer"],
     queryFn: () => getViewer(),
+    enabled: hasToken,
     staleTime: 5 * 60_000,
     retry: false,
   });
   return {
     viewer: query.data ?? null,
-    isLoading: query.isLoading,
+    isLoading: hasToken && query.isLoading,
     isAuthed: !!query.data,
-    hasToken: !!getAniListToken(),
+    hasToken,
   };
 }
 
