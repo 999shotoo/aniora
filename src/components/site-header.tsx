@@ -52,7 +52,7 @@ export function SiteHeader() {
     const popup = window.open(
       authUrl,
       "anilist-oauth",
-      "popup=yes,width=520,height=760,noopener=false,noreferrer=false",
+      "popup=yes,width=520,height=760",
     );
     if (!popup) window.location.href = authUrl;
   };
