@@ -19,15 +19,19 @@ export const exchangeAniListCode = createServerFn({ method: "POST" })
       headers: {
         "Content-Type": "application/json",
         Accept: "application/json",
+        "User-Agent": "AnioraApp/1.0 (+https://lovable.app)",
       },
       body: JSON.stringify({
         grant_type: "authorization_code",
-        client_id: clientId,
+        client_id: String(clientId),
         client_secret: clientSecret,
         redirect_uri: data.redirectUri,
         code: data.code,
       }),
     });
+    const rawText = await res.text();
+    let json: any = {};
+    try { json = rawText ? JSON.parse(rawText) : {}; } catch { json = { raw: rawText.slice(0, 300) }; }
     const json: any = await res.json().catch(() => ({}));
     if (!res.ok || !json?.access_token) {
       console.warn("AniList OAuth exchange failed", {
