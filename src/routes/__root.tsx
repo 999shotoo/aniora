@@ -93,6 +93,12 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:title", content: "Zen Stream — Anime, terminal-clean." },
+      { name: "description", content: "AniStream Hub is an anime streaming app with Anilist integration for discovery and personalized lists." },
+      { property: "og:description", content: "AniStream Hub is an anime streaming app with Anilist integration for discovery and personalized lists." },
+      { name: "twitter:description", content: "AniStream Hub is an anime streaming app with Anilist integration for discovery and personalized lists." },
+      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/37c824f9-abd7-4add-94c7-58ebfbc1cc29/id-preview-8b17a9f3--45f2bee1-fb20-467b-adda-6e829e88b4aa.lovable.app-1782965178839.png" },
+      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/37c824f9-abd7-4add-94c7-58ebfbc1cc29/id-preview-8b17a9f3--45f2bee1-fb20-467b-adda-6e829e88b4aa.lovable.app-1782965178839.png" },
     ],
     links: [
       { rel: "stylesheet", href: appCss },
