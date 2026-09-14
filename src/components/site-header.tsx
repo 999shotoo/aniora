@@ -5,7 +5,7 @@ import { useQuery } from "@tanstack/react-query";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAniListViewer, useAniListLogout } from "@/lib/anilist-auth";
 import { getAniListAuthUrl } from "@/lib/anilist-config";
-import { searchAnime, FALLBACK_COVER, type AniListMedia } from "@/lib/anilist";
+import { searchAnime, FALLBACK_COVER, setAniListToken, type AniListMedia } from "@/lib/anilist";
 import { SmartImage } from "@/components/smart-image";
 import {
   Sheet,
@@ -33,6 +33,29 @@ export function SiteHeader() {
 
   const authUrl = hydrated ? getAniListAuthUrl() : null;
   const tokenLoading = hydrated && hasToken && isLoading;
+
+  useEffect(() => {
+    if (!hydrated) return;
+    function onMessage(event: MessageEvent) {
+      if (event.origin !== window.location.origin) return;
+      const data = event.data as { type?: string; token?: string } | null;
+      if (data?.type !== "anilist-oauth-token" || !data.token) return;
+      setAniListToken(data.token);
+      window.location.href = "/profile";
+    }
+    window.addEventListener("message", onMessage);
+    return () => window.removeEventListener("message", onMessage);
+  }, [hydrated]);
+
+  const loginWithAniList = () => {
+    if (!authUrl) return;
+    const popup = window.open(
+      authUrl,
+      "anilist-oauth",
+      "popup=yes,width=520,height=760,noopener=false,noreferrer=false",
+    );
+    if (!popup) window.location.href = authUrl;
+  };
 
   return (
     <header className="sticky top-0 z-40 border-b border-border bg-background/85 backdrop-blur">
@@ -104,12 +127,13 @@ export function SiteHeader() {
           ) : tokenLoading ? (
             <div className="hidden h-8 w-24 shimmer border border-border lg:block" />
           ) : authUrl ? (
-            <a
-              href={authUrl}
+            <button
+              type="button"
+              onClick={loginWithAniList}
               className="hidden h-8 items-center border border-border bg-foreground px-3 text-[0.65rem] font-medium uppercase tracking-widest text-background hover:opacity-90 lg:inline-flex"
             >
               login · anilist
-            </a>
+            </button>
           ) : null}
 
           <Sheet open={open} onOpenChange={setOpen}>
@@ -194,12 +218,16 @@ export function SiteHeader() {
                 ) : tokenLoading ? (
                   <div className="h-9 shimmer border border-border" />
                 ) : authUrl ? (
-                  <a
-                    href={authUrl}
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setOpen(false);
+                      loginWithAniList();
+                    }}
                     className="flex h-9 items-center justify-center border border-border bg-foreground px-3 text-[0.65rem] font-medium uppercase tracking-widest text-background"
                   >
                     login · anilist
-                  </a>
+                  </button>
                 ) : null}
               </div>
             </SheetContent>
