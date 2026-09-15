@@ -53,10 +53,7 @@ export const exchangeAniListCode = createServerFn({ method: "POST" })
     }
 
     if (!response.ok) {
-      const message =
-        typeof json === "object" && json && "message" in json
-          ? String((json as { message?: unknown }).message)
-          : rawBody.trim();
+      const message = extractAniListError(json) || rawBody.trim();
       throw new Error(
         `AniList token exchange failed (${response.status})${
           message ? `: ${message}` : ""
@@ -75,3 +72,19 @@ export const exchangeAniListCode = createServerFn({ method: "POST" })
       expiresIn: parsed.data.expires_in ?? null,
     };
   });
+
+function extractAniListError(json: unknown): string {
+  if (!json || typeof json !== "object") return "";
+  if ("message" in json && typeof json.message === "string") return json.message;
+  const errors = (json as { errors?: unknown }).errors;
+  if (!Array.isArray(errors)) return "";
+  return errors
+    .map((error) => {
+      if (error && typeof error === "object" && "message" in error) {
+        return String((error as { message?: unknown }).message ?? "");
+      }
+      return "";
+    })
+    .filter(Boolean)
+    .join("; ");
+}
