@@ -1,7 +1,9 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useRef, useState } from "react";
 import { getAniListToken, setAniListToken } from "@/lib/anilist";
-import { getAniListAuthUrl } from "@/lib/anilist-config";
+import { getAniListAuthUrl, getAniListRedirectUri } from "@/lib/anilist-config";
+import { exchangeAniListCode } from "@/lib/anilist-oauth.functions";
 
 export const Route = createFileRoute("/auth/callback")({
   component: AuthCallback,
@@ -9,6 +11,7 @@ export const Route = createFileRoute("/auth/callback")({
 
 function AuthCallback() {
   const navigate = useNavigate();
+  const exchangeCode = useServerFn(exchangeAniListCode);
   const [status, setStatus] = useState<"working" | "ok" | "fail">("working");
   const [detail, setDetail] = useState<string>("");
   const [retryUrl, setRetryUrl] = useState<string | null>(null);
@@ -23,7 +26,8 @@ function AuthCallback() {
     const hashParams = new URLSearchParams(window.location.hash.replace(/^#/, ""));
     const queryParams = new URLSearchParams(window.location.search);
 
-    const token = hashParams.get("access_token");
+    const token = hashParams.get("access_token") || queryParams.get("access_token");
+    const code = queryParams.get("code");
     const err =
       hashParams.get("error") ||
       queryParams.get("error") ||
@@ -49,6 +53,40 @@ function AuthCallback() {
       return;
     }
 
+    if (code) {
+      const redirectUri = getAniListRedirectUri();
+      if (!redirectUri) {
+        setStatus("fail");
+        setDetail("Could not build the AniList redirect URL. Please try login again.");
+        return;
+      }
+
+      exchangeCode({ data: { code, redirectUri } })
+        .then((result) => {
+          setAniListToken(result.accessToken);
+          setStatus("ok");
+          window.history.replaceState(null, "", window.location.pathname);
+          if (window.opener && !window.opener.closed) {
+            window.opener.postMessage(
+              { type: "anilist-oauth-token", token: result.accessToken },
+              window.location.origin,
+            );
+            window.setTimeout(() => window.close(), 300);
+            return;
+          }
+          window.setTimeout(() => navigate({ to: "/profile" }), 400);
+        })
+        .catch((error: unknown) => {
+          setStatus("fail");
+          setDetail(
+            error instanceof Error
+              ? error.message
+              : "AniList token exchange failed. Please try login again.",
+          );
+        });
+      return;
+    }
+
     if (err) {
       setStatus("fail");
       setDetail(`${err}${errDesc ? `: ${errDesc}` : ""}`);
@@ -62,8 +100,8 @@ function AuthCallback() {
     }
 
     setStatus("fail");
-    setDetail("AniList did not return an access token. Please try login again.");
-  }, [navigate]);
+    setDetail("AniList did not return an authorization code. Please try login again.");
+  }, [exchangeCode, navigate]);
 
   return (
     <div className="mx-auto flex min-h-[60vh] max-w-md flex-col items-center justify-center px-4 text-center font-mono">
