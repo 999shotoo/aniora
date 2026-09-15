@@ -77,12 +77,22 @@ function AuthCallback() {
           window.setTimeout(() => navigate({ to: "/profile" }), 400);
         })
         .catch((error: unknown) => {
-          setStatus("fail");
-          setDetail(
+          const message =
             error instanceof Error
               ? error.message
-              : "AniList token exchange failed. Please try login again.",
-          );
+              : "AniList token exchange failed. Please try login again.";
+
+          if (shouldUseClientTokenFallback(message)) {
+            const fallbackUrl = getAniListAuthUrl("token");
+            if (fallbackUrl) {
+              sessionStorage.setItem("anilist_oauth_fallback", "1");
+              window.location.replace(fallbackUrl);
+              return;
+            }
+          }
+
+          setStatus("fail");
+          setDetail(message);
         });
       return;
     }
@@ -123,5 +133,15 @@ function AuthCallback() {
         </a>
       )}
     </div>
+  );
+}
+
+function shouldUseClientTokenFallback(message: string): boolean {
+  const normalized = message.toLowerCase();
+  return (
+    normalized.includes("403") ||
+    normalized.includes("manually blocked") ||
+    normalized.includes("principal's office") ||
+    normalized.includes("principal’s office")
   );
 }
