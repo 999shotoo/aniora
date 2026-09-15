@@ -60,7 +60,7 @@ export const exchangeAniListCode = createServerFn({ method: "POST" })
     }>;
 
     for (const request of requests) {
-      const res = await fetch(endpoint, {
+      const res = await fetch(request.endpoint, {
         method: "POST",
         headers: request.headers,
         body: request.body,
