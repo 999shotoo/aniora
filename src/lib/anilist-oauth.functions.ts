@@ -8,8 +8,8 @@ export const exchangeAniListCode = createServerFn({ method: "POST" })
     return input;
   })
   .handler(async ({ data }) => {
-    const clientId = process.env.ANILIST_CLIENT_ID ?? data.clientId ?? "44825";
-    const clientSecret = process.env.ANILIST_CLIENT_SECRET;
+    const clientId = String(process.env.ANILIST_CLIENT_ID ?? data.clientId ?? "44825").trim();
+    const clientSecret = process.env.ANILIST_CLIENT_SECRET?.trim();
     if (!clientSecret) {
       throw new Error("ANILIST_CLIENT_SECRET is not configured on the server");
     }
@@ -22,30 +22,48 @@ export const exchangeAniListCode = createServerFn({ method: "POST" })
       code: data.code,
     };
 
-    // The documented host is anilist.co, but it can return a Cloudflare 403
-    // from some server environments. The same OAuth route is reachable on the
-    // API host used by AniList GraphQL, so try that first and keep the official
-    // host as a fallback for compatibility.
-    const endpoints = [
-      "https://graphql.anilist.co/api/v2/oauth/token",
-      "https://anilist.co/api/v2/oauth/token",
-    ];
+    const endpoints = ["https://anilist.co/api/v2/oauth/token", "https://graphql.anilist.co/api/v2/oauth/token"];
+    const browserLikeHeaders = {
+      Accept: "application/json",
+      "Accept-Language": "en-US,en;q=0.9",
+      "Cache-Control": "no-cache",
+      "User-Agent":
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Aniora/1.0 Safari/537.36",
+    };
+
+    const requests = endpoints.flatMap((endpoint) => [
+      {
+        endpoint,
+        bodyType: "json" as const,
+        headers: {
+          ...browserLikeHeaders,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      },
+      {
+        endpoint,
+        bodyType: "form" as const,
+        headers: {
+          ...browserLikeHeaders,
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+        body: new URLSearchParams(payload).toString(),
+      },
+    ]);
 
     const attempts = [] as Array<{
       endpoint: string;
+      bodyType: "json" | "form";
       status: number;
       json: any;
     }>;
 
-    for (const endpoint of endpoints) {
+    for (const request of requests) {
       const res = await fetch(endpoint, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Accept: "application/json",
-          "User-Agent": "AnioraApp/1.0 (+https://lovable.app)",
-        },
-        body: JSON.stringify(payload),
+        headers: request.headers,
+        body: request.body,
       });
       const rawText = await res.text();
       let json: any = {};
@@ -63,19 +81,27 @@ export const exchangeAniListCode = createServerFn({ method: "POST" })
         };
       }
 
-      attempts.push({ endpoint, status: res.status, json });
+      attempts.push({ endpoint: request.endpoint, bodyType: request.bodyType, status: res.status, json });
 
-      // A 403 can be host/WAF-specific, so fall through to the alternate host.
-      // Other OAuth errors mean AniList understood the request and retrying the
-      // same one-time code on another host risks burning it for no benefit.
+      // 403 is a host/WAF block before OAuth validation, so try the alternate
+      // host/body format. Any other OAuth response means AniList understood the
+      // one-time code, so do not burn it with more retries.
       if (res.status !== 403) break;
     }
 
     const last = attempts.at(-1);
     if (last) {
+      const allAttemptsWere403 = attempts.every((attempt) => attempt.status === 403);
       console.warn("AniList OAuth exchange failed", {
-        status: last.status,
-        endpoint: last.endpoint,
+        attempts: attempts.map((attempt) => ({
+          status: attempt.status,
+          endpoint: attempt.endpoint,
+          bodyType: attempt.bodyType,
+          error: attempt.json?.error,
+          message: attempt.json?.message,
+          hint: attempt.json?.hint,
+          raw: attempt.json?.raw,
+        })),
         error: last.json?.error,
         message: last.json?.message,
         hint: last.json?.hint,
@@ -83,6 +109,11 @@ export const exchangeAniListCode = createServerFn({ method: "POST" })
         clientId,
         redirectUri: data.redirectUri,
       });
+
+      if (allAttemptsWere403) {
+        throw new Error("AniList token exchange blocked (403). Retrying with the browser-safe AniList flow.");
+      }
+
       const providerMsg =
         last.json?.hint || last.json?.message || last.json?.error || last.json?.raw;
       const msg = providerMsg
