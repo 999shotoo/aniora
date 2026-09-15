@@ -258,11 +258,55 @@ export async function getViewer(): Promise<AniListViewer | null> {
       Viewer {
         id
         name
+        siteUrl
+        donatorTier
+        donatorBadge
+        createdAt
+        updatedAt
         avatar { large medium }
         bannerImage
-        about
+        about(asHtml: false)
+        options {
+          titleLanguage
+          displayAdultContent
+          profileColor
+          timezone
+        }
+        mediaListOptions { scoreFormat }
         statistics {
-          anime { count meanScore minutesWatched episodesWatched }
+          anime {
+            count
+            meanScore
+            standardDeviation
+            minutesWatched
+            episodesWatched
+            statuses(sort: COUNT_DESC) { status count meanScore minutesWatched }
+            formats(sort: COUNT_DESC) { format count meanScore minutesWatched }
+            scores(sort: MEAN_SCORE) { score count meanScore minutesWatched }
+            genres(sort: COUNT_DESC, limit: 12) { genre count meanScore minutesWatched }
+            tags(sort: COUNT_DESC, limit: 12) { tag { name } count meanScore minutesWatched }
+            studios(sort: COUNT_DESC, limit: 10) { studio { name } count meanScore minutesWatched }
+            releaseYears(sort: RELEASE_YEAR) { releaseYear count meanScore minutesWatched }
+            startYears(sort: START_YEAR) { startYear count meanScore minutesWatched }
+            countries(sort: COUNT_DESC) { country count meanScore minutesWatched }
+            voiceActors(sort: COUNT_DESC, limit: 8) { voiceActor { name { full } } count meanScore minutesWatched }
+          }
+        }
+        favourites {
+          anime(perPage: 12) {
+            nodes {
+              id
+              title { romaji english native userPreferred }
+              coverImage { extraLarge large medium color }
+            }
+          }
+          characters(perPage: 8) {
+            nodes { id name { full } image { large } }
+          }
+          staff(perPage: 8) {
+            nodes { id name { full } image { large } }
+          }
+          studios(perPage: 8) { nodes { id name } }
         }
       }
     }
