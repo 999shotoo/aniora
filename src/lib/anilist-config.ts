@@ -1,8 +1,6 @@
 // AniList OAuth client config.
-// We use the Implicit Grant flow (response_type=token) because AniList's
-// Cloudflare protection blocks server-to-server token exchange requests
-// coming from Cloudflare Workers (which is where our server functions run).
-// Implicit Grant returns the access token directly in the URL fragment.
+// Authorization Code Grant: AniList returns ?code=... to /auth/callback,
+// then the app exchanges that code server-side for an access token.
 
 export const ANILIST_CLIENT_ID: string =
   (import.meta.env.VITE_ANILIST_CLIENT_ID as string | undefined) ?? "44825";
@@ -21,7 +19,7 @@ export function getAniListAuthUrl(): string | null {
   const params = new URLSearchParams({
     client_id: ANILIST_CLIENT_ID,
     redirect_uri: redirect,
-    response_type: "token",
+    response_type: "code",
   });
   return `https://anilist.co/api/v2/oauth/authorize?${params.toString()}`;
 }
