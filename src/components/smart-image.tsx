@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ImageOff } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -16,6 +16,10 @@ interface Props {
  * Image with a shimmer placeholder that fades in when loaded, cross-fades to
  * a fallback on error, and finally renders a terminal-styled "image not found"
  * card if both the source and the fallback fail.
+ *
+ * Handles the cached-image case where the browser resolves the request
+ * synchronously — before React attaches the onLoad handler — by checking
+ * `img.complete && naturalWidth > 0` on every src change.
  */
 export function SmartImage({
   src,
@@ -28,12 +32,22 @@ export function SmartImage({
   const [loaded, setLoaded] = useState(false);
   const [current, setCurrent] = useState(src || fallback);
   const [broken, setBroken] = useState(false);
+  const imgRef = useRef<HTMLImageElement | null>(null);
 
   useEffect(() => {
     setLoaded(false);
     setBroken(false);
     setCurrent(src || fallback);
   }, [src, fallback]);
+
+  // Detect images already resolved from cache before onLoad wires up.
+  useEffect(() => {
+    const el = imgRef.current;
+    if (!el) return;
+    if (el.complete && el.naturalWidth > 0) {
+      setLoaded(true);
+    }
+  }, [current]);
 
   if (broken) {
     return <ImageNotFound className={className} label={alt} />;
@@ -47,16 +61,18 @@ export function SmartImage({
             key="shimmer"
             initial={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.35 }}
+            transition={{ duration: 0.25 }}
             className="absolute inset-0 shimmer"
           />
         )}
       </AnimatePresence>
       <motion.img
+        ref={imgRef}
         key={current}
         src={current}
         alt={alt}
         loading={loading}
+        decoding="async"
         onLoad={() => setLoaded(true)}
         onError={() => {
           if (current !== fallback && fallback) {
@@ -68,7 +84,7 @@ export function SmartImage({
         }}
         initial={{ opacity: 0, scale: 1.02 }}
         animate={{ opacity: loaded ? 1 : 0, scale: loaded ? 1 : 1.02 }}
-        transition={{ duration: 0.5, ease: "easeOut" }}
+        transition={{ duration: 0.4, ease: "easeOut" }}
         className={cn("h-full w-full object-cover", imgClassName)}
       />
     </div>
