@@ -5,6 +5,7 @@ import { exchangeAniListCode } from "@/lib/anilist-oauth.functions";
 import { getAniListToken, setAniListToken } from "@/lib/anilist";
 import {
   ANILIST_CLIENT_ID,
+  getAniListFallbackAuthUrl,
   getAniListAuthUrl,
   getAniListRedirectUri,
 } from "@/lib/anilist-config";
@@ -31,20 +32,25 @@ function AuthCallback() {
     let navTimer: number | undefined;
 
     const authUrl = getAniListAuthUrl();
+    const fallbackAuthUrl = getAniListFallbackAuthUrl();
     const currentRedirectUri = getAniListRedirectUri();
     setRetryUrl(authUrl);
     setRedirectUri(currentRedirectUri);
 
     const queryParams = new URLSearchParams(window.location.search);
+    const hashParams = new URLSearchParams(window.location.hash.replace(/^#/, ""));
 
     const err =
       queryParams.get("error") ||
-      queryParams.get("hint");
+      queryParams.get("hint") ||
+      hashParams.get("error");
     const errDesc =
       queryParams.get("error_description") ||
-      queryParams.get("message");
+      queryParams.get("message") ||
+      hashParams.get("error_description");
 
     const code = queryParams.get("code");
+    const hashToken = hashParams.get("access_token");
 
     async function finishWithToken(token: string) {
       setAniListToken(token);
@@ -62,6 +68,11 @@ function AuthCallback() {
     }
 
     async function exchangeCode() {
+      if (hashToken) {
+        await finishWithToken(hashToken);
+        return;
+      }
+
       if (err) {
         setStatus("fail");
         setDetail(`${err}${errDesc ? `: ${errDesc}` : ""}`);
@@ -123,8 +134,20 @@ function AuthCallback() {
       } catch (error) {
         if (cancelled) return;
         sessionStorage.removeItem(codeKey);
+        const message = error instanceof Error ? error.message : "AniList token exchange failed.";
+        const fallbackKey = `anilist-code-fallback:${code}`;
+
+        if (message.includes("blocked (403)") && fallbackAuthUrl && !sessionStorage.getItem(fallbackKey)) {
+          sessionStorage.setItem(fallbackKey, "1");
+          setDetail("AniList blocked the server exchange. Retrying through AniList directly...");
+          navTimer = window.setTimeout(() => {
+            window.location.href = fallbackAuthUrl;
+          }, 650);
+          return;
+        }
+
         setStatus("fail");
-        setDetail(error instanceof Error ? error.message : "AniList token exchange failed.");
+        setDetail(message);
       }
     }
 
