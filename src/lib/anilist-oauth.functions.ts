@@ -22,105 +22,50 @@ export const exchangeAniListCode = createServerFn({ method: "POST" })
       code: data.code,
     };
 
-    const endpoints = ["https://anilist.co/api/v2/oauth/token", "https://graphql.anilist.co/api/v2/oauth/token"];
-    const browserLikeHeaders = {
-      Accept: "application/json",
-      "Accept-Language": "en-US,en;q=0.9",
-      "Cache-Control": "no-cache",
-      "User-Agent":
-        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Aniora/1.0 Safari/537.36",
-    };
-
-    const requests = endpoints.flatMap((endpoint) => [
-      {
-        endpoint,
-        bodyType: "json" as const,
-        headers: {
-          ...browserLikeHeaders,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(payload),
+    const res = await fetch("https://anilist.co/api/v2/oauth/token", {
+      method: "POST",
+      headers: {
+        // AniList's Authorization Code Grant expects JSON exactly as documented.
+        // Do not retry as form-data or against the GraphQL host: those paths can
+        // return misleading `unsupported_grant_type` errors.
+        "Content-Type": "application/json",
+        Accept: "application/json",
       },
-      {
-        endpoint,
-        bodyType: "form" as const,
-        headers: {
-          ...browserLikeHeaders,
-          "Content-Type": "application/x-www-form-urlencoded",
-        },
-        body: new URLSearchParams(payload).toString(),
-      },
-    ]);
+      body: JSON.stringify(payload),
+    });
 
-    const attempts = [] as Array<{
-      endpoint: string;
-      bodyType: "json" | "form";
-      status: number;
-      json: any;
-    }>;
-
-    for (const request of requests) {
-      const res = await fetch(request.endpoint, {
-        method: "POST",
-        headers: request.headers,
-        body: request.body,
-      });
-      const rawText = await res.text();
-      let json: any = {};
-      try {
-        json = rawText ? JSON.parse(rawText) : {};
-      } catch {
-        json = { raw: rawText.slice(0, 300) };
-      }
-
-      if (res.ok && json?.access_token) {
-        return {
-          access_token: json.access_token as string,
-          token_type: (json.token_type as string) ?? "Bearer",
-          expires_in: (json.expires_in as number) ?? null,
-        };
-      }
-
-      attempts.push({ endpoint: request.endpoint, bodyType: request.bodyType, status: res.status, json });
-
-      // 403 is a host/WAF block before OAuth validation, so try the alternate
-      // host/body format. Any other OAuth response means AniList understood the
-      // one-time code, so do not burn it with more retries.
-      if (res.status !== 403) break;
+    const rawText = await res.text();
+    let json: any = {};
+    try {
+      json = rawText ? JSON.parse(rawText) : {};
+    } catch {
+      json = { raw: rawText.slice(0, 500) };
     }
 
-    const last = attempts.at(-1);
-    if (last) {
-      const allAttemptsWere403 = attempts.every((attempt) => attempt.status === 403);
-      console.warn("AniList OAuth exchange failed", {
-        attempts: attempts.map((attempt) => ({
-          status: attempt.status,
-          endpoint: attempt.endpoint,
-          bodyType: attempt.bodyType,
-          error: attempt.json?.error,
-          message: attempt.json?.message,
-          hint: attempt.json?.hint,
-          raw: attempt.json?.raw,
-        })),
-        error: last.json?.error,
-        message: last.json?.message,
-        hint: last.json?.hint,
-        raw: last.json?.raw,
-        clientId,
-        redirectUri: data.redirectUri,
-      });
-
-      if (allAttemptsWere403) {
-        throw new Error("AniList token exchange blocked (403). Retrying with the browser-safe AniList flow.");
-      }
-
-      const providerMsg =
-        last.json?.hint || last.json?.message || last.json?.error || last.json?.raw;
-      const msg = providerMsg
-        ? `AniList token exchange failed (${last.status}): ${providerMsg}`
-        : `AniList token exchange failed (${last.status}). Make sure this exact redirect URL is registered in AniList: ${data.redirectUri}`;
-      throw new Error(String(msg));
+    if (res.ok && json?.access_token) {
+      return {
+        access_token: json.access_token as string,
+        token_type: (json.token_type as string) ?? "Bearer",
+        expires_in: (json.expires_in as number) ?? null,
+      };
     }
 
-    throw new Error("AniList token exchange failed before a request was made.");
+    console.warn("AniList OAuth exchange failed", {
+      status: res.status,
+      error: json?.error,
+      message: json?.message,
+      hint: json?.hint,
+      raw: json?.raw,
+      clientId,
+      redirectUri: data.redirectUri,
+      hasCode: Boolean(data.code),
+      hasSecret: Boolean(clientSecret),
+    });
+
+    const providerMsg = json?.hint || json?.message || json?.error || json?.raw;
+    const msg = providerMsg
+      ? `AniList token exchange failed (${res.status}): ${providerMsg}`
+      : `AniList token exchange failed (${res.status}). Make sure this exact redirect URL is registered in AniList: ${data.redirectUri}`;
+
+    throw new Error(String(msg));
   });
