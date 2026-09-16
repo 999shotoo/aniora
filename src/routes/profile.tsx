@@ -83,7 +83,7 @@ function ProfilePage() {
 
   if (isLoading && hasToken) {
     return (
-      <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6">
+      <div className="mx-auto max-w-none px-4 py-10 sm:px-6">
         <div className="h-40 w-full shimmer border border-border" />
         <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
           {Array.from({ length: 4 }).map((_, i) => (
@@ -140,7 +140,7 @@ function ProfilePage() {
             <div className="absolute inset-0 bg-gradient-to-b from-transparent to-background" />
           </div>
         )}
-        <div className="relative mx-auto flex max-w-6xl flex-wrap items-center gap-4 px-4 py-10 sm:px-6">
+        <div className="relative mx-auto flex max-w-none flex-wrap items-center gap-4 px-4 py-10 sm:px-6">
           {viewer.avatar?.large ? (
             <img
               src={viewer.avatar.large}
@@ -207,7 +207,7 @@ function ProfilePage() {
       </div>
 
       {/* Top stats grid */}
-      <div className="mx-auto grid max-w-6xl gap-3 px-4 py-6 sm:grid-cols-2 sm:px-6 lg:grid-cols-6">
+      <div className="mx-auto grid max-w-none gap-3 px-4 py-6 sm:grid-cols-2 sm:px-6 lg:grid-cols-6">
         <Stat icon={Tv} label="anime" value={stats?.count ?? 0} />
         <Stat icon={Hash} label="episodes" value={stats?.episodesWatched ?? 0} />
         <Stat
@@ -230,7 +230,7 @@ function ProfilePage() {
 
       {/* About */}
       {viewer.about && (
-        <Section title="~$ cat about.md" className="max-w-6xl">
+        <Section title="~$ cat about.md" className="max-w-none">
           <div className="border border-dashed border-border bg-card p-4">
             <p className="whitespace-pre-wrap text-xs leading-relaxed text-card-foreground">
               {stripHtml(viewer.about)}
@@ -241,7 +241,7 @@ function ProfilePage() {
 
       {/* Status breakdown */}
       {stats?.statuses?.length ? (
-        <Section title="~$ stat --by=status" className="max-w-6xl">
+        <Section title="~$ stat --by=status" className="max-w-none">
           <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-6">
             {stats.statuses.map((s) => (
               <div
@@ -265,13 +265,13 @@ function ProfilePage() {
 
       {/* Score distribution */}
       {stats?.scores?.length ? (
-        <Section title="~$ stat --histogram=scores" className="max-w-6xl">
+        <Section title="~$ stat --histogram=scores" className="max-w-none">
           <ScoreHistogram data={stats.scores} />
         </Section>
       ) : null}
 
       {/* Genres + Tags */}
-      <div className="mx-auto grid max-w-6xl gap-6 px-4 pt-6 sm:px-6 md:grid-cols-2">
+      <div className="mx-auto grid max-w-none gap-6 px-4 pt-6 sm:px-6 md:grid-cols-2">
         {stats?.genres?.length ? (
           <BarList
             icon={Tag}
@@ -342,7 +342,7 @@ function ProfilePage() {
 
       {/* Release / Start year timeline */}
       {stats?.releaseYears?.length ? (
-        <Section title="~$ timeline --release-year" className="max-w-6xl">
+        <Section title="~$ timeline --release-year" className="max-w-none">
           <YearBars
             data={stats.releaseYears.map((y) => ({
               year: y.releaseYear,
@@ -354,7 +354,7 @@ function ProfilePage() {
 
       {/* Favourites */}
       {viewer.favourites?.anime?.nodes?.length ? (
-        <Section title="~$ ls favourites/anime/" className="max-w-6xl">
+        <Section title="~$ ls favourites/anime/" className="max-w-none">
           <div className="grid grid-cols-3 gap-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8">
             {viewer.favourites.anime.nodes.map((a) => (
               <Link
@@ -379,7 +379,7 @@ function ProfilePage() {
       ) : null}
 
       {viewer.favourites?.characters?.nodes?.length ? (
-        <Section title="~$ ls favourites/characters/" className="max-w-6xl">
+        <Section title="~$ ls favourites/characters/" className="max-w-none">
           <PersonGrid
             items={viewer.favourites.characters.nodes.map((c) => ({
               id: c.id,
@@ -391,7 +391,7 @@ function ProfilePage() {
       ) : null}
 
       {viewer.favourites?.staff?.nodes?.length ? (
-        <Section title="~$ ls favourites/staff/" className="max-w-6xl">
+        <Section title="~$ ls favourites/staff/" className="max-w-none">
           <PersonGrid
             items={viewer.favourites.staff.nodes.map((c) => ({
               id: c.id,
@@ -403,7 +403,7 @@ function ProfilePage() {
       ) : null}
 
       {viewer.favourites?.studios?.nodes?.length ? (
-        <Section title="~$ ls favourites/studios/" className="max-w-6xl">
+        <Section title="~$ ls favourites/studios/" className="max-w-none">
           <div className="flex flex-wrap gap-2">
             {viewer.favourites.studios.nodes.map((s) => (
               <span
@@ -428,7 +428,7 @@ function ProfilePage() {
             key={s.key}
             title={`~$ ls anilist/${s.label}/`}
             meta={`${entries.length} entries`}
-            className="max-w-6xl"
+            className="max-w-none"
           >
             {q.isLoading ? (
               <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
@@ -483,7 +483,7 @@ function ProfilePage() {
 
       {/* Activity feed */}
       {activity.data && activity.data.length > 0 && (
-        <Section title="~$ tail -n 25 activity.log" className="max-w-6xl">
+        <Section title="~$ tail -n 25 activity.log" className="max-w-none">
           <ul className="divide-y divide-border border border-border bg-card">
             {activity.data.map((a) => (
               <li key={a.id} className="flex items-center gap-3 px-3 py-2">
@@ -519,7 +519,7 @@ function ProfilePage() {
       )}
 
       {/* Local storage summary */}
-      <Section title="~$ cat local/*.log" className="max-w-6xl">
+      <Section title="~$ cat local/*.log" className="max-w-none">
         <div className="grid gap-3 md:grid-cols-2">
           <div className="border border-border bg-card p-4">
             <div className="mb-2 flex items-center gap-2 text-[0.6rem] uppercase tracking-widest text-muted-foreground">
@@ -588,7 +588,7 @@ function ProfilePage() {
       </Section>
 
       {/* Account / options footer */}
-      <Section title="~$ env --user" className="max-w-6xl">
+      <Section title="~$ env --user" className="max-w-none">
         <div className="grid grid-cols-2 gap-2 border border-dashed border-border bg-card p-3 text-[0.65rem] font-mono md:grid-cols-4">
           <KV k="uid" v={String(viewer.id)} />
           <KV k="title_lang" v={viewer.options?.titleLanguage ?? "—"} />
