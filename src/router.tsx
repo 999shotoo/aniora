@@ -21,6 +21,9 @@ export const getRouter = () => {
     defaultPreload: "intent",
     defaultPendingMs: 0,
     defaultPendingMinMs: 0,
+    // Render everything client-side — pages switch instantly and each
+    // route shows its own skeletons while data streams in.
+    defaultSsr: false,
   });
 
   return router;
