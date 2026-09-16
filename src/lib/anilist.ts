@@ -44,19 +44,57 @@ export interface AniListMedia {
   endDate?: { year: number | null; month: number | null; day: number | null };
 }
 
+export interface AniListStatDistribution {
+  count: number;
+  meanScore: number;
+  minutesWatched: number;
+  mediaIds?: number[];
+}
+
 export interface AniListViewer {
   id: number;
   name: string;
   avatar: { large: string | null; medium: string | null } | null;
   bannerImage: string | null;
   about: string | null;
+  siteUrl?: string | null;
+  donatorTier?: number | null;
+  donatorBadge?: string | null;
+  createdAt?: number | null;
+  updatedAt?: number | null;
+  options?: {
+    titleLanguage?: string | null;
+    displayAdultContent?: boolean | null;
+    profileColor?: string | null;
+    timezone?: string | null;
+  } | null;
+  mediaListOptions?: {
+    scoreFormat?: string | null;
+  } | null;
   statistics?: {
     anime: {
       count: number;
       meanScore: number;
+      standardDeviation: number;
       minutesWatched: number;
       episodesWatched: number;
+      statuses: (AniListStatDistribution & { status: string })[];
+      formats: (AniListStatDistribution & { format: string })[];
+      scores: (AniListStatDistribution & { score: number })[];
+      genres: (AniListStatDistribution & { genre: string })[];
+      tags: (AniListStatDistribution & { tag: { name: string } })[];
+      studios: (AniListStatDistribution & { studio: { name: string } })[];
+      releaseYears: (AniListStatDistribution & { releaseYear: number })[];
+      startYears: (AniListStatDistribution & { startYear: number })[];
+      countries: (AniListStatDistribution & { country: string })[];
+      voiceActors: (AniListStatDistribution & { voiceActor: { name: { full: string } } })[];
     };
+  };
+  favourites?: {
+    anime: { nodes: { id: number; title: AniListTitle; coverImage: AniListCoverImage }[] };
+    characters: { nodes: { id: number; name: { full: string }; image: { large: string | null } }[] };
+    staff: { nodes: { id: number; name: { full: string }; image: { large: string | null } }[] };
+    studios: { nodes: { id: number; name: string }[] };
   };
 }
 
@@ -220,11 +258,55 @@ export async function getViewer(): Promise<AniListViewer | null> {
       Viewer {
         id
         name
+        siteUrl
+        donatorTier
+        donatorBadge
+        createdAt
+        updatedAt
         avatar { large medium }
         bannerImage
-        about
+        about(asHtml: false)
+        options {
+          titleLanguage
+          displayAdultContent
+          profileColor
+          timezone
+        }
+        mediaListOptions { scoreFormat }
         statistics {
-          anime { count meanScore minutesWatched episodesWatched }
+          anime {
+            count
+            meanScore
+            standardDeviation
+            minutesWatched
+            episodesWatched
+            statuses(sort: COUNT_DESC) { status count meanScore minutesWatched }
+            formats(sort: COUNT_DESC) { format count meanScore minutesWatched }
+            scores(sort: MEAN_SCORE) { score count meanScore minutesWatched }
+            genres(sort: COUNT_DESC, limit: 12) { genre count meanScore minutesWatched }
+            tags(sort: COUNT_DESC, limit: 12) { tag { name } count meanScore minutesWatched }
+            studios(sort: COUNT_DESC, limit: 10) { studio { name } count meanScore minutesWatched }
+            releaseYears(sort: RELEASE_YEAR) { releaseYear count meanScore minutesWatched }
+            startYears(sort: START_YEAR) { startYear count meanScore minutesWatched }
+            countries(sort: COUNT_DESC) { country count meanScore minutesWatched }
+            voiceActors(sort: COUNT_DESC, limit: 8) { voiceActor { name { full } } count meanScore minutesWatched }
+          }
+        }
+        favourites {
+          anime(perPage: 12) {
+            nodes {
+              id
+              title { romaji english native userPreferred }
+              coverImage { extraLarge large medium color }
+            }
+          }
+          characters(perPage: 8) {
+            nodes { id name { full } image { large } }
+          }
+          staff(perPage: 8) {
+            nodes { id name { full } image { large } }
+          }
+          studios(perPage: 8) { nodes { id name } }
         }
       }
     }

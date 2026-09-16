@@ -80,3 +80,49 @@ export async function fetchViewerList(
   );
   return data.Page.mediaList ?? [];
 }
+
+export interface AniListActivityItem {
+  id: number;
+  status: string | null;
+  progress: string | null;
+  createdAt: number;
+  media: {
+    id: number;
+    title: { userPreferred: string | null };
+    coverImage: { large: string | null };
+  } | null;
+}
+
+const ACTIVITY_QUERY = `
+  query ($userId: Int) {
+    Page(page: 1, perPage: 25) {
+      activities(userId: $userId, type: ANIME_LIST, sort: ID_DESC) {
+        ... on ListActivity {
+          id
+          status
+          progress
+          createdAt
+          media {
+            id
+            title { userPreferred }
+            coverImage { large }
+          }
+        }
+      }
+    }
+  }
+`;
+
+export async function fetchViewerActivity(
+  userId: number,
+): Promise<AniListActivityItem[]> {
+  if (!getAniListToken()) return [];
+  try {
+    const data = await anilistFetch<{
+      Page: { activities: AniListActivityItem[] };
+    }>(ACTIVITY_QUERY, { userId });
+    return (data.Page.activities ?? []).filter((a) => a && a.id);
+  } catch {
+    return [];
+  }
+}
