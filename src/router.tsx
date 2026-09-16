@@ -18,9 +18,6 @@ export const getRouter = () => {
     context: { queryClient },
     scrollRestoration: true,
     defaultPreloadStaleTime: 0,
-    // Fully client-rendered: pages switch instantly and their own
-    // components/loaders render skeletons while data streams in.
-    defaultSsr: false,
     defaultPreload: "intent",
     defaultPendingMs: 0,
     defaultPendingMinMs: 0,
