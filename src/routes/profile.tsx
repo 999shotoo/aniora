@@ -246,14 +246,16 @@ function ProfileTabs({
   history,
 }: {
   viewer: NonNullable<ReturnType<typeof useAniListViewer>["viewer"]>;
-  stats: NonNullable<
-    NonNullable<
-      ReturnType<typeof useAniListViewer>["viewer"]
-    >["statistics"]
-  >["anime"];
+  stats:
+    | NonNullable<
+        NonNullable<
+          ReturnType<typeof useAniListViewer>["viewer"]
+        >["statistics"]
+      >["anime"]
+    | undefined;
   days: number;
-  listsById: ReturnType<typeof useQueries>;
-  activity: ReturnType<typeof useQuery>;
+  listsById: Array<{ data?: Awaited<ReturnType<typeof fetchViewerList>>; isLoading: boolean; refetch: () => void }>;
+  activity: { data?: Awaited<ReturnType<typeof fetchViewerActivity>>; isFetching: boolean; refetch: () => void };
   wishlistItems: ReturnType<typeof useWishlist>["items"];
   history: ReturnType<typeof useWatchHistory>["items"];
 }) {
