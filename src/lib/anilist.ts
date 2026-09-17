@@ -286,8 +286,8 @@ export async function getViewer(): Promise<AniListViewer | null> {
             genres(sort: COUNT_DESC, limit: 12) { genre count meanScore minutesWatched }
             tags(sort: COUNT_DESC, limit: 12) { tag { name } count meanScore minutesWatched }
             studios(sort: COUNT_DESC, limit: 10) { studio { name } count meanScore minutesWatched }
-            releaseYears(sort: RELEASE_YEAR) { releaseYear count meanScore minutesWatched }
-            startYears(sort: START_YEAR) { startYear count meanScore minutesWatched }
+            releaseYears(sort: MEAN_SCORE_DESC) { releaseYear count meanScore minutesWatched }
+            startYears(sort: MEAN_SCORE_DESC) { startYear count meanScore minutesWatched }
             countries(sort: COUNT_DESC) { country count meanScore minutesWatched }
             voiceActors(sort: COUNT_DESC, limit: 8) { voiceActor { name { full } } count meanScore minutesWatched }
           }
