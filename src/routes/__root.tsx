@@ -4,12 +4,10 @@ import {
   Link,
   createRootRouteWithContext,
   useRouter,
-  useRouterState,
   HeadContent,
   Scripts,
 } from "@tanstack/react-router";
 import { useEffect, type ReactNode } from "react";
-import { AnimatePresence, motion } from "framer-motion";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
@@ -164,7 +162,7 @@ function RootComponent() {
       <div className="flex min-h-screen flex-col bg-background">
         <SiteHeader />
         <main className="flex-1">
-          <RouteFadeOutlet />
+          <Outlet />
         </main>
         <footer className="mt-16 border-t border-border">
           <div className="mx-auto flex max-w-none flex-col gap-2 px-6 lg:px-10 py-6 text-[0.65rem] uppercase tracking-widest text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
@@ -178,24 +176,4 @@ function RootComponent() {
   );
 }
 
-function RouteFadeOutlet() {
-  const pathname = useRouterState({ select: (s) => s.location.pathname });
-  return (
-    <AnimatePresence mode="popLayout" initial={false}>
-      <motion.div
-        key={pathname}
-        initial={{ opacity: 0, filter: "blur(8px)", scale: 0.995 }}
-        animate={{ opacity: 1, filter: "blur(0px)", scale: 1 }}
-        exit={{ opacity: 0, filter: "blur(8px)", scale: 1.005 }}
-        transition={{
-          duration: 0.45,
-          ease: [0.22, 1, 0.36, 1],
-        }}
-        style={{ willChange: "opacity, filter, transform" }}
-      >
-        <Outlet />
-      </motion.div>
-    </AnimatePresence>
-  );
-}
 
