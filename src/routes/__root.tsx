@@ -157,6 +157,23 @@ function RootComponent() {
     };
   }, []);
 
+  // Silence benign view-transition aborts that fire when the user
+  // navigates before the previous transition finishes.
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const swallow = (e: PromiseRejectionEvent) => {
+      const msg = String((e.reason as Error)?.message ?? e.reason ?? "");
+      if (
+        msg.includes("Transition was aborted") ||
+        msg.includes("Transition was skipped")
+      ) {
+        e.preventDefault();
+      }
+    };
+    window.addEventListener("unhandledrejection", swallow);
+    return () => window.removeEventListener("unhandledrejection", swallow);
+  }, []);
+
   return (
     <QueryClientProvider client={queryClient}>
       <div className="flex min-h-screen flex-col bg-background">
