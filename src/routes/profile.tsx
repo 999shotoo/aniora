@@ -349,7 +349,7 @@ function ProfileTabs({
       {tab === "anime" && (
         <>
           {LIST_STATUSES.map((s, i) => {
-            const q = listsById[i] as { data?: Awaited<ReturnType<typeof fetchViewerList>>; isLoading: boolean };
+            const q = listsById[i];
             const entries = q.data ?? [];
             if (!q.isLoading && entries.length === 0) return null;
             return (
