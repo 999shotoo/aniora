@@ -617,10 +617,10 @@ function ProfileTabs({
 
       {tab === "activity" && (
         <>
-          {activity.data && (activity.data as any[]).length > 0 ? (
+          {activity.data && activity.data.length > 0 ? (
             <Section title="~$ tail -n 25 activity.log" className="max-w-none">
               <ul className="divide-y divide-border border border-border bg-card">
-                {(activity.data as any[]).map((a) => (
+                {activity.data.map((a) => (
                   <li key={a.id} className="flex items-center gap-3 px-3 py-2">
                     {a.media?.coverImage?.large ? (
                       <SmartImage
