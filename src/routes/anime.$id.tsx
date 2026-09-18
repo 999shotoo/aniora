@@ -25,6 +25,71 @@ import { InfoHeaderSkeleton, Skeleton } from "@/components/skeleton";
 
 export const Route = createFileRoute("/anime/$id")({
   component: AnimeInfoPage,
+  loader: async ({ params, context }) => {
+    const id = Number(params.id);
+    if (!Number.isFinite(id)) return null;
+    try {
+      return await context.queryClient.ensureQueryData({
+        queryKey: ["anime", id],
+        queryFn: () => getAnimeById(id),
+        staleTime: 10 * 60_000,
+      });
+    } catch {
+      return null;
+    }
+  },
+  head: ({ params, loaderData }) => {
+    const url = `https://anilist-dream-stream.lovable.app/anime/${params.id}`;
+    const media = loaderData ?? null;
+    const title = media ? pickTitle(media.title) : "Anime";
+    const rawDesc = media?.description
+      ? media.description.replace(/<[^>]+>/g, "").replace(/\s+/g, " ").trim()
+      : "";
+    const desc = rawDesc
+      ? rawDesc.slice(0, 155) + (rawDesc.length > 155 ? "…" : "")
+      : `Watch ${title} on Zen Stream — dub or sub, episode guide, and streaming info.`;
+    const pageTitle = `${title} — Zen Stream`.slice(0, 60);
+    const image = media?.coverImage?.extraLarge || media?.coverImage?.large || undefined;
+    const scripts = media
+      ? [
+          {
+            type: "application/ld+json",
+            children: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": media.format === "MOVIE" ? "Movie" : "TVSeries",
+              name: title,
+              alternateName: [media.title.english, media.title.native].filter(Boolean),
+              description: rawDesc || undefined,
+              image: image || undefined,
+              genre: media.genres,
+              numberOfEpisodes: media.episodes ?? undefined,
+              aggregateRating:
+                media.averageScore != null
+                  ? {
+                      "@type": "AggregateRating",
+                      ratingValue: (media.averageScore / 10).toFixed(2),
+                      bestRating: "10",
+                      ratingCount: media.popularity ?? 1,
+                    }
+                  : undefined,
+            }),
+          },
+        ]
+      : undefined;
+    return {
+      meta: [
+        { title: pageTitle },
+        { name: "description", content: desc },
+        { property: "og:title", content: pageTitle },
+        { property: "og:description", content: desc },
+        { property: "og:type", content: media?.format === "MOVIE" ? "video.movie" : "video.tv_show" },
+        { property: "og:url", content: url },
+        ...(image ? [{ property: "og:image", content: image }, { name: "twitter:image", content: image }] : []),
+      ],
+      links: [{ rel: "canonical", href: url }],
+      scripts,
+    };
+  },
 });
 
 function formatDate(d?: { year: number | null; month: number | null; day: number | null } | null) {
