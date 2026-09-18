@@ -9,9 +9,17 @@ export const Route = createFileRoute("/anime/")({
   component: AnimePage,
   head: () => ({
     meta: [
-      { title: "Anime — Zen Stream" },
-      { name: "description", content: "Browse trending, popular, and seasonal anime series." },
+      { title: "Browse TV Anime — Zen Stream" },
+      {
+        name: "description",
+        content:
+          "Browse trending, popular, top-rated, and recent TV anime series. Stream them dub or sub on Zen Stream.",
+      },
+      { property: "og:title", content: "Browse TV Anime — Zen Stream" },
+      { property: "og:description", content: "Trending, popular, top-rated, and recent TV anime series." },
+      { property: "og:url", content: "https://anilist-dream-stream.lovable.app/anime" },
     ],
+    links: [{ rel: "canonical", href: "https://anilist-dream-stream.lovable.app/anime" }],
   }),
 });
 
