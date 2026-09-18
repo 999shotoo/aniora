@@ -131,6 +131,9 @@ function HomePage() {
 
   return (
     <>
+      <h1 className="sr-only">
+        Zen Stream — Stream anime with a terminal-clean interface
+      </h1>
       <Hero items={featured} />
 
       <div className="mx-auto max-w-none px-6 lg:px-10 pt-6">
