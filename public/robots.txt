@@ -1,2 +1,6 @@
 User-agent: *
 Allow: /
+Disallow: /auth/
+Disallow: /watch/
+
+Sitemap: https://anilist-dream-stream.lovable.app/sitemap.xml
