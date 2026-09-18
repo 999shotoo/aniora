@@ -130,6 +130,27 @@ function RootShell({ children }: { children: ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
+  const persister = useMemo(
+    () =>
+      typeof window === "undefined"
+        ? null
+        : createSyncStoragePersister({
+            storage: window.localStorage,
+            key: "zen-stream-query-cache",
+            throttleTime: 2000,
+          }),
+    [],
+  );
+
+  if (!persister) {
+    return (
+      <div className="flex min-h-screen flex-col bg-background">
+        <main className="flex-1"><Outlet /></main>
+      </div>
+    );
+  }
+
+
 
   useEffect(() => {
     if (typeof window === "undefined") return;
