@@ -1,4 +1,6 @@
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { QueryClient } from "@tanstack/react-query";
+import { PersistQueryClientProvider } from "@tanstack/react-query-persist-client";
+import { createSyncStoragePersister } from "@tanstack/query-sync-storage-persister";
 import {
   Outlet,
   Link,
@@ -7,7 +9,7 @@ import {
   HeadContent,
   Scripts,
 } from "@tanstack/react-router";
-import { useEffect, type ReactNode } from "react";
+import { useEffect, useMemo, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
@@ -128,6 +130,27 @@ function RootShell({ children }: { children: ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
+  const persister = useMemo(
+    () =>
+      typeof window === "undefined"
+        ? null
+        : createSyncStoragePersister({
+            storage: window.localStorage,
+            key: "zen-stream-query-cache",
+            throttleTime: 2000,
+          }),
+    [],
+  );
+
+  if (!persister) {
+    return (
+      <div className="flex min-h-screen flex-col bg-background">
+        <main className="flex-1"><Outlet /></main>
+      </div>
+    );
+  }
+
+
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -175,7 +198,14 @@ function RootComponent() {
   }, []);
 
   return (
-    <QueryClientProvider client={queryClient}>
+    <PersistQueryClientProvider
+      client={queryClient}
+      persistOptions={{
+        persister,
+        maxAge: 24 * 60 * 60 * 1000,
+        buster: "v1",
+      }}
+    >
       <div className="flex min-h-screen flex-col bg-background">
         <SiteHeader />
         <main className="flex-1">
@@ -189,7 +219,7 @@ function RootComponent() {
           </div>
         </footer>
       </div>
-    </QueryClientProvider>
+    </PersistQueryClientProvider>
   );
 }
 
