@@ -6,9 +6,13 @@ export const getRouter = () => {
   const queryClient = new QueryClient({
     defaultOptions: {
       queries: {
-        staleTime: 60_000,
+        // Aggressive caching — avoid re-hitting AniList/mappings on every mount.
+        staleTime: 10 * 60_000,
+        gcTime: 60 * 60_000,
         retry: 1,
         refetchOnWindowFocus: false,
+        refetchOnMount: false,
+        refetchOnReconnect: false,
       },
     },
   });
@@ -18,7 +22,8 @@ export const getRouter = () => {
     context: { queryClient },
     scrollRestoration: true,
     defaultPreloadStaleTime: 0,
-    defaultPreload: "intent",
+    // No preload — avoids fetching route chunks on hover (cuts edge requests).
+    defaultPreload: false,
     defaultPendingMs: 0,
     defaultPendingMinMs: 0,
     defaultViewTransition: true,
