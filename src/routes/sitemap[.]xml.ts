@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import type {} from "@tanstack/react-start";
 
-const BASE_URL = "";
+const BASE_URL = "https://anilist-dream-stream.lovable.app";
 
 interface SitemapEntry {
   path: string;
@@ -19,6 +19,8 @@ export const Route = createFileRoute("/sitemap.xml")({
           { path: "/movies", changefreq: "weekly", priority: "0.8" },
           { path: "/search", changefreq: "weekly", priority: "0.6" },
           { path: "/wishlist", changefreq: "monthly", priority: "0.3" },
+          { path: "/history", changefreq: "monthly", priority: "0.3" },
+          { path: "/profile", changefreq: "monthly", priority: "0.3" },
         ];
 
         const urls = entries.map(
