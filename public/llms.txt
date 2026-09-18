@@ -1,0 +1,15 @@
+# Zen Stream
+
+> Terminal-clean anime streaming platform with AniList integration. Search, wishlist, and watch dub or sub.
+
+Zen Stream is a fast, minimalist web app for discovering and streaming anime. It uses AniList for metadata (titles, covers, synopses, scores, seasonal calendars) and provides episode guides sourced from open mapping data. Users can optionally sign in with AniList to sync their watch list.
+
+## Pages
+
+- [Home](/): Featured hero, trending, popular, seasonal, top-rated, and top-airing anime.
+- [Browse TV Anime](/anime): Trending, popular, top-rated, and recently aired TV anime series.
+- [Browse Anime Movies](/movies): Popular, top-rated, trending, and recent anime films.
+- [Search](/search): Full-text anime search with genre, year, format, status, and sort filters.
+- [Wishlist](/wishlist): Locally saved anime titles.
+- [History](/history): Locally tracked watch history.
+- [Profile](/profile): AniList profile, lists, stats, favorites, and activity when signed in.
