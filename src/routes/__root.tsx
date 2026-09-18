@@ -81,31 +81,60 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Zen Stream — Anime, terminal-clean." },
+      { title: "Zen Stream — Anime Streaming, Terminal-Clean" },
       {
         name: "description",
         content:
-          "Stream anime with a terminal-style interface. Powered by AniList. Search, wishlist, and watch dub or sub.",
+          "Zen Stream is a terminal-clean anime streaming platform with AniList integration — search, wishlist, and watch dub or sub instantly.",
       },
       { name: "author", content: "Zen Stream" },
-      { property: "og:title", content: "Zen Stream — Anime, terminal-clean." },
+      { property: "og:site_name", content: "Zen Stream" },
+      { property: "og:title", content: "Zen Stream — Anime Streaming, Terminal-Clean" },
       {
         property: "og:description",
         content:
-          "Stream anime with a terminal-style interface. Powered by AniList.",
+          "A terminal-clean anime streaming platform with AniList integration. Search, wishlist, and watch dub or sub.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:title", content: "Zen Stream — Anime, terminal-clean." },
-      { name: "description", content: "AniStream Hub is an anime streaming app with Anilist integration for discovery and personalized lists." },
-      { property: "og:description", content: "AniStream Hub is an anime streaming app with Anilist integration for discovery and personalized lists." },
-      { name: "twitter:description", content: "AniStream Hub is an anime streaming app with Anilist integration for discovery and personalized lists." },
-      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/37c824f9-abd7-4add-94c7-58ebfbc1cc29/id-preview-8b17a9f3--45f2bee1-fb20-467b-adda-6e829e88b4aa.lovable.app-1782965178839.png" },
-      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/37c824f9-abd7-4add-94c7-58ebfbc1cc29/id-preview-8b17a9f3--45f2bee1-fb20-467b-adda-6e829e88b4aa.lovable.app-1782965178839.png" },
+      { name: "twitter:title", content: "Zen Stream — Anime Streaming, Terminal-Clean" },
+      {
+        name: "twitter:description",
+        content:
+          "A terminal-clean anime streaming platform with AniList integration.",
+      },
     ],
     links: [
       { rel: "stylesheet", href: appCss },
       { rel: "icon", href: "/favicon.ico", type: "image/x-icon" },
+    ],
+    scripts: [
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "WebSite",
+          name: "Zen Stream",
+          url: "https://anilist-dream-stream.lovable.app",
+          description:
+            "Terminal-clean anime streaming platform with AniList integration.",
+          potentialAction: {
+            "@type": "SearchAction",
+            target:
+              "https://anilist-dream-stream.lovable.app/search?q={search_term_string}",
+            "query-input": "required name=search_term_string",
+          },
+        }),
+      },
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "Organization",
+          name: "Zen Stream",
+          url: "https://anilist-dream-stream.lovable.app",
+        }),
+      },
     ],
   }),
   shellComponent: RootShell,
