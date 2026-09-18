@@ -177,7 +177,14 @@ function RootComponent() {
   }, []);
 
   return (
-    <QueryClientProvider client={queryClient}>
+    <PersistQueryClientProvider
+      client={queryClient}
+      persistOptions={{
+        persister,
+        maxAge: 24 * 60 * 60 * 1000,
+        buster: "v1",
+      }}
+    >
       <div className="flex min-h-screen flex-col bg-background">
         <SiteHeader />
         <main className="flex-1">
@@ -191,7 +198,7 @@ function RootComponent() {
           </div>
         </footer>
       </div>
-    </QueryClientProvider>
+    </PersistQueryClientProvider>
   );
 }
 
