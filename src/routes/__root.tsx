@@ -305,8 +305,8 @@ function RootComponent() {
           </div>
           <div className="border-t border-border">
             <div className="mx-auto flex max-w-none flex-col gap-2 px-6 lg:px-10 py-4 text-[0.65rem] uppercase tracking-widest text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
-              <span>© {new Date().getFullYear()} aniora.qzz.io · terminal for anime</span>
-              <span>data · anilist · mappings · zenshin</span>
+              <span>© {new Date().getFullYear()} aniora.qzz.io · watch · track · enjoy</span>
+              <span>watch · track · enjoy</span>
             </div>
           </div>
         </footer>
