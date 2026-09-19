@@ -11,23 +11,21 @@ export const Route = createFileRoute("/")({
   component: HomePage,
   head: () => ({
     meta: [
-      { title: "Aniora — Stream Anime with a Terminal-Clean Interface" },
+      { title: "Aniora — Watch Anime Free Online in HD (Sub & Dub)" },
       {
         name: "description",
         content:
-          "Watch trending, popular, and seasonal anime dubbed or subbed. Aniora is a terminal-clean anime streaming platform powered by AniList.",
+          "Watch anime free on Aniora — stream trending, seasonal, and classic anime online in HD with sub or dub. Free anime streaming site with AniList sync, no signup.",
       },
-      { property: "og:title", content: "Aniora — Stream Anime with a Terminal-Clean Interface" },
+      { property: "og:title", content: "Aniora — Watch Anime Free Online in HD (Sub & Dub)" },
       {
         property: "og:description",
         content:
-          "Watch trending, popular, and seasonal anime dubbed or subbed. Powered by AniList.",
+          "Free anime streaming with AniList sync. Watch trending, seasonal, and classic anime — sub or dub — in HD.",
       },
       { property: "og:url", content: "https://aniora.qzz.io/" },
     ],
-    links: [
-      { rel: "canonical", href: "https://aniora.qzz.io/" },
-    ],
+    links: [{ rel: "canonical", href: "https://aniora.qzz.io/" }],
   }),
 });
 
