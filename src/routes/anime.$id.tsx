@@ -39,7 +39,7 @@ export const Route = createFileRoute("/anime/$id")({
     }
   },
   head: ({ params, loaderData }) => {
-    const url = `https://anilist-dream-stream.lovable.app/anime/${params.id}`;
+    const url = `https://aniora.qzz.io/anime/${params.id}`;
     const media = loaderData ?? null;
     const title = media ? pickTitle(media.title) : "Anime";
     const rawDesc = media?.description
@@ -47,8 +47,8 @@ export const Route = createFileRoute("/anime/$id")({
       : "";
     const desc = rawDesc
       ? rawDesc.slice(0, 155) + (rawDesc.length > 155 ? "…" : "")
-      : `Watch ${title} on Zen Stream — dub or sub, episode guide, and streaming info.`;
-    const pageTitle = `${title} — Zen Stream`.slice(0, 60);
+      : `Watch ${title} on Aniora — dub or sub, episode guide, and streaming info.`;
+    const pageTitle = `${title} — Aniora`.slice(0, 60);
     const image = media?.coverImage?.extraLarge || media?.coverImage?.large || undefined;
     const scripts = media
       ? [

@@ -9,7 +9,7 @@ export const Route = createFileRoute("/history")({
   component: HistoryPage,
   head: () => ({
     meta: [
-      { title: "Watch History — Zen Stream" },
+      { title: "Watch History — Aniora" },
       {
         name: "description",
         content: "Everything you've watched, stored locally in your browser.",

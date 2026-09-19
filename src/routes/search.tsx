@@ -28,7 +28,7 @@ export const Route = createFileRoute("/search")({
   }),
   head: () => ({
     meta: [
-      { title: "Search — Zen Stream" },
+      { title: "Search — Aniora" },
       { name: "description", content: "Search anime powered by AniList." },
     ],
   }),

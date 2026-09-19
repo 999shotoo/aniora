@@ -9,17 +9,17 @@ export const Route = createFileRoute("/movies")({
   component: MoviesPage,
   head: () => ({
     meta: [
-      { title: "Browse Anime Movies — Zen Stream" },
+      { title: "Browse Anime Movies — Aniora" },
       {
         name: "description",
         content:
-          "Browse popular, top-rated, trending, and recent anime films. Stream anime movies dub or sub on Zen Stream.",
+          "Browse popular, top-rated, trending, and recent anime films. Stream anime movies dub or sub on Aniora.",
       },
-      { property: "og:title", content: "Browse Anime Movies — Zen Stream" },
+      { property: "og:title", content: "Browse Anime Movies — Aniora" },
       { property: "og:description", content: "Popular, top-rated, trending, and recent anime films." },
-      { property: "og:url", content: "https://anilist-dream-stream.lovable.app/movies" },
+      { property: "og:url", content: "https://aniora.qzz.io/movies" },
     ],
-    links: [{ rel: "canonical", href: "https://anilist-dream-stream.lovable.app/movies" }],
+    links: [{ rel: "canonical", href: "https://aniora.qzz.io/movies" }],
   }),
 });
 

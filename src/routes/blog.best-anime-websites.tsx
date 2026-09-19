@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 
-const URL = "https://anilist-dream-stream.lovable.app/blog/best-anime-websites";
+const URL = "https://aniora.qzz.io/blog/best-anime-websites";
 
 export const Route = createFileRoute("/blog/best-anime-websites")({
   component: BestAnimeWebsitesGuide,
@@ -31,8 +31,8 @@ export const Route = createFileRoute("/blog/best-anime-websites")({
           headline: "Best Anime Websites in 2026: Free Streaming Sites Compared",
           description:
             "A hands-on comparison of the best free anime websites in 2026, covering library size, sub/dub support, player quality, ads, and AniList integration.",
-          author: { "@type": "Organization", name: "Zen Stream" },
-          publisher: { "@type": "Organization", name: "Zen Stream" },
+          author: { "@type": "Organization", name: "Aniora" },
+          publisher: { "@type": "Organization", name: "Aniora" },
           datePublished: "2026-01-15",
           dateModified: "2026-07-01",
           mainEntityOfPage: URL,
@@ -52,7 +52,7 @@ interface Site {
 
 const SITES: Site[] = [
   {
-    name: "Zen Stream",
+    name: "Aniora",
     tagline: "Terminal-clean anime discovery with AniList sync",
     pros: [
       "Free, no signup required to watch",
@@ -203,9 +203,9 @@ function BestAnimeWebsitesGuide() {
       </section>
 
       <section className="mb-10">
-        <h2 className="text-xl font-semibold mb-3">Try Zen Stream</h2>
+        <h2 className="text-xl font-semibold mb-3">Try Aniora</h2>
         <p className="mb-4">
-          Zen Stream focuses on the parts most anime websites get wrong: fast navigation, honest
+          Aniora focuses on the parts most anime websites get wrong: fast navigation, honest
           episode data, and real AniList sync. It's free, needs no signup, and works on any device.
         </p>
         <div className="flex flex-wrap gap-3">
@@ -213,7 +213,7 @@ function BestAnimeWebsitesGuide() {
             to="/"
             className="inline-flex items-center px-4 py-2 rounded-md bg-primary text-primary-foreground font-medium hover:opacity-90"
           >
-            Open Zen Stream
+            Open Aniora
           </Link>
           <Link
             to="/anime"

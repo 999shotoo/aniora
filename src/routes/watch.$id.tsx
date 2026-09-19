@@ -35,13 +35,13 @@ export const Route = createFileRoute("/watch/$id")({
     }
   },
   head: ({ params, loaderData }) => {
-    const url = `https://anilist-dream-stream.lovable.app/watch/${params.id}`;
+    const url = `https://aniora.qzz.io/watch/${params.id}`;
     const media = loaderData ?? null;
     const title = media ? pickTitle(media.title) : "Watch";
-    const pageTitle = `Watch ${title} — Zen Stream`.slice(0, 60);
+    const pageTitle = `Watch ${title} — Aniora`.slice(0, 60);
     const desc = media
-      ? `Watch ${title} online — dub or sub — with episode guide on Zen Stream.`.slice(0, 155)
-      : "Stream anime episodes on Zen Stream — dub or sub, with episode guides.";
+      ? `Watch ${title} online — dub or sub — with episode guide on Aniora.`.slice(0, 155)
+      : "Stream anime episodes on Aniora — dub or sub, with episode guides.";
     const image = media?.coverImage?.extraLarge || media?.coverImage?.large || undefined;
     return {
       meta: [
