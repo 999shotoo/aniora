@@ -15,6 +15,23 @@ import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { SiteHeader } from "@/components/site-header";
 
+function FooterCol({ title, links }: { title: string; links: { to: string; label: string }[] }) {
+  return (
+    <div className="space-y-3">
+      <h3 className="text-[0.65rem] font-medium uppercase tracking-widest text-muted-foreground">{title}</h3>
+      <ul className="space-y-2 text-xs">
+        {links.map((l) => (
+          <li key={l.to}>
+            <Link to={l.to} className="text-foreground/80 transition-colors hover:text-foreground">
+              {l.label}
+            </Link>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
 function NotFoundComponent() {
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-6 lg:px-10">
