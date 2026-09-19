@@ -427,7 +427,7 @@ function AnimeInfoCard({
 
           {/* Description */}
           {description ? (
-            <p className="mt-4 max-h-40 overflow-y-auto border border-dashed border-border p-3 text-xs leading-relaxed text-card-foreground">
+            <p data-lenis-prevent className="mt-4 max-h-40 overflow-y-auto border border-dashed border-border p-3 text-xs leading-relaxed text-card-foreground">
               {description}
             </p>
           ) : (
