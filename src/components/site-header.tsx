@@ -377,6 +377,7 @@ function HeaderSearch() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -4 }}
             transition={{ duration: 0.12 }}
+            data-lenis-prevent
             className="fixed left-2 right-2 top-[3.5rem] z-40 max-h-[70vh] overflow-y-auto border border-border bg-background shadow-2xl sm:absolute sm:left-auto sm:right-0 sm:top-full sm:mt-1 sm:w-[22rem] md:w-[26rem]"
           >
             {isFetching && items.length === 0 ? (
