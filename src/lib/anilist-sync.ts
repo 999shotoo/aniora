@@ -25,12 +25,81 @@ export interface AniListListEntry {
 }
 
 const SAVE_MUTATION = `
-  mutation ($mediaId: Int, $progress: Int, $status: MediaListStatus) {
-    SaveMediaListEntry(mediaId: $mediaId, progress: $progress, status: $status) {
-      id progress status
+  mutation ($mediaId: Int, $progress: Int, $status: MediaListStatus, $score: Float, $notes: String) {
+    SaveMediaListEntry(mediaId: $mediaId, progress: $progress, status: $status, score: $score, notes: $notes) {
+      id progress status score notes
     }
   }
 `;
+
+const DELETE_MUTATION = `
+  mutation ($id: Int) {
+    DeleteMediaListEntry(id: $id) { deleted }
+  }
+`;
+
+const TOGGLE_FAV_MUTATION = `
+  mutation ($animeId: Int) {
+    ToggleFavourite(animeId: $animeId) {
+      anime { nodes { id } }
+    }
+  }
+`;
+
+const MEDIA_ENTRY_QUERY = `
+  query ($mediaId: Int) {
+    Media(id: $mediaId) {
+      id
+      isFavourite
+      mediaListEntry {
+        id status progress score notes
+      }
+    }
+  }
+`;
+
+export interface AniListMediaEntry {
+  id: number;
+  isFavourite: boolean;
+  mediaListEntry: {
+    id: number;
+    status: AniListListStatus | null;
+    progress: number | null;
+    score: number | null;
+    notes: string | null;
+  } | null;
+}
+
+export async function fetchMediaEntry(mediaId: number): Promise<AniListMediaEntry | null> {
+  if (!getAniListToken()) return null;
+  try {
+    const data = await anilistFetch<{ Media: AniListMediaEntry }>(MEDIA_ENTRY_QUERY, { mediaId });
+    return data.Media ?? null;
+  } catch {
+    return null;
+  }
+}
+
+export async function saveMediaEntry(opts: {
+  mediaId: number;
+  status?: AniListListStatus;
+  progress?: number;
+  score?: number;
+  notes?: string;
+}): Promise<void> {
+  if (!getAniListToken()) return;
+  await anilistFetch(SAVE_MUTATION, opts);
+}
+
+export async function deleteMediaEntry(id: number): Promise<void> {
+  if (!getAniListToken()) return;
+  await anilistFetch(DELETE_MUTATION, { id });
+}
+
+export async function toggleAnimeFavourite(animeId: number): Promise<void> {
+  if (!getAniListToken()) return;
+  await anilistFetch(TOGGLE_FAV_MUTATION, { animeId });
+}
 
 /**
  * Push watched progress to the signed-in AniList account.
