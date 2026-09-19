@@ -9,9 +9,17 @@ export const Route = createFileRoute("/anime/")({
   component: AnimePage,
   head: () => ({
     meta: [
-      { title: "Anime — Zen Stream" },
-      { name: "description", content: "Browse trending, popular, and seasonal anime series." },
+      { title: "Browse TV Anime — Zen Stream" },
+      {
+        name: "description",
+        content:
+          "Browse trending, popular, top-rated, and recent TV anime series. Stream them dub or sub on Zen Stream.",
+      },
+      { property: "og:title", content: "Browse TV Anime — Zen Stream" },
+      { property: "og:description", content: "Trending, popular, top-rated, and recent TV anime series." },
+      { property: "og:url", content: "https://anilist-dream-stream.lovable.app/anime" },
     ],
+    links: [{ rel: "canonical", href: "https://anilist-dream-stream.lovable.app/anime" }],
   }),
 });
 
@@ -51,8 +59,9 @@ function AnimePage() {
   return (
     <div className="mx-auto max-w-none px-6 lg:px-10 py-6">
       <div className="mb-4 flex items-baseline justify-between border-b border-border pb-2">
-        <h1 className="font-mono text-xs uppercase tracking-widest text-muted-foreground">
-          ~$ ls anime/ --tv
+        <h1 className="text-lg font-medium text-foreground sm:text-xl">
+          Browse TV Anime
+          <span className="ml-2 font-mono text-[0.6rem] uppercase tracking-widest text-muted-foreground">~$ ls anime/ --tv</span>
         </h1>
         <span className="text-[0.6rem] uppercase tracking-widest text-muted-foreground/70">
           {items.length} loaded

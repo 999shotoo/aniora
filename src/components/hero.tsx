@@ -102,9 +102,9 @@ export function Hero({ items, intervalMs = 6500 }: Props) {
                   <span>· {(media.averageScore / 10).toFixed(1)}★</span>
                 )}
               </div>
-              <h1 className="mb-3 max-w-3xl text-2xl font-medium leading-tight sm:mb-4 sm:text-3xl md:text-4xl lg:text-5xl">
+              <h2 className="mb-3 max-w-3xl text-2xl font-medium leading-tight sm:mb-4 sm:text-3xl md:text-4xl lg:text-5xl">
                 {title}
-              </h1>
+              </h2>
               {desc && (
                 <p className="mb-5 line-clamp-3 max-w-2xl text-xs leading-relaxed text-muted-foreground sm:mb-6 sm:text-sm sm:line-clamp-4">
                   {desc}

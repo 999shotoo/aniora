@@ -9,6 +9,26 @@ import { WatchHistoryRow } from "@/components/watch-history-row";
 
 export const Route = createFileRoute("/")({
   component: HomePage,
+  head: () => ({
+    meta: [
+      { title: "Zen Stream — Stream Anime with a Terminal-Clean Interface" },
+      {
+        name: "description",
+        content:
+          "Watch trending, popular, and seasonal anime dubbed or subbed. Zen Stream is a terminal-clean anime streaming platform powered by AniList.",
+      },
+      { property: "og:title", content: "Zen Stream — Stream Anime with a Terminal-Clean Interface" },
+      {
+        property: "og:description",
+        content:
+          "Watch trending, popular, and seasonal anime dubbed or subbed. Powered by AniList.",
+      },
+      { property: "og:url", content: "https://anilist-dream-stream.lovable.app/" },
+    ],
+    links: [
+      { rel: "canonical", href: "https://anilist-dream-stream.lovable.app/" },
+    ],
+  }),
 });
 
 function currentSeason(): { season: string; year: number } {
@@ -111,6 +131,9 @@ function HomePage() {
 
   return (
     <>
+      <h1 className="sr-only">
+        Zen Stream — Stream anime with a terminal-clean interface
+      </h1>
       <Hero items={featured} />
 
       <div className="mx-auto max-w-none px-6 lg:px-10 pt-6">

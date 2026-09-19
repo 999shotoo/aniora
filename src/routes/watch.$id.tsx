@@ -21,6 +21,42 @@ export const Route = createFileRoute("/watch/$id")({
   validateSearch: (search: Record<string, unknown>) => ({
     ep: search.ep != null ? Number(search.ep) : undefined,
   }),
+  loader: async ({ params, context }) => {
+    const id = Number(params.id);
+    if (!Number.isFinite(id)) return null;
+    try {
+      return await context.queryClient.ensureQueryData({
+        queryKey: ["anime", id],
+        queryFn: () => getAnimeById(id),
+        staleTime: 10 * 60_000,
+      });
+    } catch {
+      return null;
+    }
+  },
+  head: ({ params, loaderData }) => {
+    const url = `https://anilist-dream-stream.lovable.app/watch/${params.id}`;
+    const media = loaderData ?? null;
+    const title = media ? pickTitle(media.title) : "Watch";
+    const pageTitle = `Watch ${title} — Zen Stream`.slice(0, 60);
+    const desc = media
+      ? `Watch ${title} online — dub or sub — with episode guide on Zen Stream.`.slice(0, 155)
+      : "Stream anime episodes on Zen Stream — dub or sub, with episode guides.";
+    const image = media?.coverImage?.extraLarge || media?.coverImage?.large || undefined;
+    return {
+      meta: [
+        { title: pageTitle },
+        { name: "description", content: desc },
+        { property: "og:title", content: pageTitle },
+        { property: "og:description", content: desc },
+        { property: "og:type", content: "video.episode" },
+        { property: "og:url", content: url },
+        { name: "robots", content: "noindex,follow" },
+        ...(image ? [{ property: "og:image", content: image }, { name: "twitter:image", content: image }] : []),
+      ],
+      links: [{ rel: "canonical", href: url }],
+    };
+  },
 });
 
 function stripHtml(s: string | null): string {
