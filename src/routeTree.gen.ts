@@ -18,6 +18,7 @@ import { Route as HistoryRouteImport } from './routes/history'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AnimeIndexRouteImport } from './routes/anime.index'
 import { Route as WatchIdRouteImport } from './routes/watch.$id'
+import { Route as BlogBestAnimeWebsitesRouteImport } from './routes/blog.best-anime-websites'
 import { Route as AuthCallbackRouteImport } from './routes/auth.callback'
 import { Route as AnimeIdRouteImport } from './routes/anime.$id'
 
@@ -66,6 +67,11 @@ const WatchIdRoute = WatchIdRouteImport.update({
   path: '/watch/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
+const BlogBestAnimeWebsitesRoute = BlogBestAnimeWebsitesRouteImport.update({
+  id: '/blog/best-anime-websites',
+  path: '/blog/best-anime-websites',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthCallbackRoute = AuthCallbackRouteImport.update({
   id: '/auth/callback',
   path: '/auth/callback',
@@ -87,6 +93,7 @@ export interface FileRoutesByFullPath {
   '/wishlist': typeof WishlistRoute
   '/anime/$id': typeof AnimeIdRoute
   '/auth/callback': typeof AuthCallbackRoute
+  '/blog/best-anime-websites': typeof BlogBestAnimeWebsitesRoute
   '/watch/$id': typeof WatchIdRoute
   '/anime/': typeof AnimeIndexRoute
 }
@@ -100,6 +107,7 @@ export interface FileRoutesByTo {
   '/wishlist': typeof WishlistRoute
   '/anime/$id': typeof AnimeIdRoute
   '/auth/callback': typeof AuthCallbackRoute
+  '/blog/best-anime-websites': typeof BlogBestAnimeWebsitesRoute
   '/watch/$id': typeof WatchIdRoute
   '/anime': typeof AnimeIndexRoute
 }
@@ -114,6 +122,7 @@ export interface FileRoutesById {
   '/wishlist': typeof WishlistRoute
   '/anime/$id': typeof AnimeIdRoute
   '/auth/callback': typeof AuthCallbackRoute
+  '/blog/best-anime-websites': typeof BlogBestAnimeWebsitesRoute
   '/watch/$id': typeof WatchIdRoute
   '/anime/': typeof AnimeIndexRoute
 }
@@ -129,6 +138,7 @@ export interface FileRouteTypes {
     | '/wishlist'
     | '/anime/$id'
     | '/auth/callback'
+    | '/blog/best-anime-websites'
     | '/watch/$id'
     | '/anime/'
   fileRoutesByTo: FileRoutesByTo
@@ -142,6 +152,7 @@ export interface FileRouteTypes {
     | '/wishlist'
     | '/anime/$id'
     | '/auth/callback'
+    | '/blog/best-anime-websites'
     | '/watch/$id'
     | '/anime'
   id:
@@ -155,6 +166,7 @@ export interface FileRouteTypes {
     | '/wishlist'
     | '/anime/$id'
     | '/auth/callback'
+    | '/blog/best-anime-websites'
     | '/watch/$id'
     | '/anime/'
   fileRoutesById: FileRoutesById
@@ -169,6 +181,7 @@ export interface RootRouteChildren {
   WishlistRoute: typeof WishlistRoute
   AnimeIdRoute: typeof AnimeIdRoute
   AuthCallbackRoute: typeof AuthCallbackRoute
+  BlogBestAnimeWebsitesRoute: typeof BlogBestAnimeWebsitesRoute
   WatchIdRoute: typeof WatchIdRoute
   AnimeIndexRoute: typeof AnimeIndexRoute
 }
@@ -238,6 +251,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof WatchIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/blog/best-anime-websites': {
+      id: '/blog/best-anime-websites'
+      path: '/blog/best-anime-websites'
+      fullPath: '/blog/best-anime-websites'
+      preLoaderRoute: typeof BlogBestAnimeWebsitesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/auth/callback': {
       id: '/auth/callback'
       path: '/auth/callback'
@@ -265,6 +285,7 @@ const rootRouteChildren: RootRouteChildren = {
   WishlistRoute: WishlistRoute,
   AnimeIdRoute: AnimeIdRoute,
   AuthCallbackRoute: AuthCallbackRoute,
+  BlogBestAnimeWebsitesRoute: BlogBestAnimeWebsitesRoute,
   WatchIdRoute: WatchIdRoute,
   AnimeIndexRoute: AnimeIndexRoute,
 }
