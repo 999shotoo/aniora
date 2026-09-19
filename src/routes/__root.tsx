@@ -254,11 +254,43 @@ function RootComponent() {
         <main className="flex-1">
           <Outlet />
         </main>
-        <footer className="mt-16 border-t border-border">
-          <div className="mx-auto flex max-w-none flex-col gap-2 px-6 lg:px-10 py-6 text-[0.65rem] uppercase tracking-widest text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
-            <span>~// aniora · terminal for anime</span>
-            <span>data · anilist · mappings · zenshin</span>
-            <span>© {new Date().getFullYear()}</span>
+        <footer className="mt-20 border-t border-border bg-background/50">
+          <div className="mx-auto grid max-w-none gap-10 px-6 lg:px-10 py-12 md:grid-cols-[1.4fr_1fr_1fr] lg:grid-cols-[1.6fr_1fr_1fr_1fr]">
+            <div className="space-y-3 font-mono">
+              <Link to="/" className="flex items-baseline gap-1 text-lg">
+                <span className="text-muted-foreground">~//</span>
+                <span className="font-semibold text-foreground">aniora</span>
+              </Link>
+              <p className="max-w-md text-xs leading-relaxed text-muted-foreground">
+                Aniora is a free anime streaming site. Watch anime online, sub or dub, in HD — with optional AniList sync for tracking.
+              </p>
+              <p className="max-w-md text-[0.65rem] leading-relaxed text-muted-foreground/70">
+                This website does not retain any files on its server. It solely provides links to media content hosted by third-party services.
+              </p>
+            </div>
+
+            <FooterCol title="Discover" links={[
+              { to: "/", label: "Home" },
+              { to: "/anime", label: "TV Anime" },
+              { to: "/movies", label: "Movies" },
+              { to: "/search", label: "Search" },
+            ]} />
+
+            <FooterCol title="Library" links={[
+              { to: "/history", label: "Watch History" },
+              { to: "/wishlist", label: "Wishlist" },
+              { to: "/profile", label: "Profile" },
+            ]} />
+
+            <FooterCol title="Read" links={[
+              { to: "/blog/best-anime-websites", label: "Best Anime Sites" },
+            ]} />
+          </div>
+          <div className="border-t border-border">
+            <div className="mx-auto flex max-w-none flex-col gap-2 px-6 lg:px-10 py-4 text-[0.65rem] uppercase tracking-widest text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
+              <span>© {new Date().getFullYear()} aniora.qzz.io · terminal for anime</span>
+              <span>data · anilist · mappings · zenshin</span>
+            </div>
           </div>
         </footer>
       </div>
