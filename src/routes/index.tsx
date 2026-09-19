@@ -130,7 +130,7 @@ function HomePage() {
   return (
     <>
       <h1 className="sr-only">
-        Aniora — Stream anime with a terminal-clean interface
+        Aniora — Watch anime free online in HD, sub and dub, with AniList sync
       </h1>
       <Hero items={featured} />
 
