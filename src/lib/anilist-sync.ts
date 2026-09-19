@@ -150,6 +150,58 @@ export async function fetchViewerList(
   return data.Page.mediaList ?? [];
 }
 
+// Full paginated fetch of the viewer's entire anime list (for local sync).
+const FULL_LIST_QUERY = `
+  query ($userId: Int, $page: Int) {
+    Page(page: $page, perPage: 50) {
+      pageInfo { hasNextPage }
+      mediaList(userId: $userId, type: ANIME, sort: UPDATED_TIME_DESC) {
+        id status progress score updatedAt
+        media {
+          id idMal episodes
+          title { userPreferred romaji english }
+          coverImage { extraLarge large }
+          bannerImage
+        }
+      }
+    }
+  }
+`;
+
+export interface AniListFullEntry {
+  id: number;
+  status: AniListListStatus | null;
+  progress: number | null;
+  score: number | null;
+  updatedAt: number | null;
+  media: {
+    id: number;
+    idMal: number | null;
+    episodes: number | null;
+    title: { userPreferred: string | null; romaji: string | null; english: string | null };
+    coverImage: { extraLarge: string | null; large: string | null };
+    bannerImage: string | null;
+  };
+}
+
+export async function fetchAllViewerEntries(userId: number): Promise<AniListFullEntry[]> {
+  if (!getAniListToken()) return [];
+  const all: AniListFullEntry[] = [];
+  for (let page = 1; page <= 20; page++) {
+    try {
+      const data = await anilistFetch<{
+        Page: { pageInfo: { hasNextPage: boolean }; mediaList: AniListFullEntry[] };
+      }>(FULL_LIST_QUERY, { userId, page });
+      const entries = data.Page.mediaList ?? [];
+      all.push(...entries);
+      if (!data.Page.pageInfo?.hasNextPage) break;
+    } catch {
+      break;
+    }
+  }
+  return all;
+}
+
 export interface AniListActivityItem {
   id: number;
   status: string | null;
