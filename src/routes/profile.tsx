@@ -36,7 +36,7 @@ export const Route = createFileRoute("/profile")({
   component: ProfilePage,
   head: () => ({
     meta: [
-      { title: "Profile — Zen Stream" },
+      { title: "Profile — Aniora" },
       {
         name: "description",
         content:

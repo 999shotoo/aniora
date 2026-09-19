@@ -1,8 +1,8 @@
-# Zen Stream
+# Aniora
 
 > Terminal-clean anime streaming platform with AniList integration. Search, wishlist, and watch dub or sub.
 
-Zen Stream is a fast, minimalist web app for discovering and streaming anime. It uses AniList for metadata (titles, covers, synopses, scores, seasonal calendars) and provides episode guides sourced from open mapping data. Users can optionally sign in with AniList to sync their watch list.
+Aniora is a fast, minimalist web app for discovering and streaming anime. It uses AniList for metadata (titles, covers, synopses, scores, seasonal calendars) and provides episode guides sourced from open mapping data. Users can optionally sign in with AniList to sync their watch list.
 
 ## Pages
 

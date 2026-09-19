@@ -8,7 +8,7 @@ export const Route = createFileRoute("/wishlist")({
   component: WishlistPage,
   head: () => ({
     meta: [
-      { title: "Wishlist — Zen Stream" },
+      { title: "Wishlist — Aniora" },
       { name: "description", content: "Your saved anime, stored locally in your browser." },
     ],
   }),

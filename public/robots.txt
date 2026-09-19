@@ -3,4 +3,4 @@ Allow: /
 Disallow: /auth/
 Disallow: /watch/
 
-Sitemap: https://anilist-dream-stream.lovable.app/sitemap.xml
+Sitemap: https://aniora.qzz.io/sitemap.xml

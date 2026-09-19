@@ -9,17 +9,17 @@ export const Route = createFileRoute("/anime/")({
   component: AnimePage,
   head: () => ({
     meta: [
-      { title: "Browse TV Anime — Zen Stream" },
+      { title: "Browse TV Anime — Aniora" },
       {
         name: "description",
         content:
-          "Browse trending, popular, top-rated, and recent TV anime series. Stream them dub or sub on Zen Stream.",
+          "Browse trending, popular, top-rated, and recent TV anime series. Stream them dub or sub on Aniora.",
       },
-      { property: "og:title", content: "Browse TV Anime — Zen Stream" },
+      { property: "og:title", content: "Browse TV Anime — Aniora" },
       { property: "og:description", content: "Trending, popular, top-rated, and recent TV anime series." },
-      { property: "og:url", content: "https://anilist-dream-stream.lovable.app/anime" },
+      { property: "og:url", content: "https://aniora.qzz.io/anime" },
     ],
-    links: [{ rel: "canonical", href: "https://anilist-dream-stream.lovable.app/anime" }],
+    links: [{ rel: "canonical", href: "https://aniora.qzz.io/anime" }],
   }),
 });
 

@@ -11,22 +11,22 @@ export const Route = createFileRoute("/")({
   component: HomePage,
   head: () => ({
     meta: [
-      { title: "Zen Stream — Stream Anime with a Terminal-Clean Interface" },
+      { title: "Aniora — Stream Anime with a Terminal-Clean Interface" },
       {
         name: "description",
         content:
-          "Watch trending, popular, and seasonal anime dubbed or subbed. Zen Stream is a terminal-clean anime streaming platform powered by AniList.",
+          "Watch trending, popular, and seasonal anime dubbed or subbed. Aniora is a terminal-clean anime streaming platform powered by AniList.",
       },
-      { property: "og:title", content: "Zen Stream — Stream Anime with a Terminal-Clean Interface" },
+      { property: "og:title", content: "Aniora — Stream Anime with a Terminal-Clean Interface" },
       {
         property: "og:description",
         content:
           "Watch trending, popular, and seasonal anime dubbed or subbed. Powered by AniList.",
       },
-      { property: "og:url", content: "https://anilist-dream-stream.lovable.app/" },
+      { property: "og:url", content: "https://aniora.qzz.io/" },
     ],
     links: [
-      { rel: "canonical", href: "https://anilist-dream-stream.lovable.app/" },
+      { rel: "canonical", href: "https://aniora.qzz.io/" },
     ],
   }),
 });
@@ -132,7 +132,7 @@ function HomePage() {
   return (
     <>
       <h1 className="sr-only">
-        Zen Stream — Stream anime with a terminal-clean interface
+        Aniora — Stream anime with a terminal-clean interface
       </h1>
       <Hero items={featured} />
 

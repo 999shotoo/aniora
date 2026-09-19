@@ -62,8 +62,8 @@ export function SiteHeader() {
       <div className="mx-auto flex h-14 max-w-none items-center gap-2 px-3 sm:gap-4 sm:px-6 lg:px-10">
         <Link to="/" className="flex shrink-0 items-baseline gap-1 font-mono text-sm">
           <span className="text-muted-foreground">~//</span>
-          <span className="text-foreground font-medium">zen</span>
-          <span className="hidden text-muted-foreground xs:inline sm:inline">.stream</span>
+          <span className="text-foreground font-medium">aniora</span>
+          <span className="hidden text-muted-foreground xs:inline sm:inline"></span>
         </Link>
 
         <nav className="ml-4 hidden items-center gap-1 md:flex">
@@ -152,8 +152,8 @@ export function SiteHeader() {
               <SheetHeader className="border-b border-border px-5 py-4 text-left">
                 <SheetTitle className="flex items-baseline gap-1 text-sm">
                   <span className="text-muted-foreground">~//</span>
-                  <span className="font-medium text-foreground">zen</span>
-                  <span className="text-muted-foreground">.stream</span>
+                  <span className="font-medium text-foreground">aniora</span>
+                  <span className="text-muted-foreground"></span>
                 </SheetTitle>
               </SheetHeader>
 

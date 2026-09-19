@@ -81,15 +81,15 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Zen Stream — Anime Streaming, Terminal-Clean" },
+      { title: "Aniora — Anime Streaming, Terminal-Clean" },
       {
         name: "description",
         content:
-          "Zen Stream is a terminal-clean anime streaming platform with AniList integration — search, wishlist, and watch dub or sub instantly.",
+          "Aniora is a terminal-clean anime streaming platform with AniList integration — search, wishlist, and watch dub or sub instantly.",
       },
-      { name: "author", content: "Zen Stream" },
-      { property: "og:site_name", content: "Zen Stream" },
-      { property: "og:title", content: "Zen Stream — Anime Streaming, Terminal-Clean" },
+      { name: "author", content: "Aniora" },
+      { property: "og:site_name", content: "Aniora" },
+      { property: "og:title", content: "Aniora — Anime Streaming, Terminal-Clean" },
       {
         property: "og:description",
         content:
@@ -97,7 +97,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:title", content: "Zen Stream — Anime Streaming, Terminal-Clean" },
+      { name: "twitter:title", content: "Aniora — Anime Streaming, Terminal-Clean" },
       {
         name: "twitter:description",
         content:
@@ -114,14 +114,14 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         children: JSON.stringify({
           "@context": "https://schema.org",
           "@type": "WebSite",
-          name: "Zen Stream",
-          url: "https://anilist-dream-stream.lovable.app",
+          name: "Aniora",
+          url: "https://aniora.qzz.io",
           description:
             "Terminal-clean anime streaming platform with AniList integration.",
           potentialAction: {
             "@type": "SearchAction",
             target:
-              "https://anilist-dream-stream.lovable.app/search?q={search_term_string}",
+              "https://aniora.qzz.io/search?q={search_term_string}",
             "query-input": "required name=search_term_string",
           },
         }),
@@ -131,8 +131,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         children: JSON.stringify({
           "@context": "https://schema.org",
           "@type": "Organization",
-          name: "Zen Stream",
-          url: "https://anilist-dream-stream.lovable.app",
+          name: "Aniora",
+          url: "https://aniora.qzz.io",
         }),
       },
     ],
@@ -165,7 +165,7 @@ function RootComponent() {
         ? null
         : createSyncStoragePersister({
             storage: window.localStorage,
-            key: "zen-stream-query-cache",
+            key: "aniora-query-cache",
             throttleTime: 2000,
           }),
     [],
@@ -242,7 +242,7 @@ function RootComponent() {
         </main>
         <footer className="mt-16 border-t border-border">
           <div className="mx-auto flex max-w-none flex-col gap-2 px-6 lg:px-10 py-6 text-[0.65rem] uppercase tracking-widest text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
-            <span>~// zen.stream · terminal for anime</span>
+            <span>~// aniora · terminal for anime</span>
             <span>data · anilist · mappings · zenshin</span>
             <span>© {new Date().getFullYear()}</span>
           </div>
