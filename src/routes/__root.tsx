@@ -81,32 +81,44 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Aniora — Anime Streaming, Terminal-Clean" },
+      { name: "theme-color", content: "#0a0a0a" },
+      { title: "Aniora — Watch Anime Free Online, Sub & Dub in HD" },
       {
         name: "description",
         content:
-          "Aniora is a terminal-clean anime streaming platform with AniList integration — search, wishlist, and watch dub or sub instantly.",
+          "Aniora is a free anime streaming site. Watch trending, seasonal, and classic anime online in HD — sub or dub — with AniList sync, no signup required.",
+      },
+      {
+        name: "keywords",
+        content:
+          "aniora, watch anime free, free anime streaming, anime streaming site, watch anime online, anime sub, anime dub, anime hd, anilist, hianime alternative, miruro alternative, anitaku alternative, 9anime alternative, aniwatch, animepahe",
       },
       { name: "author", content: "Aniora" },
+      { name: "application-name", content: "Aniora" },
+      { name: "robots", content: "index, follow, max-image-preview:large, max-snippet:-1" },
       { property: "og:site_name", content: "Aniora" },
-      { property: "og:title", content: "Aniora — Anime Streaming, Terminal-Clean" },
+      { property: "og:title", content: "Aniora — Watch Anime Free Online, Sub & Dub in HD" },
       {
         property: "og:description",
         content:
-          "A terminal-clean anime streaming platform with AniList integration. Search, wishlist, and watch dub or sub.",
+          "Free anime streaming with AniList sync. Watch trending, seasonal, and classic anime — sub or dub — in HD.",
       },
       { property: "og:type", content: "website" },
+      { property: "og:locale", content: "en_US" },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:title", content: "Aniora — Anime Streaming, Terminal-Clean" },
+      { name: "twitter:title", content: "Aniora — Watch Anime Free Online, Sub & Dub in HD" },
       {
         name: "twitter:description",
         content:
-          "A terminal-clean anime streaming platform with AniList integration.",
+          "Free anime streaming with AniList sync — sub, dub, and a clean player.",
       },
     ],
     links: [
       { rel: "stylesheet", href: appCss },
       { rel: "icon", href: "/favicon.ico", type: "image/x-icon" },
+      { rel: "preconnect", href: "https://graphql.anilist.co" },
+      { rel: "preconnect", href: "https://s4.anilist.co" },
+      { rel: "dns-prefetch", href: "https://megaplay.buzz" },
     ],
     scripts: [
       {
@@ -115,13 +127,13 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
           "@context": "https://schema.org",
           "@type": "WebSite",
           name: "Aniora",
+          alternateName: ["Aniora Anime", "Aniora Stream"],
           url: "https://aniora.qzz.io",
           description:
-            "Terminal-clean anime streaming platform with AniList integration.",
+            "Free anime streaming site with AniList integration — watch sub or dub in HD.",
           potentialAction: {
             "@type": "SearchAction",
-            target:
-              "https://aniora.qzz.io/search?q={search_term_string}",
+            target: "https://aniora.qzz.io/search?q={search_term_string}",
             "query-input": "required name=search_term_string",
           },
         }),
@@ -133,6 +145,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
           "@type": "Organization",
           name: "Aniora",
           url: "https://aniora.qzz.io",
+          logo: "https://aniora.qzz.io/favicon.ico",
+          sameAs: [],
         }),
       },
     ],
