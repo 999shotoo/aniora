@@ -21,6 +21,7 @@ import {
 import { useWishlist } from "@/lib/wishlist";
 import { EmptyState, BackHomeAction } from "@/components/empty-state";
 import { InfoHeaderSkeleton, Skeleton } from "@/components/skeleton";
+import { AniListTracker } from "@/components/anilist-tracker";
 
 
 export const Route = createFileRoute("/anime/$id")({
@@ -280,6 +281,8 @@ function AnimeInfoPage() {
                 </a>
               )}
             </div>
+
+            <AniListTracker mediaId={media.id} totalEpisodes={media.episodes} />
 
             {media.nextAiringEpisode && (
               <div className="mt-4 inline-flex items-center gap-2 border border-dashed border-border bg-card px-3 py-2 text-[0.65rem] uppercase tracking-widest text-muted-foreground">
