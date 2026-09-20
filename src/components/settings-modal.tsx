@@ -34,15 +34,6 @@ export function SettingsModal() {
     return () => window.removeEventListener("aniora:shortcuts", openShortcuts);
   }, [setSection]);
 
-  useEffect(() => {
-    const open = () => {
-      const { openSettings } = useSettings.name ? {} : {};
-      // Actually just dispatch DOM event; but we need context. Handled below.
-      void open;
-    };
-    // no-op; handled in wrapper via ExternalOpener
-  }, []);
-
   const active =
     (SECTIONS.find((s) => s.id === section)?.id as SectionId) ?? "behavior";
 
