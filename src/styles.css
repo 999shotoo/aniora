@@ -301,3 +301,10 @@ body::before {
   100% { background-position: 140% 0; }
 }
 
+
+/* User-toggleable body classes */
+body.no-select,
+body.no-select * {
+  user-select: none;
+  -webkit-user-select: none;
+}
