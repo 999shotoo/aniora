@@ -14,6 +14,12 @@ import { useEffect, useMemo, type ReactNode } from "react";
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { SiteHeader } from "@/components/site-header";
+import { useAniListWatchSync } from "@/lib/anilist-sync-hook";
+
+function AniListSyncMount() {
+  useAniListWatchSync();
+  return null;
+}
 
 function FooterCol({ title, links }: { title: string; links: { to: string; label: string }[] }) {
   return (
