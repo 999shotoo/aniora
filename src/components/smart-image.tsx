@@ -1,5 +1,4 @@
 import { useEffect, useRef, useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
 import { ImageOff } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -13,13 +12,9 @@ interface Props {
 }
 
 /**
- * Image with a shimmer placeholder that fades in when loaded, cross-fades to
- * a fallback on error, and finally renders a terminal-styled "image not found"
- * card if both the source and the fallback fail.
- *
- * Handles the cached-image case where the browser resolves the request
- * synchronously — before React attaches the onLoad handler — by checking
- * `img.complete && naturalWidth > 0` on every src change.
+ * Lightweight image with CSS fade-in, fallback swap, and a "not found" card.
+ * Uses plain CSS transitions instead of framer-motion to stay cheap when
+ * rendered hundreds of times across grids.
  */
 export function SmartImage({
   src,
@@ -40,35 +35,18 @@ export function SmartImage({
     setCurrent(src || fallback);
   }, [src, fallback]);
 
-  // Detect images already resolved from cache before onLoad wires up.
   useEffect(() => {
     const el = imgRef.current;
-    if (!el) return;
-    if (el.complete && el.naturalWidth > 0) {
-      setLoaded(true);
-    }
+    if (el && el.complete && el.naturalWidth > 0) setLoaded(true);
   }, [current]);
 
-  if (broken) {
-    return <ImageNotFound className={className} label={alt} />;
-  }
+  if (broken) return <ImageNotFound className={className} label={alt} />;
 
   return (
     <div className={cn("relative overflow-hidden bg-muted/40", className)}>
-      <AnimatePresence>
-        {!loaded && (
-          <motion.div
-            key="shimmer"
-            initial={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.25 }}
-            className="absolute inset-0 shimmer"
-          />
-        )}
-      </AnimatePresence>
-      <motion.img
+      {!loaded && <div className="absolute inset-0 shimmer" />}
+      <img
         ref={imgRef}
-        key={current}
         src={current}
         alt={alt}
         loading={loading}
@@ -82,14 +60,13 @@ export function SmartImage({
             setBroken(true);
           }
         }}
-        initial={{ opacity: 0, scale: 1.02 }}
-        animate={{ opacity: loaded ? 1 : 0, scale: loaded ? 1 : 1.02 }}
-        transition={{ duration: 0.4, ease: "easeOut" }}
+        style={{ opacity: loaded ? 1 : 0, transition: "opacity 250ms ease-out" }}
         className={cn("h-full w-full object-cover", imgClassName)}
       />
     </div>
   );
 }
+
 
 export function ImageNotFound({
   className,
