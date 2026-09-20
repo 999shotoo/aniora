@@ -60,7 +60,7 @@ export function WatchHistoryRow() {
                   <div className="absolute inset-x-0 bottom-0 h-1 bg-muted">
                     <div className="h-full w-full bg-chart-1" />
                   </div>
-                  <div className="absolute bottom-2 left-2 border border-border bg-background/90 px-2 py-1 font-mono text-[0.6rem] uppercase tracking-widest text-foreground backdrop-blur">
+                  <div className="absolute bottom-2 left-2 border border-border bg-background/90 px-2 py-1 font-mono text-[0.6rem] uppercase tracking-widest text-foreground">
                     ep {item.episode}
                   </div>
                 </div>
@@ -76,7 +76,7 @@ export function WatchHistoryRow() {
               <button
                 onClick={() => remove(item.animeId, item.episode)}
                 aria-label="Remove from watch history"
-                className="absolute right-1.5 top-1.5 flex h-6 w-6 items-center justify-center border border-border bg-background/85 text-muted-foreground opacity-0 backdrop-blur transition-opacity hover:text-foreground group-hover:opacity-100"
+                className="absolute right-1.5 top-1.5 flex h-6 w-6 items-center justify-center border border-border bg-background/85 text-muted-foreground opacity-0 transition-opacity hover:text-foreground group-hover:opacity-100"
               >
                 <X className="h-3.5 w-3.5" />
               </button>

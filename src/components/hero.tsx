@@ -92,7 +92,7 @@ export function Hero({ items, intervalMs = 6500 }: Props) {
             />
             <div className="min-w-0 flex-1">
               <div className="mb-3 flex flex-wrap items-center gap-1.5 text-[0.6rem] uppercase tracking-widest text-muted-foreground sm:gap-2">
-                <span className="border border-border bg-background/50 px-2 py-1 backdrop-blur">
+                <span className="border border-border bg-background/50 px-2 py-1">
                   ~$ ./featured
                 </span>
                 {media.format && <span>{media.format}</span>}
@@ -121,7 +121,7 @@ export function Hero({ items, intervalMs = 6500 }: Props) {
                 </Link>
                 <button
                   onClick={() => toggle(media)}
-                  className="inline-flex items-center gap-2 border border-border bg-background/60 px-4 py-2 text-[0.7rem] font-medium uppercase tracking-widest text-foreground backdrop-blur hover:bg-accent sm:px-6"
+                  className="inline-flex items-center gap-2 border border-border bg-background/60 px-4 py-2 text-[0.7rem] font-medium uppercase tracking-widest text-foreground hover:bg-accent sm:px-6"
                 >
                   {saved ? (
                     <>
