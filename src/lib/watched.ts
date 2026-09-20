@@ -99,6 +99,78 @@ function write(store: Store): void {
   window.dispatchEvent(new StorageEvent("storage", { key: KEY }));
 }
 
+export function readWatchedStore(): Store {
+  return read();
+}
+
+export interface AniListSyncEntry {
+  animeId: number;
+  progress: number;
+  malId: number | null;
+  title: string;
+  cover: string | null;
+  poster: string | null;
+  updatedAt: number | null;
+}
+
+/**
+ * Merge AniList progress into the local watched store.
+ * For each anime, ensure episodes 1..progress are marked locally.
+ * Preserves existing local entries (never downgrades progress).
+ * Returns list of anime IDs where local progress > anilist progress (need push back).
+ */
+export function mergeAniListEntries(entries: AniListSyncEntry[]): Array<{
+  animeId: number;
+  localProgress: number;
+  malId: number | null;
+  totalEpisodes: number | null;
+}> {
+  if (typeof window === "undefined") return [];
+  const store = read();
+  const needsPush: Array<{ animeId: number; localProgress: number; malId: number | null; totalEpisodes: number | null }> = [];
+
+  for (const entry of entries) {
+    const id = String(entry.animeId);
+    const existing = store[id] ?? [];
+    const localMax = existing.reduce((m, e) => Math.max(m, e.episode), 0);
+    const targetProgress = entry.progress || 0;
+
+    if (localMax > targetProgress) {
+      needsPush.push({
+        animeId: entry.animeId,
+        localProgress: localMax,
+        malId: entry.malId,
+        totalEpisodes: null,
+      });
+      continue;
+    }
+
+    if (targetProgress > localMax) {
+      const existingSet = new Set(existing.map((e) => e.episode));
+      const baseWatchedAt = entry.updatedAt ? entry.updatedAt * 1000 : Date.now();
+      for (let ep = 1; ep <= targetProgress; ep++) {
+        if (existingSet.has(ep)) continue;
+        upsert(store, id, {
+          animeId: entry.animeId,
+          animeTitle: entry.title,
+          animeCover: entry.cover,
+          animePoster: entry.poster,
+          episode: ep,
+          episodeTitle: `Episode ${ep}`,
+          episodeImage: entry.cover || entry.poster,
+          malId: entry.malId,
+          runtime: null,
+          watchedAt: baseWatchedAt - (targetProgress - ep) * 1000,
+        });
+      }
+    }
+  }
+
+  write(store);
+  return needsPush;
+}
+
+
 function upsert(store: Store, id: string, input: WatchEntryInput) {
   const episode = Number(input.episode);
   if (!Number.isFinite(episode) || episode < 1) return;
