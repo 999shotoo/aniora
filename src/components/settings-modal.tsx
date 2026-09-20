@@ -20,19 +20,18 @@ const SECTIONS: { id: SectionId; label: string; icon: React.ComponentType<{ clas
 /* -------------------------------------------------------------------------- */
 
 export function SettingsModal() {
-  const { settings, update, reset, isOpen, closeSettings, section, setSection } = useSettings();
+  const { settings, update, reset, isOpen, closeSettings, openSettings, section, setSection } = useSettings();
   const [query, setQuery] = useState("");
 
   // Listen for external "show shortcuts" event.
   useEffect(() => {
     const openShortcuts = () => {
       setSection("shortcuts");
-      // Also open dialog.
-      window.dispatchEvent(new CustomEvent("aniora:open-settings"));
+      openSettings();
     };
     window.addEventListener("aniora:shortcuts", openShortcuts);
     return () => window.removeEventListener("aniora:shortcuts", openShortcuts);
-  }, [setSection]);
+  }, [setSection, openSettings]);
 
   const active =
     (SECTIONS.find((s) => s.id === section)?.id as SectionId) ?? "behavior";
