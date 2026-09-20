@@ -42,7 +42,7 @@ export function AnimeCard({ media }: { media: AniListMedia }) {
         </div>
         <div className="absolute right-1 top-1 flex items-center gap-1">
           {media.format && (
-            <span className="border border-border bg-background/80 px-1.5 py-0.5 text-[0.55rem] uppercase tracking-widest text-muted-foreground backdrop-blur">
+            <span className="border border-border bg-background/80 px-1.5 py-0.5 text-[0.55rem] uppercase tracking-widest text-muted-foreground">
               {media.format}
             </span>
           )}
@@ -55,7 +55,7 @@ export function AnimeCard({ media }: { media: AniListMedia }) {
           toggle(media);
         }}
         aria-label={saved ? "Remove from wishlist" : "Add to wishlist"}
-        className="absolute left-1 top-1 flex h-7 w-7 items-center justify-center border border-border bg-background/80 text-muted-foreground backdrop-blur transition-colors hover:text-foreground"
+        className="absolute left-1 top-1 flex h-7 w-7 items-center justify-center border border-border bg-background/80 text-muted-foreground transition-colors hover:text-foreground"
       >
         {saved ? (
           <BookmarkCheck className="h-3.5 w-3.5 text-foreground" />

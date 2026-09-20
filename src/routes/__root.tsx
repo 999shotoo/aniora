@@ -218,50 +218,6 @@ function RootComponent() {
 
 
 
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-
-    let frame = 0;
-    let cleanup: (() => void) | undefined;
-    let cancelled = false;
-
-    import("lenis").then(({ default: Lenis }) => {
-      if (cancelled) return;
-      const lenis = new Lenis({ lerp: 0.11, wheelMultiplier: 0.9 });
-      const raf = (time: number) => {
-        lenis.raf(time);
-        frame = window.requestAnimationFrame(raf);
-      };
-      frame = window.requestAnimationFrame(raf);
-      cleanup = () => {
-        window.cancelAnimationFrame(frame);
-        lenis.destroy();
-      };
-    });
-
-    return () => {
-      cancelled = true;
-      cleanup?.();
-    };
-  }, []);
-
-  // Silence benign view-transition aborts that fire when the user
-  // navigates before the previous transition finishes.
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    const swallow = (e: PromiseRejectionEvent) => {
-      const msg = String((e.reason as Error)?.message ?? e.reason ?? "");
-      if (
-        msg.includes("Transition was aborted") ||
-        msg.includes("Transition was skipped")
-      ) {
-        e.preventDefault();
-      }
-    };
-    window.addEventListener("unhandledrejection", swallow);
-    return () => window.removeEventListener("unhandledrejection", swallow);
-  }, []);
 
   return (
     <PersistQueryClientProvider

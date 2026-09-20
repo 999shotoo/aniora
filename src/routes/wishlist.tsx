@@ -60,7 +60,7 @@ function WishlistPage() {
               <button
                 onClick={() => remove(item.id)}
                 aria-label="Remove"
-                className="absolute left-1 top-1 flex h-5 w-5 items-center justify-center border border-border bg-background/85 text-muted-foreground backdrop-blur hover:text-destructive opacity-0 transition-opacity group-hover:opacity-100"
+                className="absolute left-1 top-1 flex h-5 w-5 items-center justify-center border border-border bg-background/85 text-muted-foreground hover:text-destructive opacity-0 transition-opacity group-hover:opacity-100"
               >
                 <X className="h-3 w-3" />
               </button>

@@ -58,7 +58,7 @@ export function SiteHeader() {
   };
 
   return (
-    <header className="sticky top-0 z-40 border-b border-border bg-background/85 backdrop-blur">
+    <header className="sticky top-0 z-40 border-b border-border bg-background/85">
       <div className="mx-auto flex h-14 max-w-none items-center gap-2 px-3 sm:gap-4 sm:px-6 lg:px-10">
         <Link to="/" className="flex shrink-0 items-baseline gap-1 font-mono text-sm">
           <span className="text-muted-foreground">~//</span>

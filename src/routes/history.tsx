@@ -102,10 +102,10 @@ function HistoryPage() {
                       alt={item.episodeTitle}
                       className="h-full w-full"
                     />
-                    <div className="absolute bottom-1 left-1 border border-border bg-background/90 px-1.5 py-0.5 font-mono text-[0.55rem] uppercase tracking-widest text-foreground backdrop-blur">
+                    <div className="absolute bottom-1 left-1 border border-border bg-background/90 px-1.5 py-0.5 font-mono text-[0.55rem] uppercase tracking-widest text-foreground">
                       ep {item.episode}
                     </div>
-                    <div className="absolute right-1 top-1 border border-border bg-background/90 px-1.5 py-0.5 font-mono text-[0.5rem] uppercase tracking-widest text-muted-foreground backdrop-blur">
+                    <div className="absolute right-1 top-1 border border-border bg-background/90 px-1.5 py-0.5 font-mono text-[0.5rem] uppercase tracking-widest text-muted-foreground">
                       {relativeTime(item.watchedAt)}
                     </div>
                   </div>
@@ -121,7 +121,7 @@ function HistoryPage() {
                 <button
                   onClick={() => remove(item.animeId, item.episode)}
                   aria-label="Remove from watch history"
-                  className="absolute right-1 top-1 flex h-5 w-5 items-center justify-center border border-border bg-background/85 text-muted-foreground opacity-0 backdrop-blur transition-opacity hover:text-foreground group-hover:opacity-100"
+                  className="absolute right-1 top-1 flex h-5 w-5 items-center justify-center border border-border bg-background/85 text-muted-foreground opacity-0 transition-opacity hover:text-foreground group-hover:opacity-100"
                 >
                   <X className="h-3 w-3" />
                 </button>

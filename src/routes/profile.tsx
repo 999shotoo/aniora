@@ -264,7 +264,7 @@ function ProfileTabs({
   return (
     <>
       {/* Tab bar */}
-      <div className="sticky top-0 z-20 border-b border-border bg-background/85 backdrop-blur">
+      <div className="sticky top-0 z-20 border-b border-border bg-background/85">
         <div className="mx-auto max-w-none overflow-x-auto px-4 sm:px-6">
           <div className="flex min-w-max gap-1 py-2">
             {TABS.map((t) => {
