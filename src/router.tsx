@@ -26,7 +26,7 @@ export const getRouter = () => {
     defaultPreload: false,
     defaultPendingMs: 0,
     defaultPendingMinMs: 0,
-    defaultViewTransition: true,
+    defaultViewTransition: false,
   });
 
   return router;
