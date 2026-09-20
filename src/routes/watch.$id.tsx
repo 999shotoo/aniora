@@ -300,7 +300,23 @@ function WatchPage() {
                 isWatched={watched.has}
                 onToggleWatched={(n) => {
                   const epData = airedEpisodes.find((e) => e.episodeNumber === n);
+                  const wasWatched = watched.has(n);
                   watched.toggleEpisode(buildWatchEntry(n, epData));
+                  // Sync to AniList: pick new max after toggle.
+                  const currentMax = watched.entries.reduce(
+                    (m, e) => Math.max(m, e.episode),
+                    0,
+                  );
+                  const newMax = wasWatched
+                    ? Math.max(0, currentMax === n ? Math.max(...watched.entries.filter((e) => e.episode !== n).map((e) => e.episode), 0) : currentMax)
+                    : Math.max(currentMax, n);
+                  if (newMax > 0) {
+                    void syncAniListProgress({
+                      mediaId: anilistId,
+                      progress: newMax,
+                      totalEpisodes: media?.episodes ?? null,
+                    });
+                  }
                 }}
               />
             )}
