@@ -22,8 +22,7 @@ export function AnimeCard({ media }: { media: AniListMedia }) {
   return (
     <div className="group relative flex flex-col">
       <Link
-        to="/anime/$id"
-        params={{ id: String(media.id) }}
+        {...linkProps}
         className="relative block aspect-[2/3] w-full overflow-hidden border border-border bg-card"
       >
         <SmartImage
