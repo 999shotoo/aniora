@@ -100,6 +100,14 @@ export function SiteHeader() {
 
         <div className="ml-auto flex min-w-0 items-center gap-1.5 sm:gap-2">
           <HeaderSearch />
+          <button
+            onClick={openSettings}
+            className="flex h-8 w-8 items-center justify-center border border-border text-muted-foreground hover:text-foreground"
+            aria-label="Open settings"
+            title="Settings (Shift + S)"
+          >
+            <SettingsIcon className="h-4 w-4" />
+          </button>
           <Link
             to="/wishlist"
             className="hidden h-8 w-8 items-center justify-center border border-border text-muted-foreground hover:text-foreground sm:flex"
