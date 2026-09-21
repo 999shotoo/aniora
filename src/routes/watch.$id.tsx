@@ -77,6 +77,7 @@ function WatchPage() {
   const { ep: epParam } = Route.useSearch();
   const navigate = Route.useNavigate();
   const anilistId = Number(id);
+  const { settings } = useSettings();
   const [streamWarningKey, setStreamWarningKey] = useState<string | null>(null);
   const [dismissedWarningKey, setDismissedWarningKey] = useState<string | null>(null);
   const [streamReloadKey, setStreamReloadKey] = useState(0);
