@@ -30,6 +30,7 @@ export function SiteHeader() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const { viewer, hasToken, isLoading } = useAniListViewer();
   const logout = useAniListLogout();
+  const { openSettings, settings } = useSettings();
   const [open, setOpen] = useState(false);
 
   const authUrl = hydrated ? getAniListAuthUrl() : null;
