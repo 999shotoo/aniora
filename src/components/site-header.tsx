@@ -1,5 +1,5 @@
 import { Link, useHydrated, useNavigate, useRouterState } from "@tanstack/react-router";
-import { Search, User, LogOut, Bookmark, Menu, X, Loader2 } from "lucide-react";
+import { Search, User, LogOut, Bookmark, Menu, X, Loader2, Settings as SettingsIcon } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { motion, AnimatePresence } from "framer-motion";
@@ -7,6 +7,7 @@ import { useAniListViewer, useAniListLogout } from "@/lib/anilist-auth";
 import { getAniListAuthUrl } from "@/lib/anilist-config";
 import { searchAnime, FALLBACK_COVER, setAniListToken, type AniListMedia } from "@/lib/anilist";
 import { SmartImage } from "@/components/smart-image";
+import { useSettings } from "@/lib/settings";
 import {
   Sheet,
   SheetContent,
