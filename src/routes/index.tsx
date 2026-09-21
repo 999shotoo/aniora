@@ -6,6 +6,8 @@ import { Hero } from "@/components/hero";
 import { AnimeRow } from "@/components/anime-row";
 import { SideCard } from "@/components/side-card";
 import { WatchHistoryRow } from "@/components/watch-history-row";
+import { AdSlot } from "@/components/ad-slot";
+import { useSetting } from "@/lib/settings";
 
 export const Route = createFileRoute("/")({
   component: HomePage,
