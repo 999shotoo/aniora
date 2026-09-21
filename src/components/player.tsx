@@ -81,7 +81,7 @@ export function Player({ malId, episode, ep, fallbackTitle, onSlowLoad, reloadKe
 
   return (
     <div className="flex flex-col gap-3">
-      <div className="relative aspect-video w-full overflow-hidden border border-border bg-black">
+      <div ref={wrapRef} className="relative aspect-video w-full overflow-hidden border border-border bg-black">
         {(!readySrc || !loaded) && (
           <div className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-3 bg-card text-center">
             <div className="h-10 w-10 border border-border shimmer" />
