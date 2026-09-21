@@ -83,6 +83,7 @@ async function fetchUpcoming(): Promise<AniListMedia[]> {
 
 function HomePage() {
   const { season, year } = currentSeason();
+  const showHistory = useSetting("showWatchHistoryHome");
 
   const trending = useQuery({
     queryKey: ["home", "trending"],
