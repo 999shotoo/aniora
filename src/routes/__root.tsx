@@ -15,6 +15,11 @@ import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { SiteHeader } from "@/components/site-header";
 import { useAniListWatchSync } from "@/lib/anilist-sync-hook";
+import { SettingsProvider } from "@/lib/settings";
+import { SettingsModal } from "@/components/settings-modal";
+import { GlobalShortcuts } from "@/lib/shortcuts";
+import { SmoothScrollMount } from "@/components/smooth-scroll";
+import { AdSlot } from "@/components/ad-slot";
 
 function AniListSyncMount() {
   useAniListWatchSync();
