@@ -174,6 +174,25 @@ function WatchPage() {
     navigate({ search: { ep: n } }).catch(() => {});
   };
 
+  // Prev / next episode shortcuts.
+  useEffect(() => {
+    const step = (dir: 1 | -1) => {
+      if (!episode || airedEpisodes.length === 0) return;
+      const idx = airedEpisodes.findIndex((e) => e.episodeNumber === episode);
+      const next = airedEpisodes[idx + dir];
+      if (next?.episodeNumber) handleSelect(next.episodeNumber);
+    };
+    const onPrev = () => step(-1);
+    const onNext = () => step(1);
+    window.addEventListener("aniora:watch:prev", onPrev);
+    window.addEventListener("aniora:watch:next", onNext);
+    return () => {
+      window.removeEventListener("aniora:watch:prev", onPrev);
+      window.removeEventListener("aniora:watch:next", onNext);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [airedEpisodes, episode]);
+
   const canShowPlayer = Boolean(mapping.data && currentEp && episode && malId);
   const showEmpty =
     !mapping.isLoading && airedEpisodes.length === 0;
