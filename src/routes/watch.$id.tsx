@@ -346,8 +346,9 @@ function WatchPage() {
 
       {/* Anime info card — below player + episodes */}
       {!showEmpty && (
-        <div className="mx-auto max-w-none px-6 lg:px-10">
+        <div className="mx-auto flex max-w-none flex-col gap-6 px-6 lg:px-10">
           <AnimeInfoCard isLoading={anime.isLoading} media={media} />
+          <AdSlot slot="watch-in-body" format="leaderboard" />
         </div>
       )}
     </div>
