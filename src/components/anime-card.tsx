@@ -71,8 +71,7 @@ export function AnimeCard({ media }: { media: AniListMedia }) {
 
       <div className="mt-2 flex flex-col gap-0.5">
         <Link
-          to="/anime/$id"
-          params={{ id: String(media.id) }}
+          {...linkProps}
           className="line-clamp-2 text-xs font-medium text-foreground hover:underline"
           title={pickTitle(media.title)}
         >
