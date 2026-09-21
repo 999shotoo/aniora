@@ -152,13 +152,14 @@ function HomePage() {
       {/* Main + Sidebar layout */}
       <div className="mx-auto grid max-w-none gap-6 px-6 lg:px-10 py-6 lg:grid-cols-[minmax(0,1fr)_300px] xl:grid-cols-[minmax(0,1fr)_340px]">
         <div className="min-w-0 space-y-8">
-          <WatchHistoryRow />
+          {showHistory && <WatchHistoryRow />}
           <AnimeRow
             title="ls trending/"
             hint={`${trending.data?.length ?? 0} results`}
             media={trending.data ?? []}
             loading={trending.isLoading}
           />
+          <AdSlot slot="home-in-feed-1" format="leaderboard" />
           <AnimeRow
             title={`ls seasonal/${season.toLowerCase()}-${year}`}
             hint={`${seasonal.data?.length ?? 0} results`}
@@ -171,6 +172,7 @@ function HomePage() {
             media={popular.data ?? []}
             loading={popular.isLoading}
           />
+          <AdSlot slot="home-in-feed-2" format="leaderboard" />
           <AnimeRow
             title="ls top-rated/"
             hint={`${topRated.data?.length ?? 0} results`}
