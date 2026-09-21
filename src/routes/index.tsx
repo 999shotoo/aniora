@@ -201,6 +201,7 @@ function HomePage() {
             items={topRated.data ?? []}
             loading={topRated.isLoading}
           />
+          <AdSlot slot="home-sidebar" format="sidebar" />
         </aside>
       </div>
     </>
