@@ -2,16 +2,22 @@ import { Link } from "@tanstack/react-router";
 import { Bookmark, BookmarkCheck, Star } from "lucide-react";
 import { type AniListMedia, FALLBACK_COVER, pickTitle } from "@/lib/anilist";
 import { useWishlist } from "@/lib/wishlist";
+import { useSetting } from "@/lib/settings";
 import { SmartImage } from "./smart-image";
 
 export function AnimeCard({ media }: { media: AniListMedia }) {
   const { has, toggle } = useWishlist();
+  const dest = useSetting("defaultAnimePage");
   const saved = has(media.id);
   const cover =
     media.coverImage?.large ||
     media.coverImage?.extraLarge ||
     media.coverImage?.medium ||
     FALLBACK_COVER;
+  const linkProps =
+    dest === "watch"
+      ? ({ to: "/watch/$id", params: { id: String(media.id) } } as const)
+      : ({ to: "/anime/$id", params: { id: String(media.id) } } as const);
 
   return (
     <div className="group relative flex flex-col">
