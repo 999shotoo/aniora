@@ -112,9 +112,16 @@ const encodeSlot = (s: string) =>
 export function AdSlot({ slot, format = "banner", className = "", label = "sponsored" }: AdSlotProps) {
   const [narrow, setNarrow] = useState(false);
   const [loaded, setLoaded] = useState(false);
+  const [visible, setVisible] = useState(false);
   const holder = useRef<HTMLDivElement>(null);
+  const wrapRef = useRef<HTMLElement>(null);
   const encoded = useMemo(() => encodeSlot(slot), [slot]);
   const adblocked = useAdblockDetected();
+
+  useEffect(() => {
+    // Fire adblock detection on first AdSlot mount.
+    if (adblockCache === null) runAdblockCheck();
+  }, []);
 
   useEffect(() => {
     const mq = window.matchMedia("(max-width: 640px)");
@@ -124,16 +131,30 @@ export function AdSlot({ slot, format = "banner", className = "", label = "spons
     return () => mq.removeEventListener("change", on);
   }, []);
 
+  // Only mount the ad iframe when the slot scrolls into view — keeps offscreen
+  // ad scripts from ever executing and blocking the main thread.
+  useEffect(() => {
+    if (!wrapRef.current || visible) return;
+    const io = new IntersectionObserver((entries) => {
+      if (entries.some((e) => e.isIntersecting)) {
+        setVisible(true);
+        io.disconnect();
+      }
+    }, { rootMargin: "200px" });
+    io.observe(wrapRef.current);
+    return () => io.disconnect();
+  }, [visible]);
+
   const unit = pickUnit(format, narrow);
 
   useEffect(() => {
-    if (adblocked) return;
+    if (adblocked || !visible) return;
     const t = window.setTimeout(() => {
       const iframe = holder.current?.querySelector("iframe");
       setLoaded(Boolean(iframe));
     }, 3000);
     return () => window.clearTimeout(t);
-  }, [unit, adblocked]);
+  }, [unit, adblocked, visible]);
 
   const isNative = unit === "native";
   const size = isNative ? null : UNITS[unit];
@@ -142,6 +163,7 @@ export function AdSlot({ slot, format = "banner", className = "", label = "spons
   if (adblocked) {
     return (
       <section
+        ref={wrapRef}
         className={`relative mx-auto w-full max-w-full overflow-hidden border border-dashed border-border bg-card/40 px-4 py-5 ${className}`}
         style={size ? { maxWidth: Math.max(size.w, 320), minHeight: Math.max(size.h, 120) } : { minHeight: 140 }}
         aria-label="support aniora"
@@ -166,6 +188,55 @@ export function AdSlot({ slot, format = "banner", className = "", label = "spons
       </section>
     );
   }
+
+  return (
+    <section
+      ref={wrapRef}
+      className={`relative mx-auto w-full max-w-full overflow-hidden border border-dashed border-border bg-card/40 ${className}`}
+      style={size ? { maxWidth: size.w, minHeight: size.h } : { minHeight: 120 }}
+      aria-label="sponsored content"
+      data-slot={encoded}
+    >
+      <div ref={holder} className="flex items-center justify-center">
+        {visible && (isNative ? (
+          <iframe
+            title="sponsor"
+            srcDoc={NATIVE}
+            sandbox="allow-scripts allow-same-origin allow-popups"
+            className="h-full w-full border-0"
+            style={{ minHeight: 250 }}
+            scrolling="no"
+          />
+        ) : (
+          <iframe
+            key={unit}
+            title="sponsor"
+            srcDoc={size!.doc}
+            sandbox="allow-scripts allow-same-origin allow-popups"
+            width={size!.w}
+            height={size!.h}
+            className="block border-0"
+            scrolling="no"
+          />
+        ))}
+      </div>
+      {!loaded && (
+        <div className="pointer-events-none absolute inset-0 -z-0 flex flex-col items-center justify-center gap-1 px-4 text-center">
+          <span className="font-mono text-[0.55rem] uppercase tracking-widest text-muted-foreground/70">
+            {label} · {encoded.slice(0, 8)}
+          </span>
+          <p className="text-xs text-foreground/80">Sponsor slot available</p>
+          <a
+            href="mailto:me@aniora.qzz.io?subject=Placement%20on%20Aniora"
+            className="pointer-events-auto mt-1 inline-flex items-center gap-1.5 border border-border bg-background px-2.5 py-1 text-[0.6rem] uppercase tracking-widest text-foreground hover:bg-accent"
+          >
+            <Mail className="h-3 w-3" /> me@aniora.qzz.io
+          </a>
+        </div>
+      )}
+    </section>
+  );
+}
 
   return (
     <section
