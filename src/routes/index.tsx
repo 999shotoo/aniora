@@ -172,7 +172,7 @@ function HomePage() {
             media={popular.data ?? []}
             loading={popular.isLoading}
           />
-          <AdSlot slot="home-in-feed-2" format="leaderboard" />
+          
           <AnimeRow
             title="ls top-rated/"
             hint={`${topRated.data?.length ?? 0} results`}
