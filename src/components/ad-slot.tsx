@@ -2,14 +2,14 @@ import { useEffect, useRef, useState } from "react";
 import { Mail } from "lucide-react";
 
 /**
- * Ad slot. Renders an ad by default and falls back to a self-serve
- * placeholder ("Ads go here — email me@aniora.qzz.io") if nothing loads.
- *
- * Wire real ads by injecting an <ins> tag or an <iframe> via `renderAd`.
- * Until then, this ships as a clean, monetize-ready surface.
+ * Sponsor slot. Uses neutral naming (no "ad", "ads", "advertisement",
+ * "banner", "sponsor" tokens in class/attr/id) so common blocklists
+ * (EasyList, uBO) don't hide the element outright. Ad networks can still
+ * inject inside `ref.current`; if nothing lands within the grace period,
+ * we render a self-serve placeholder.
  */
 export interface AdSlotProps {
-  slot: string; // stable id — used as data-attr for future ad wiring
+  slot: string;
   format?: "banner" | "leaderboard" | "square" | "sidebar" | "native";
   className?: string;
   label?: string;
@@ -23,13 +23,23 @@ const FORMAT_SIZES: Record<NonNullable<AdSlotProps["format"]>, string> = {
   native: "min-h-[120px]",
 };
 
-export function AdSlot({ slot, format = "banner", className = "", label = "advertisement" }: AdSlotProps) {
+// Obfuscate the slot id so it doesn't match generic "ad-*" filter rules.
+const encodeSlot = (s: string) =>
+  typeof window === "undefined"
+    ? s
+    : btoa(s).replace(/=+$/, "").toLowerCase();
+
+export function AdSlot({
+  slot,
+  format = "banner",
+  className = "",
+  label = "sponsored",
+}: AdSlotProps) {
   const [loaded, setLoaded] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
+  const encoded = encodeSlot(slot);
 
   useEffect(() => {
-    // Give ad networks 2.5s to inject content; if the slot is still empty,
-    // show the placeholder. Wire your ad tag inside this effect when ready.
     const timer = window.setTimeout(() => {
       if (!ref.current) return;
       const hasChild = ref.current.querySelector("iframe, ins, img, script");
@@ -39,26 +49,26 @@ export function AdSlot({ slot, format = "banner", className = "", label = "adver
   }, [slot]);
 
   return (
-    <aside
+    <section
       className={`relative w-full overflow-hidden border border-dashed border-border bg-card/40 ${FORMAT_SIZES[format]} ${className}`}
-      aria-label={label}
-      data-ad-slot={slot}
+      aria-label="sponsored content"
+      data-slot={encoded}
     >
       <div ref={ref} className="absolute inset-0" />
       {!loaded && (
         <div className="pointer-events-auto absolute inset-0 flex flex-col items-center justify-center gap-1 px-4 text-center">
           <span className="font-mono text-[0.55rem] uppercase tracking-widest text-muted-foreground/70">
-            {label} · {slot}
+            {label} · {encoded.slice(0, 8)}
           </span>
-          <p className="text-xs text-foreground/80">Ads go here</p>
+          <p className="text-xs text-foreground/80">Sponsor slot available</p>
           <a
-            href="mailto:me@aniora.qzz.io?subject=Ad%20placement%20on%20Aniora"
+            href="mailto:me@aniora.qzz.io?subject=Placement%20on%20Aniora"
             className="mt-1 inline-flex items-center gap-1.5 border border-border bg-background px-2.5 py-1 text-[0.6rem] uppercase tracking-widest text-foreground hover:bg-accent"
           >
             <Mail className="h-3 w-3" /> me@aniora.qzz.io
           </a>
         </div>
       )}
-    </aside>
+    </section>
   );
 }
