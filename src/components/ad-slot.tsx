@@ -214,20 +214,31 @@ export function AdSlot({ slot, format = "banner", className = "", label = "spons
 }
 
 /* -------------------------------------------------------------------------- */
-/*  Global social-bar (mounts once). Kept minimal — one script, no UI.        */
+/*  Global social-bar. Isolated in a hidden sandboxed iframe so the vendor    */
+/*  script cannot block the main thread or hijack navigation.                 */
 /* -------------------------------------------------------------------------- */
 
+const SOCIAL_BAR_DOC = `<!doctype html><html><head><meta charset="utf-8"><style>html,body{margin:0;padding:0;background:transparent}</style></head><body>
+<script async data-cfasync="false" src="https://pl30166307.effectivecpmnetwork.com/c1/04/32/c10432c1376985f6b1714e6e8c84df87.js"></script>
+</body></html>`;
+
 export function SocialBarMount() {
+  const [mount, setMount] = useState(false);
   useEffect(() => {
-    if (typeof window === "undefined") return;
-    if (document.getElementById("aniora-sb")) return;
-    const s = document.createElement("script");
-    s.id = "aniora-sb";
-    s.src = "https://pl30166307.effectivecpmnetwork.com/c1/04/32/c10432c1376985f6b1714e6e8c84df87.js";
-    s.async = true;
-    document.body.appendChild(s);
-    // Kick off adblock detection once we've tried to load a known-blocked resource.
-    runAdblockCheck();
+    // Defer past first paint + user idle so the vendor script never competes
+    // with route-level rendering.
+    const t = window.setTimeout(() => setMount(true), 4000);
+    return () => window.clearTimeout(t);
   }, []);
-  return null;
+  if (!mount) return null;
+  return (
+    <iframe
+      title="sb"
+      srcDoc={SOCIAL_BAR_DOC}
+      aria-hidden
+      tabIndex={-1}
+      sandbox="allow-scripts allow-same-origin allow-popups"
+      style={{ position: "fixed", inset: "auto 0 0 0", width: 1, height: 1, border: 0, opacity: 0, pointerEvents: "none", zIndex: -1 }}
+    />
+  );
 }
