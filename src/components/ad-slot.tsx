@@ -112,9 +112,16 @@ const encodeSlot = (s: string) =>
 export function AdSlot({ slot, format = "banner", className = "", label = "sponsored" }: AdSlotProps) {
   const [narrow, setNarrow] = useState(false);
   const [loaded, setLoaded] = useState(false);
+  const [visible, setVisible] = useState(false);
   const holder = useRef<HTMLDivElement>(null);
+  const wrapRef = useRef<HTMLElement>(null);
   const encoded = useMemo(() => encodeSlot(slot), [slot]);
   const adblocked = useAdblockDetected();
+
+  useEffect(() => {
+    // Fire adblock detection on first AdSlot mount.
+    if (adblockCache === null) runAdblockCheck();
+  }, []);
 
   useEffect(() => {
     const mq = window.matchMedia("(max-width: 640px)");
@@ -124,16 +131,30 @@ export function AdSlot({ slot, format = "banner", className = "", label = "spons
     return () => mq.removeEventListener("change", on);
   }, []);
 
+  // Only mount the ad iframe when the slot scrolls into view — keeps offscreen
+  // ad scripts from ever executing and blocking the main thread.
+  useEffect(() => {
+    if (!wrapRef.current || visible) return;
+    const io = new IntersectionObserver((entries) => {
+      if (entries.some((e) => e.isIntersecting)) {
+        setVisible(true);
+        io.disconnect();
+      }
+    }, { rootMargin: "200px" });
+    io.observe(wrapRef.current);
+    return () => io.disconnect();
+  }, [visible]);
+
   const unit = pickUnit(format, narrow);
 
   useEffect(() => {
-    if (adblocked) return;
+    if (adblocked || !visible) return;
     const t = window.setTimeout(() => {
       const iframe = holder.current?.querySelector("iframe");
       setLoaded(Boolean(iframe));
     }, 3000);
     return () => window.clearTimeout(t);
-  }, [unit, adblocked]);
+  }, [unit, adblocked, visible]);
 
   const isNative = unit === "native";
   const size = isNative ? null : UNITS[unit];
@@ -142,6 +163,7 @@ export function AdSlot({ slot, format = "banner", className = "", label = "spons
   if (adblocked) {
     return (
       <section
+        ref={wrapRef}
         className={`relative mx-auto w-full max-w-full overflow-hidden border border-dashed border-border bg-card/40 px-4 py-5 ${className}`}
         style={size ? { maxWidth: Math.max(size.w, 320), minHeight: Math.max(size.h, 120) } : { minHeight: 140 }}
         aria-label="support aniora"
@@ -169,16 +191,18 @@ export function AdSlot({ slot, format = "banner", className = "", label = "spons
 
   return (
     <section
+      ref={wrapRef}
       className={`relative mx-auto w-full max-w-full overflow-hidden border border-dashed border-border bg-card/40 ${className}`}
       style={size ? { maxWidth: size.w, minHeight: size.h } : { minHeight: 120 }}
       aria-label="sponsored content"
       data-slot={encoded}
     >
       <div ref={holder} className="flex items-center justify-center">
-        {isNative ? (
+        {visible && (isNative ? (
           <iframe
             title="sponsor"
             srcDoc={NATIVE}
+            sandbox="allow-scripts allow-same-origin allow-popups"
             className="h-full w-full border-0"
             style={{ minHeight: 250 }}
             scrolling="no"
@@ -188,12 +212,13 @@ export function AdSlot({ slot, format = "banner", className = "", label = "spons
             key={unit}
             title="sponsor"
             srcDoc={size!.doc}
+            sandbox="allow-scripts allow-same-origin allow-popups"
             width={size!.w}
             height={size!.h}
             className="block border-0"
             scrolling="no"
           />
-        )}
+        ))}
       </div>
       {!loaded && (
         <div className="pointer-events-none absolute inset-0 -z-0 flex flex-col items-center justify-center gap-1 px-4 text-center">
@@ -214,20 +239,31 @@ export function AdSlot({ slot, format = "banner", className = "", label = "spons
 }
 
 /* -------------------------------------------------------------------------- */
-/*  Global social-bar (mounts once). Kept minimal — one script, no UI.        */
+/*  Global social-bar. Isolated in a hidden sandboxed iframe so the vendor    */
+/*  script cannot block the main thread or hijack navigation.                 */
 /* -------------------------------------------------------------------------- */
 
+const SOCIAL_BAR_DOC = `<!doctype html><html><head><meta charset="utf-8"><style>html,body{margin:0;padding:0;background:transparent}</style></head><body>
+<script async data-cfasync="false" src="https://pl30166307.effectivecpmnetwork.com/c1/04/32/c10432c1376985f6b1714e6e8c84df87.js"></script>
+</body></html>`;
+
 export function SocialBarMount() {
+  const [mount, setMount] = useState(false);
   useEffect(() => {
-    if (typeof window === "undefined") return;
-    if (document.getElementById("aniora-sb")) return;
-    const s = document.createElement("script");
-    s.id = "aniora-sb";
-    s.src = "https://pl30166307.effectivecpmnetwork.com/c1/04/32/c10432c1376985f6b1714e6e8c84df87.js";
-    s.async = true;
-    document.body.appendChild(s);
-    // Kick off adblock detection once we've tried to load a known-blocked resource.
-    runAdblockCheck();
+    // Defer past first paint + user idle so the vendor script never competes
+    // with route-level rendering.
+    const t = window.setTimeout(() => setMount(true), 4000);
+    return () => window.clearTimeout(t);
   }, []);
-  return null;
+  if (!mount) return null;
+  return (
+    <iframe
+      title="sb"
+      srcDoc={SOCIAL_BAR_DOC}
+      aria-hidden
+      tabIndex={-1}
+      sandbox="allow-scripts allow-same-origin allow-popups"
+      style={{ position: "fixed", inset: "auto 0 0 0", width: 1, height: 1, border: 0, opacity: 0, pointerEvents: "none", zIndex: -1 }}
+    />
+  );
 }
