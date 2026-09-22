@@ -238,52 +238,6 @@ export function AdSlot({ slot, format = "banner", className = "", label = "spons
   );
 }
 
-  return (
-    <section
-      className={`relative mx-auto w-full max-w-full overflow-hidden border border-dashed border-border bg-card/40 ${className}`}
-      style={size ? { maxWidth: size.w, minHeight: size.h } : { minHeight: 120 }}
-      aria-label="sponsored content"
-      data-slot={encoded}
-    >
-      <div ref={holder} className="flex items-center justify-center">
-        {isNative ? (
-          <iframe
-            title="sponsor"
-            srcDoc={NATIVE}
-            className="h-full w-full border-0"
-            style={{ minHeight: 250 }}
-            scrolling="no"
-          />
-        ) : (
-          <iframe
-            key={unit}
-            title="sponsor"
-            srcDoc={size!.doc}
-            width={size!.w}
-            height={size!.h}
-            className="block border-0"
-            scrolling="no"
-          />
-        )}
-      </div>
-      {!loaded && (
-        <div className="pointer-events-none absolute inset-0 -z-0 flex flex-col items-center justify-center gap-1 px-4 text-center">
-          <span className="font-mono text-[0.55rem] uppercase tracking-widest text-muted-foreground/70">
-            {label} · {encoded.slice(0, 8)}
-          </span>
-          <p className="text-xs text-foreground/80">Sponsor slot available</p>
-          <a
-            href="mailto:me@aniora.qzz.io?subject=Placement%20on%20Aniora"
-            className="pointer-events-auto mt-1 inline-flex items-center gap-1.5 border border-border bg-background px-2.5 py-1 text-[0.6rem] uppercase tracking-widest text-foreground hover:bg-accent"
-          >
-            <Mail className="h-3 w-3" /> me@aniora.qzz.io
-          </a>
-        </div>
-      )}
-    </section>
-  );
-}
-
 /* -------------------------------------------------------------------------- */
 /*  Global social-bar. Isolated in a hidden sandboxed iframe so the vendor    */
 /*  script cannot block the main thread or hijack navigation.                 */
