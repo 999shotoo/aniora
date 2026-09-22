@@ -333,7 +333,7 @@ function WatchPage() {
                   const newMax = wasWatched
                     ? Math.max(0, currentMax === n ? Math.max(...watched.entries.filter((e) => e.episode !== n).map((e) => e.episode), 0) : currentMax)
                     : Math.max(currentMax, n);
-                  if (newMax > 0) {
+                  if (newMax > 0 && settings.autoSyncAniList) {
                     void syncAniListProgress({
                       mediaId: anilistId,
                       progress: newMax,
