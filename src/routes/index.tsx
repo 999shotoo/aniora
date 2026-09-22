@@ -6,6 +6,8 @@ import { Hero } from "@/components/hero";
 import { AnimeRow } from "@/components/anime-row";
 import { SideCard } from "@/components/side-card";
 import { WatchHistoryRow } from "@/components/watch-history-row";
+import { AdSlot } from "@/components/ad-slot";
+import { useSetting } from "@/lib/settings";
 
 export const Route = createFileRoute("/")({
   component: HomePage,
@@ -81,6 +83,7 @@ async function fetchUpcoming(): Promise<AniListMedia[]> {
 
 function HomePage() {
   const { season, year } = currentSeason();
+  const showHistory = useSetting("showWatchHistoryHome");
 
   const trending = useQuery({
     queryKey: ["home", "trending"],
@@ -149,13 +152,14 @@ function HomePage() {
       {/* Main + Sidebar layout */}
       <div className="mx-auto grid max-w-none gap-6 px-6 lg:px-10 py-6 lg:grid-cols-[minmax(0,1fr)_300px] xl:grid-cols-[minmax(0,1fr)_340px]">
         <div className="min-w-0 space-y-8">
-          <WatchHistoryRow />
+          {showHistory && <WatchHistoryRow />}
           <AnimeRow
             title="ls trending/"
             hint={`${trending.data?.length ?? 0} results`}
             media={trending.data ?? []}
             loading={trending.isLoading}
           />
+          <AdSlot slot="home-in-feed-1" format="leaderboard" />
           <AnimeRow
             title={`ls seasonal/${season.toLowerCase()}-${year}`}
             hint={`${seasonal.data?.length ?? 0} results`}
@@ -168,6 +172,7 @@ function HomePage() {
             media={popular.data ?? []}
             loading={popular.isLoading}
           />
+          <AdSlot slot="home-in-feed-2" format="leaderboard" />
           <AnimeRow
             title="ls top-rated/"
             hint={`${topRated.data?.length ?? 0} results`}
@@ -196,6 +201,7 @@ function HomePage() {
             items={topRated.data ?? []}
             loading={topRated.isLoading}
           />
+          <AdSlot slot="home-sidebar" format="sidebar" />
         </aside>
       </div>
     </>

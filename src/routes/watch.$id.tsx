@@ -15,6 +15,8 @@ import { EmptyState, BackHomeAction } from "@/components/empty-state";
 import { EpisodesPanelSkeleton, PlayerSkeleton } from "@/components/skeleton";
 import { pickDefaultEpisodeFromHistory, useWatched } from "@/lib/watched";
 import { syncAniListProgress } from "@/lib/anilist-sync";
+import { AdSlot } from "@/components/ad-slot";
+import { useSettings } from "@/lib/settings";
 
 export const Route = createFileRoute("/watch/$id")({
   component: WatchPage,
@@ -75,6 +77,7 @@ function WatchPage() {
   const { ep: epParam } = Route.useSearch();
   const navigate = Route.useNavigate();
   const anilistId = Number(id);
+  const { settings } = useSettings();
   const [streamWarningKey, setStreamWarningKey] = useState<string | null>(null);
   const [dismissedWarningKey, setDismissedWarningKey] = useState<string | null>(null);
   const [streamReloadKey, setStreamReloadKey] = useState(0);
@@ -173,6 +176,25 @@ function WatchPage() {
     navigate({ search: { ep: n } }).catch(() => {});
   };
 
+  // Prev / next episode shortcuts.
+  useEffect(() => {
+    const step = (dir: 1 | -1) => {
+      if (!episode || airedEpisodes.length === 0) return;
+      const idx = airedEpisodes.findIndex((e) => e.episodeNumber === episode);
+      const next = airedEpisodes[idx + dir];
+      if (next?.episodeNumber) handleSelect(next.episodeNumber);
+    };
+    const onPrev = () => step(-1);
+    const onNext = () => step(1);
+    window.addEventListener("aniora:watch:prev", onPrev);
+    window.addEventListener("aniora:watch:next", onNext);
+    return () => {
+      window.removeEventListener("aniora:watch:prev", onPrev);
+      window.removeEventListener("aniora:watch:next", onNext);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [airedEpisodes, episode]);
+
   const canShowPlayer = Boolean(mapping.data && currentEp && episode && malId);
   const showEmpty =
     !mapping.isLoading && airedEpisodes.length === 0;
@@ -183,12 +205,13 @@ function WatchPage() {
   useEffect(() => {
     if (!canShowPlayer || !episode || !currentEp) return;
     watched.markEpisode(buildWatchEntry(episode, currentEp));
+    if (!settings.autoSyncAniList) return;
     void syncAniListProgress({
       mediaId: anilistId,
       progress: episode,
       totalEpisodes: media?.episodes ?? null,
     });
-  }, [anilistId, buildWatchEntry, canShowPlayer, currentEp, episode, media?.episodes, watched.markEpisode]);
+  }, [anilistId, buildWatchEntry, canShowPlayer, currentEp, episode, media?.episodes, settings.autoSyncAniList, watched.markEpisode]);
 
   return (
     <div className="pb-16">
@@ -310,7 +333,7 @@ function WatchPage() {
                   const newMax = wasWatched
                     ? Math.max(0, currentMax === n ? Math.max(...watched.entries.filter((e) => e.episode !== n).map((e) => e.episode), 0) : currentMax)
                     : Math.max(currentMax, n);
-                  if (newMax > 0) {
+                  if (newMax > 0 && settings.autoSyncAniList) {
                     void syncAniListProgress({
                       mediaId: anilistId,
                       progress: newMax,
@@ -326,8 +349,9 @@ function WatchPage() {
 
       {/* Anime info card — below player + episodes */}
       {!showEmpty && (
-        <div className="mx-auto max-w-none px-6 lg:px-10">
+        <div className="mx-auto flex max-w-none flex-col gap-6 px-6 lg:px-10">
           <AnimeInfoCard isLoading={anime.isLoading} media={media} />
+          <AdSlot slot="watch-in-body" format="leaderboard" />
         </div>
       )}
     </div>

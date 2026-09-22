@@ -2,22 +2,27 @@ import { Link } from "@tanstack/react-router";
 import { Bookmark, BookmarkCheck, Star } from "lucide-react";
 import { type AniListMedia, FALLBACK_COVER, pickTitle } from "@/lib/anilist";
 import { useWishlist } from "@/lib/wishlist";
+import { useSetting } from "@/lib/settings";
 import { SmartImage } from "./smart-image";
 
 export function AnimeCard({ media }: { media: AniListMedia }) {
   const { has, toggle } = useWishlist();
+  const dest = useSetting("defaultAnimePage");
   const saved = has(media.id);
   const cover =
     media.coverImage?.large ||
     media.coverImage?.extraLarge ||
     media.coverImage?.medium ||
     FALLBACK_COVER;
+  const linkProps =
+    dest === "watch"
+      ? ({ to: "/watch/$id", params: { id: String(media.id) } } as const)
+      : ({ to: "/anime/$id", params: { id: String(media.id) } } as const);
 
   return (
     <div className="group relative flex flex-col">
       <Link
-        to="/anime/$id"
-        params={{ id: String(media.id) }}
+        {...linkProps}
         className="relative block aspect-[2/3] w-full overflow-hidden border border-border bg-card"
       >
         <SmartImage
@@ -66,8 +71,7 @@ export function AnimeCard({ media }: { media: AniListMedia }) {
 
       <div className="mt-2 flex flex-col gap-0.5">
         <Link
-          to="/anime/$id"
-          params={{ id: String(media.id) }}
+          {...linkProps}
           className="line-clamp-2 text-xs font-medium text-foreground hover:underline"
           title={pickTitle(media.title)}
         >

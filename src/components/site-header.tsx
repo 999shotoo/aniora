@@ -1,5 +1,5 @@
 import { Link, useHydrated, useNavigate, useRouterState } from "@tanstack/react-router";
-import { Search, User, LogOut, Bookmark, Menu, X, Loader2 } from "lucide-react";
+import { Search, User, LogOut, Bookmark, Menu, X, Loader2, Settings as SettingsIcon } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { motion, AnimatePresence } from "framer-motion";
@@ -7,6 +7,7 @@ import { useAniListViewer, useAniListLogout } from "@/lib/anilist-auth";
 import { getAniListAuthUrl } from "@/lib/anilist-config";
 import { searchAnime, FALLBACK_COVER, setAniListToken, type AniListMedia } from "@/lib/anilist";
 import { SmartImage } from "@/components/smart-image";
+import { useSettings } from "@/lib/settings";
 import {
   Sheet,
   SheetContent,
@@ -29,6 +30,7 @@ export function SiteHeader() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const { viewer, hasToken, isLoading } = useAniListViewer();
   const logout = useAniListLogout();
+  const { openSettings, settings } = useSettings();
   const [open, setOpen] = useState(false);
 
   const authUrl = hydrated ? getAniListAuthUrl() : null;
@@ -58,7 +60,14 @@ export function SiteHeader() {
   };
 
   return (
-    <header className="sticky top-0 z-40 border-b border-border bg-background/85">
+    <header
+      className={
+        "sticky top-0 z-40 border-b border-border transition-colors " +
+        (settings.glassNav
+          ? "bg-background/60 backdrop-blur-lg supports-[backdrop-filter]:bg-background/50"
+          : "bg-background/95")
+      }
+    >
       <div className="mx-auto flex h-14 max-w-none items-center gap-2 px-3 sm:gap-4 sm:px-6 lg:px-10">
         <Link to="/" className="flex shrink-0 items-baseline gap-1 font-mono text-sm">
           <span className="text-muted-foreground">~//</span>
@@ -91,6 +100,14 @@ export function SiteHeader() {
 
         <div className="ml-auto flex min-w-0 items-center gap-1.5 sm:gap-2">
           <HeaderSearch />
+          <button
+            onClick={openSettings}
+            className="flex h-8 w-8 items-center justify-center border border-border text-muted-foreground hover:text-foreground"
+            aria-label="Open settings"
+            title="Settings (Shift + S)"
+          >
+            <SettingsIcon className="h-4 w-4" />
+          </button>
           <Link
             to="/wishlist"
             className="hidden h-8 w-8 items-center justify-center border border-border text-muted-foreground hover:text-foreground sm:flex"

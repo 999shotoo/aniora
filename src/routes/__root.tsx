@@ -15,6 +15,11 @@ import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { SiteHeader } from "@/components/site-header";
 import { useAniListWatchSync } from "@/lib/anilist-sync-hook";
+import { SettingsProvider } from "@/lib/settings";
+import { SettingsModal } from "@/components/settings-modal";
+import { GlobalShortcuts } from "@/lib/shortcuts";
+import { SmoothScrollMount } from "@/components/smooth-scroll";
+import { AdSlot } from "@/components/ad-slot";
 
 function AniListSyncMount() {
   useAniListWatchSync();
@@ -228,51 +233,59 @@ function RootComponent() {
         buster: "v1",
       }}
     >
-      <div className="flex min-h-screen flex-col bg-background">
-        <AniListSyncMount />
-        <SiteHeader />
-        <main className="flex-1">
-          <Outlet />
-        </main>
-        <footer className="mt-20 border-t border-border bg-background/50">
-          <div className="mx-auto grid max-w-none gap-10 px-6 lg:px-10 py-12 md:grid-cols-[1.4fr_1fr_1fr] lg:grid-cols-[1.6fr_1fr_1fr_1fr]">
-            <div className="space-y-3 font-mono">
-              <Link to="/" className="flex items-baseline gap-1 text-lg">
-                <span className="text-muted-foreground">~//</span>
-                <span className="font-semibold text-foreground">aniora</span>
-              </Link>
-              <p className="max-w-md text-xs leading-relaxed text-muted-foreground">
-                Aniora is a free anime streaming site. Watch anime online, sub or dub, in HD — with optional AniList sync for tracking.
-              </p>
-              <p className="max-w-md text-[0.65rem] leading-relaxed text-muted-foreground/70">
-                This website does not retain any files on its server. It solely provides links to media content hosted by third-party services.
-              </p>
-            </div>
-
-            <FooterCol title="Discover" links={[
-              { to: "/", label: "Home" },
-              { to: "/anime", label: "TV Anime" },
-              { to: "/movies", label: "Movies" },
-              { to: "/search", label: "Search" },
-            ]} />
-
-            <FooterCol title="Library" links={[
-              { to: "/history", label: "Watch History" },
-              { to: "/wishlist", label: "Wishlist" },
-              { to: "/profile", label: "Profile" },
-            ]} />
-
-            <FooterCol title="Read" links={[
-              { to: "/blog/best-anime-websites", label: "Best Anime Sites" },
-            ]} />
+      <SettingsProvider>
+        <SmoothScrollMount />
+        <GlobalShortcuts />
+        <SettingsModal />
+        <div className="flex min-h-screen flex-col bg-background">
+          <AniListSyncMount />
+          <SiteHeader />
+          <main className="flex-1">
+            <Outlet />
+          </main>
+          <div className="mx-auto mt-10 w-full max-w-none px-6 lg:px-10">
+            <AdSlot slot="footer-leaderboard" format="leaderboard" />
           </div>
-          <div className="border-t border-border">
-            <div className="mx-auto flex max-w-none flex-col gap-2 px-6 lg:px-10 py-4 text-[0.65rem] uppercase tracking-widest text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
-              <span>© {new Date().getFullYear()} aniora.qzz.io · watch · track · enjoy</span>
+          <footer className="mt-10 border-t border-border bg-background/50">
+            <div className="mx-auto grid max-w-none gap-10 px-6 lg:px-10 py-12 md:grid-cols-[1.4fr_1fr_1fr] lg:grid-cols-[1.6fr_1fr_1fr_1fr]">
+              <div className="space-y-3 font-mono">
+                <Link to="/" className="flex items-baseline gap-1 text-lg">
+                  <span className="text-muted-foreground">~//</span>
+                  <span className="font-semibold text-foreground">aniora</span>
+                </Link>
+                <p className="max-w-md text-xs leading-relaxed text-muted-foreground">
+                  Aniora is a free anime streaming site. Watch anime online, sub or dub, in HD — with optional AniList sync for tracking.
+                </p>
+                <p className="max-w-md text-[0.65rem] leading-relaxed text-muted-foreground/70">
+                  This website does not retain any files on its server. It solely provides links to media content hosted by third-party services.
+                </p>
+              </div>
+
+              <FooterCol title="Discover" links={[
+                { to: "/", label: "Home" },
+                { to: "/anime", label: "TV Anime" },
+                { to: "/movies", label: "Movies" },
+                { to: "/search", label: "Search" },
+              ]} />
+
+              <FooterCol title="Library" links={[
+                { to: "/history", label: "Watch History" },
+                { to: "/wishlist", label: "Wishlist" },
+                { to: "/profile", label: "Profile" },
+              ]} />
+
+              <FooterCol title="Read" links={[
+                { to: "/blog/best-anime-websites", label: "Best Anime Sites" },
+              ]} />
             </div>
-          </div>
-        </footer>
-      </div>
+            <div className="border-t border-border">
+              <div className="mx-auto flex max-w-none flex-col gap-2 px-6 lg:px-10 py-4 text-[0.65rem] uppercase tracking-widest text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
+                <span>© {new Date().getFullYear()} aniora.qzz.io · watch · track · enjoy</span>
+              </div>
+            </div>
+          </footer>
+        </div>
+      </SettingsProvider>
     </PersistQueryClientProvider>
   );
 }

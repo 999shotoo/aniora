@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import type { MappingEpisode } from "@/lib/mappings";
+import { useSettings } from "@/lib/settings";
 
 interface Props {
   malId: number | null;
@@ -21,18 +22,38 @@ const FALLBACK_EP_IMAGE =
   );
 
 export function Player({ malId, episode, ep, fallbackTitle, onSlowLoad, reloadKey = 0 }: Props) {
-  const [mode, setMode] = useState<"sub" | "dub">("sub");
+  const { settings } = useSettings();
+  const [mode, setMode] = useState<"sub" | "dub">(settings.defaultLanguage);
   const [readySrc, setReadySrc] = useState<string | null>(null);
   const [loaded, setLoaded] = useState(false);
   const onSlowLoadRef = useRef(onSlowLoad);
+  const wrapRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     onSlowLoadRef.current = onSlowLoad;
   }, [onSlowLoad]);
 
+  // React to shortcut events.
+  useEffect(() => {
+    const onToggle = () => setMode((m) => (m === "sub" ? "dub" : "sub"));
+    const onFs = () => {
+      const el = wrapRef.current;
+      if (!el) return;
+      if (document.fullscreenElement) void document.exitFullscreen();
+      else void el.requestFullscreen?.();
+    };
+    window.addEventListener("aniora:watch:toggle-lang", onToggle);
+    window.addEventListener("aniora:watch:fullscreen", onFs);
+    return () => {
+      window.removeEventListener("aniora:watch:toggle-lang", onToggle);
+      window.removeEventListener("aniora:watch:fullscreen", onFs);
+    };
+  }, []);
+
   const validEp = Number.isFinite(episode) && episode > 0;
+  const autoParam = settings.autoPlay ? "?autoplay=1" : "";
   const src = malId && validEp && ep
-    ? `https://megaplay.buzz/stream/mal/${malId}/${episode}/${mode}`
+    ? `https://megaplay.buzz/stream/mal/${malId}/${episode}/${mode}${autoParam}`
     : "";
   const title = ep?.title?.en || ep?.nameTvdb || fallbackTitle || `Episode ${episode}`;
 
@@ -60,7 +81,7 @@ export function Player({ malId, episode, ep, fallbackTitle, onSlowLoad, reloadKe
 
   return (
     <div className="flex flex-col gap-3">
-      <div className="relative aspect-video w-full overflow-hidden border border-border bg-black">
+      <div ref={wrapRef} className="relative aspect-video w-full overflow-hidden border border-border bg-black">
         {(!readySrc || !loaded) && (
           <div className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-3 bg-card text-center">
             <div className="h-10 w-10 border border-border shimmer" />
