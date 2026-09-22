@@ -114,6 +114,7 @@ export function AdSlot({ slot, format = "banner", className = "", label = "spons
   const [loaded, setLoaded] = useState(false);
   const holder = useRef<HTMLDivElement>(null);
   const encoded = useMemo(() => encodeSlot(slot), [slot]);
+  const adblocked = useAdblockDetected();
 
   useEffect(() => {
     const mq = window.matchMedia("(max-width: 640px)");
@@ -126,16 +127,45 @@ export function AdSlot({ slot, format = "banner", className = "", label = "spons
   const unit = pickUnit(format, narrow);
 
   useEffect(() => {
-    // Give the iframe a moment to paint; if nothing meaningful loaded, show placeholder.
+    if (adblocked) return;
     const t = window.setTimeout(() => {
       const iframe = holder.current?.querySelector("iframe");
       setLoaded(Boolean(iframe));
     }, 3000);
     return () => window.clearTimeout(t);
-  }, [unit]);
+  }, [unit, adblocked]);
 
   const isNative = unit === "native";
   const size = isNative ? null : UNITS[unit];
+
+  // Adblock detected → replace the ad entirely with a friendly card.
+  if (adblocked) {
+    return (
+      <section
+        className={`relative mx-auto w-full max-w-full overflow-hidden border border-dashed border-border bg-card/40 px-4 py-5 ${className}`}
+        style={size ? { maxWidth: Math.max(size.w, 320), minHeight: Math.max(size.h, 120) } : { minHeight: 140 }}
+        aria-label="support aniora"
+        data-slot={encoded}
+      >
+        <div className="flex h-full flex-col items-center justify-center gap-2 text-center">
+          <span className="inline-flex items-center gap-1.5 font-mono text-[0.55rem] uppercase tracking-widest text-muted-foreground/80">
+            <Heart className="h-3 w-3" /> support aniora
+          </span>
+          <p className="max-w-md text-xs text-foreground/90">
+            Looks like you're using an ad blocker. Ads keep Aniora free — please consider disabling it here, or drop a star on GitHub instead <span aria-hidden>&lt;3</span>
+          </p>
+          <a
+            href="https://github.com/999shotoo/aniora"
+            target="_blank"
+            rel="noreferrer"
+            className="mt-1 inline-flex items-center gap-1.5 border border-foreground bg-foreground px-3 py-1 text-[0.6rem] uppercase tracking-widest text-background hover:opacity-90"
+          >
+            <Github className="h-3 w-3" /> star on github
+          </a>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section
@@ -196,6 +226,8 @@ export function SocialBarMount() {
     s.src = "https://pl30166307.effectivecpmnetwork.com/c1/04/32/c10432c1376985f6b1714e6e8c84df87.js";
     s.async = true;
     document.body.appendChild(s);
+    // Kick off adblock detection once we've tried to load a known-blocked resource.
+    runAdblockCheck();
   }, []);
   return null;
 }
