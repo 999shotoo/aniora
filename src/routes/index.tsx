@@ -159,7 +159,7 @@ function HomePage() {
             media={trending.data ?? []}
             loading={trending.isLoading}
           />
-          <AdSlot slot="home-in-feed-1" format="leaderboard" />
+          
           <AnimeRow
             title={`ls seasonal/${season.toLowerCase()}-${year}`}
             hint={`${seasonal.data?.length ?? 0} results`}
