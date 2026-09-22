@@ -1,5 +1,47 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Mail } from "lucide-react";
+import { Mail, Github, Heart } from "lucide-react";
+
+/* ---------- adblock detection (module-level, runs once) ---------- */
+
+let adblockCache: boolean | null = null;
+const adblockListeners = new Set<(v: boolean) => void>();
+
+function runAdblockCheck() {
+  if (typeof window === "undefined") return;
+  let detected = false;
+
+  // 1. Bait element with class names blocked by common lists
+  const bait = document.createElement("div");
+  bait.className = "adsbox ad-banner ad-placement pub_300x250 pub_300x250m pub_728x90 text-ad textAd text_ad text_ads text-ads text-ad-links";
+  bait.style.cssText = "position:absolute!important;left:-9999px!important;top:-9999px!important;width:1px;height:1px;";
+  bait.innerHTML = "&nbsp;";
+  document.body.appendChild(bait);
+
+  window.setTimeout(() => {
+    if (!bait.offsetParent || bait.offsetHeight === 0 || bait.clientHeight === 0) {
+      detected = true;
+    }
+    bait.remove();
+
+    // 2. Fetch a known ad script; blockers will fail the request
+    fetch("https://www.highperformanceformat.com/ping.js", { method: "HEAD", mode: "no-cors", cache: "no-store" })
+      .catch(() => { detected = true; })
+      .finally(() => {
+        adblockCache = detected;
+        adblockListeners.forEach((cb) => cb(detected));
+      });
+  }, 100);
+}
+
+function useAdblockDetected(): boolean {
+  const [v, setV] = useState<boolean>(adblockCache ?? false);
+  useEffect(() => {
+    if (adblockCache !== null) { setV(adblockCache); return; }
+    adblockListeners.add(setV);
+    return () => { adblockListeners.delete(setV); };
+  }, []);
+  return v;
+}
 
 /**
  * Sponsor slot. Renders a real ad unit inside a sandboxed iframe (so multiple
