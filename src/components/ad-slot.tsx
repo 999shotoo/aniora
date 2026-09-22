@@ -1,5 +1,47 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Mail } from "lucide-react";
+import { Mail, Github, Heart } from "lucide-react";
+
+/* ---------- adblock detection (module-level, runs once) ---------- */
+
+let adblockCache: boolean | null = null;
+const adblockListeners = new Set<(v: boolean) => void>();
+
+function runAdblockCheck() {
+  if (typeof window === "undefined") return;
+  let detected = false;
+
+  // 1. Bait element with class names blocked by common lists
+  const bait = document.createElement("div");
+  bait.className = "adsbox ad-banner ad-placement pub_300x250 pub_300x250m pub_728x90 text-ad textAd text_ad text_ads text-ads text-ad-links";
+  bait.style.cssText = "position:absolute!important;left:-9999px!important;top:-9999px!important;width:1px;height:1px;";
+  bait.innerHTML = "&nbsp;";
+  document.body.appendChild(bait);
+
+  window.setTimeout(() => {
+    if (!bait.offsetParent || bait.offsetHeight === 0 || bait.clientHeight === 0) {
+      detected = true;
+    }
+    bait.remove();
+
+    // 2. Fetch a known ad script; blockers will fail the request
+    fetch("https://www.highperformanceformat.com/ping.js", { method: "HEAD", mode: "no-cors", cache: "no-store" })
+      .catch(() => { detected = true; })
+      .finally(() => {
+        adblockCache = detected;
+        adblockListeners.forEach((cb) => cb(detected));
+      });
+  }, 100);
+}
+
+function useAdblockDetected(): boolean {
+  const [v, setV] = useState<boolean>(adblockCache ?? false);
+  useEffect(() => {
+    if (adblockCache !== null) { setV(adblockCache); return; }
+    adblockListeners.add(setV);
+    return () => { adblockListeners.delete(setV); };
+  }, []);
+  return v;
+}
 
 /**
  * Sponsor slot. Renders a real ad unit inside a sandboxed iframe (so multiple
@@ -72,6 +114,7 @@ export function AdSlot({ slot, format = "banner", className = "", label = "spons
   const [loaded, setLoaded] = useState(false);
   const holder = useRef<HTMLDivElement>(null);
   const encoded = useMemo(() => encodeSlot(slot), [slot]);
+  const adblocked = useAdblockDetected();
 
   useEffect(() => {
     const mq = window.matchMedia("(max-width: 640px)");
@@ -84,16 +127,45 @@ export function AdSlot({ slot, format = "banner", className = "", label = "spons
   const unit = pickUnit(format, narrow);
 
   useEffect(() => {
-    // Give the iframe a moment to paint; if nothing meaningful loaded, show placeholder.
+    if (adblocked) return;
     const t = window.setTimeout(() => {
       const iframe = holder.current?.querySelector("iframe");
       setLoaded(Boolean(iframe));
     }, 3000);
     return () => window.clearTimeout(t);
-  }, [unit]);
+  }, [unit, adblocked]);
 
   const isNative = unit === "native";
   const size = isNative ? null : UNITS[unit];
+
+  // Adblock detected → replace the ad entirely with a friendly card.
+  if (adblocked) {
+    return (
+      <section
+        className={`relative mx-auto w-full max-w-full overflow-hidden border border-dashed border-border bg-card/40 px-4 py-5 ${className}`}
+        style={size ? { maxWidth: Math.max(size.w, 320), minHeight: Math.max(size.h, 120) } : { minHeight: 140 }}
+        aria-label="support aniora"
+        data-slot={encoded}
+      >
+        <div className="flex h-full flex-col items-center justify-center gap-2 text-center">
+          <span className="inline-flex items-center gap-1.5 font-mono text-[0.55rem] uppercase tracking-widest text-muted-foreground/80">
+            <Heart className="h-3 w-3" /> support aniora
+          </span>
+          <p className="max-w-md text-xs text-foreground/90">
+            Looks like you're using an ad blocker. Ads keep Aniora free — please consider disabling it here, or drop a star on GitHub instead <span aria-hidden>&lt;3</span>
+          </p>
+          <a
+            href="https://github.com/999shotoo/aniora"
+            target="_blank"
+            rel="noreferrer"
+            className="mt-1 inline-flex items-center gap-1.5 border border-foreground bg-foreground px-3 py-1 text-[0.6rem] uppercase tracking-widest text-background hover:opacity-90"
+          >
+            <Github className="h-3 w-3" /> star on github
+          </a>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section
@@ -154,6 +226,8 @@ export function SocialBarMount() {
     s.src = "https://pl30166307.effectivecpmnetwork.com/c1/04/32/c10432c1376985f6b1714e6e8c84df87.js";
     s.async = true;
     document.body.appendChild(s);
+    // Kick off adblock detection once we've tried to load a known-blocked resource.
+    runAdblockCheck();
   }, []);
   return null;
 }
