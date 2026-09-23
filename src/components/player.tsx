@@ -36,7 +36,7 @@ export function Player({ malId, episode, ep, fallbackTitle, onSlowLoad, reloadKe
 
   // React to shortcut events.
   useEffect(() => {
-    const onToggle = () => setMode((m) => (m === "sub" ? "dub" : "sub"));
+    const onToggle = () => setMode(mode === "sub" ? "dub" : "sub");
     const onFs = () => {
       const el = wrapRef.current;
       if (!el) return;
