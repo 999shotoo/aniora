@@ -6,7 +6,7 @@ import { Hero } from "@/components/hero";
 import { AnimeRow } from "@/components/anime-row";
 import { SideCard } from "@/components/side-card";
 import { WatchHistoryRow } from "@/components/watch-history-row";
-import { AdSlot } from "@/components/ad-slot";
+
 import { useSetting } from "@/lib/settings";
 
 export const Route = createFileRoute("/")({
@@ -159,7 +159,7 @@ function HomePage() {
             media={trending.data ?? []}
             loading={trending.isLoading}
           />
-          <AdSlot slot="home-in-feed-1" format="leaderboard" />
+          
           <AnimeRow
             title={`ls seasonal/${season.toLowerCase()}-${year}`}
             hint={`${seasonal.data?.length ?? 0} results`}
@@ -172,7 +172,7 @@ function HomePage() {
             media={popular.data ?? []}
             loading={popular.isLoading}
           />
-          <AdSlot slot="home-in-feed-2" format="leaderboard" />
+          
           <AnimeRow
             title="ls top-rated/"
             hint={`${topRated.data?.length ?? 0} results`}
@@ -201,7 +201,7 @@ function HomePage() {
             items={topRated.data ?? []}
             loading={topRated.isLoading}
           />
-          <AdSlot slot="home-sidebar" format="sidebar" />
+          
         </aside>
       </div>
     </>

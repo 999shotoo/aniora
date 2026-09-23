@@ -19,7 +19,7 @@ import { SettingsProvider } from "@/lib/settings";
 import { SettingsModal } from "@/components/settings-modal";
 import { GlobalShortcuts } from "@/lib/shortcuts";
 import { SmoothScrollMount } from "@/components/smooth-scroll";
-import { AdSlot, SocialBarMount } from "@/components/ad-slot";
+import { SocialBarMount } from "@/components/ad-slot";
 
 function AniListSyncMount() {
   useAniListWatchSync();
@@ -244,9 +244,6 @@ function RootComponent() {
           <main className="flex-1">
             <Outlet />
           </main>
-          <div className="mx-auto mt-10 w-full max-w-none px-6 lg:px-10">
-            <AdSlot slot="footer-leaderboard" format="leaderboard" />
-          </div>
           <footer className="mt-10 border-t border-border bg-background/50">
             <div className="mx-auto grid max-w-none gap-10 px-6 lg:px-10 py-12 md:grid-cols-[1.4fr_1fr_1fr] lg:grid-cols-[1.6fr_1fr_1fr_1fr]">
               <div className="space-y-3 font-mono">
