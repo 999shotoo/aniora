@@ -243,27 +243,36 @@ export function AdSlot({ slot, format = "banner", className = "", label = "spons
 /*  script cannot block the main thread or hijack navigation.                 */
 /* -------------------------------------------------------------------------- */
 
-const SOCIAL_BAR_DOC = `<!doctype html><html><head><meta charset="utf-8"><style>html,body{margin:0;padding:0;background:transparent}</style></head><body>
-<script async data-cfasync="false" src="https://pl30166307.effectivecpmnetwork.com/c1/04/32/c10432c1376985f6b1714e6e8c84df87.js"></script>
-</body></html>`;
+const SOCIAL_BAR_SRC =
+  "https://pl30166307.effectivecpmnetwork.com/c1/04/32/c10432c1376985f6b1714e6e8c84df87.js";
 
 export function SocialBarMount() {
-  const [mount, setMount] = useState(false);
   useEffect(() => {
-    // Defer past first paint + user idle so the vendor script never competes
-    // with route-level rendering.
-    const t = window.setTimeout(() => setMount(true), 4000);
+    if (typeof window === "undefined") return;
+    if (document.querySelector('script[data-sb="1"]')) return;
+
+    let injected = false;
+    const inject = () => {
+      if (injected) return;
+      injected = true;
+      const s = document.createElement("script");
+      s.src = SOCIAL_BAR_SRC;
+      s.async = true;
+      s.defer = true;
+      s.setAttribute("data-cfasync", "false");
+      s.setAttribute("data-sb", "1");
+      document.body.appendChild(s);
+    };
+
+    // Wait for idle + a small delay so it never competes with first paint.
+    const ric = (window as any).requestIdleCallback as
+      | ((cb: () => void, opts?: { timeout: number }) => number)
+      | undefined;
+    const t = window.setTimeout(() => {
+      if (ric) ric(inject, { timeout: 2000 });
+      else inject();
+    }, 3500);
     return () => window.clearTimeout(t);
   }, []);
-  if (!mount) return null;
-  return (
-    <iframe
-      title="sb"
-      srcDoc={SOCIAL_BAR_DOC}
-      aria-hidden
-      tabIndex={-1}
-      sandbox="allow-scripts allow-same-origin allow-popups"
-      style={{ position: "fixed", inset: "auto 0 0 0", width: 1, height: 1, border: 0, opacity: 0, pointerEvents: "none", zIndex: -1 }}
-    />
-  );
+  return null;
 }
