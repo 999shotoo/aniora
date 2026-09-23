@@ -20,6 +20,7 @@ export interface AnioraSettings {
   defaultLanguage: "sub" | "dub";
   autoPlay: boolean;
   autoNextEpisode: boolean;
+  episodesView: "thumb" | "row" | "grid";
 
   // Behavior
   disableContextMenu: boolean;
