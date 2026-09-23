@@ -97,7 +97,12 @@ export function SettingsModal() {
                 <input
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
-                  placeholder="Search"
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" && filtered[0]) {
+                      setSection(filtered[0].id);
+                    }
+                  }}
+                  placeholder="Search settings…"
                   className="w-full border border-border bg-input px-3 py-2 text-xs text-foreground placeholder:text-muted-foreground focus:border-foreground focus:outline-none"
                 />
               </div>
