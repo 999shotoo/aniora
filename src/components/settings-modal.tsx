@@ -372,6 +372,20 @@ function MediaSection({ settings, update }: UpdaterProps) {
           onChange={(v) => update("autoNextEpisode", v)}
         />
       </Row>
+      <Row
+        title="Episodes view mode"
+        description="Default layout for the episodes list. Changes here save automatically when you cycle from the panel."
+      >
+        <Segmented
+          value={settings.episodesView}
+          onChange={(v) => update("episodesView", v)}
+          options={[
+            { value: "thumb", label: "Thumb" },
+            { value: "row", label: "Row" },
+            { value: "grid", label: "Grid" },
+          ]}
+        />
+      </Row>
     </div>
   );
 }
