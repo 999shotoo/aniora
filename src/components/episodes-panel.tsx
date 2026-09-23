@@ -4,6 +4,7 @@ import type { MappingEpisode } from "@/lib/mappings";
 import { isAired } from "@/lib/mappings";
 import { FALLBACK_EP_IMAGE } from "./player";
 import { SmartImage } from "./smart-image";
+import { useSettings } from "@/lib/settings";
 
 type ViewMode = "thumb" | "row" | "grid";
 
