@@ -76,7 +76,9 @@ export function EpisodesPanel({
     if (idx >= 0) setRangeIdx(idx);
   }, [currentEp, ranges]);
 
-  const [view, setView] = useState<ViewMode>(total > 100 ? "grid" : "thumb");
+  const { settings, update } = useSettings();
+  const view: ViewMode = settings.episodesView ?? (total > 100 ? "grid" : "thumb");
+  const setView = (v: ViewMode) => update("episodesView", v);
   const [query, setQuery] = useState("");
 
   const activeRange = ranges[rangeIdx];
