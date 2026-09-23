@@ -15,7 +15,7 @@ import { EmptyState, BackHomeAction } from "@/components/empty-state";
 import { EpisodesPanelSkeleton, PlayerSkeleton } from "@/components/skeleton";
 import { pickDefaultEpisodeFromHistory, useWatched } from "@/lib/watched";
 import { syncAniListProgress } from "@/lib/anilist-sync";
-import { AdSlot } from "@/components/ad-slot";
+
 import { useSettings } from "@/lib/settings";
 
 export const Route = createFileRoute("/watch/$id")({
