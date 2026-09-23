@@ -244,7 +244,7 @@ export function AdSlot({ slot, format = "banner", className = "", label = "spons
 /* -------------------------------------------------------------------------- */
 
 const SOCIAL_BAR_SRC =
-  "https://pl30166307.effectivecpmnetwork.com/c1/04/32/c10432c1376985f6b1714e6e8c84df87.js";
+  "https://pl30166305.effectivecpmnetwork.com/16/ea/97/16ea97a656a5ba4a8f70ad0380f1fd3f.js";
 
 export function SocialBarMount() {
   useEffect(() => {
