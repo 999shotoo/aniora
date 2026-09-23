@@ -22,8 +22,9 @@ const FALLBACK_EP_IMAGE =
   );
 
 export function Player({ malId, episode, ep, fallbackTitle, onSlowLoad, reloadKey = 0 }: Props) {
-  const { settings } = useSettings();
-  const [mode, setMode] = useState<"sub" | "dub">(settings.defaultLanguage);
+  const { settings, update } = useSettings();
+  const mode = settings.defaultLanguage;
+  const setMode = (m: "sub" | "dub") => update("defaultLanguage", m);
   const [readySrc, setReadySrc] = useState<string | null>(null);
   const [loaded, setLoaded] = useState(false);
   const onSlowLoadRef = useRef(onSlowLoad);
