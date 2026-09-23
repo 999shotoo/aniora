@@ -174,14 +174,16 @@ function Toggle({
       aria-checked={checked}
       aria-label={label}
       className={
-        "relative inline-flex h-6 w-11 items-center rounded-full transition-colors " +
-        (checked ? "bg-primary" : "bg-muted")
+        "relative inline-flex h-6 w-11 items-center rounded-full border transition-colors " +
+        (checked
+          ? "border-primary bg-primary"
+          : "border-border bg-muted/60")
       }
     >
       <span
         className={
-          "inline-block h-5 w-5 transform rounded-full bg-background shadow transition-transform " +
-          (checked ? "translate-x-5" : "translate-x-0.5")
+          "inline-block h-4 w-4 transform rounded-full shadow-md ring-1 ring-black/20 transition-transform " +
+          (checked ? "translate-x-[1.4rem] bg-white" : "translate-x-1 bg-white/90")
         }
       />
     </button>
