@@ -41,6 +41,7 @@ export const DEFAULT_SETTINGS: AnioraSettings = {
   defaultLanguage: "sub",
   autoPlay: false,
   autoNextEpisode: false,
+  episodesView: "thumb",
 
   disableContextMenu: false,
   disableTextSelection: false,
