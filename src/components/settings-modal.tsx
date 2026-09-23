@@ -36,8 +36,34 @@ export function SettingsModal() {
   const active =
     (SECTIONS.find((s) => s.id === section)?.id as SectionId) ?? "behavior";
 
-  const filtered = query
-    ? SECTIONS.filter((s) => s.label.toLowerCase().includes(query.toLowerCase()))
+  // Search matches section labels AND known setting/shortcut labels — pressing
+  // Enter jumps to the first matching section.
+  const SEARCH_INDEX: { section: SectionId; label: string }[] = [
+    ...SECTIONS.map((s) => ({ section: s.id, label: s.label })),
+    { section: "behavior", label: "Auto sync AniList" },
+    { section: "behavior", label: "Sync threshold" },
+    { section: "behavior", label: "Hide spoilers" },
+    { section: "behavior", label: "Anime card destination" },
+    { section: "appearance", label: "Glass navigation bar" },
+    { section: "appearance", label: "Smooth scroll" },
+    { section: "appearance", label: "Watch history on home" },
+    { section: "media", label: "Default language sub dub" },
+    { section: "media", label: "Auto play" },
+    { section: "media", label: "Auto next episode" },
+    { section: "media", label: "Episodes view mode grid list thumb" },
+    { section: "shortcuts", label: "Keyboard shortcuts hotkeys" },
+    { section: "other", label: "Disable right click" },
+    { section: "other", label: "Disable text selection" },
+    { section: "other", label: "Clear watch history" },
+    { section: "other", label: "Restore default settings" },
+  ];
+  const q = query.trim().toLowerCase();
+  const matches = q
+    ? SEARCH_INDEX.filter((s) => s.label.toLowerCase().includes(q))
+    : [];
+  const matchedSectionIds = new Set(matches.map((m) => m.section));
+  const filtered = q
+    ? SECTIONS.filter((s) => matchedSectionIds.has(s.id))
     : SECTIONS;
 
   return (
