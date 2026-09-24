@@ -112,10 +112,11 @@ export function GlobalShortcuts() {
       if (pathname.startsWith("/watch")) {
         const dispatch = (name: string) =>
           window.dispatchEvent(new CustomEvent(`aniora:watch:${name}`));
-        if (e.key === "[") { e.preventDefault(); dispatch("prev"); }
-        else if (e.key === "]") { e.preventDefault(); dispatch("next"); }
-        else if (e.key.toLowerCase() === "f") { e.preventDefault(); dispatch("fullscreen"); }
-        else if (e.key.toLowerCase() === "t") { e.preventDefault(); dispatch("toggle-lang"); }
+        const k = e.key.toLowerCase();
+        if (e.shiftKey && (k === "p" || k === "b")) { e.preventDefault(); dispatch("prev"); }
+        else if (e.shiftKey && k === "n") { e.preventDefault(); dispatch("next"); }
+        else if (!e.shiftKey && k === "f") { e.preventDefault(); dispatch("fullscreen"); }
+        else if (!e.shiftKey && k === "t") { e.preventDefault(); dispatch("toggle-lang"); }
       }
     };
 
