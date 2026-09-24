@@ -20,11 +20,16 @@ export const SHORTCUTS: Shortcut[] = [
   { keys: ["G", "W"], combo: "g w", scope: "global", label: "Go to wishlist", icon: "Bookmark" },
   { keys: ["G", "Y"], combo: "g y", scope: "global", label: "Go to history", icon: "History" },
   { keys: ["G", "P"], combo: "g p", scope: "global", label: "Go to profile", icon: "User" },
-  { keys: ["["], combo: "[", scope: "watch", label: "Previous episode", icon: "ChevronLeft" },
-  { keys: ["]"], combo: "]", scope: "watch", label: "Next episode", icon: "ChevronRight" },
-  { keys: ["F"], combo: "f", scope: "watch", label: "Fullscreen player", icon: "Maximize" },
-  { keys: ["T"], combo: "t", scope: "watch", label: "Toggle sub / dub", icon: "Languages" },
   { keys: ["Esc"], combo: "escape", scope: "global", label: "Close modals", icon: "X" },
+
+  // Watching / episodes
+  { keys: ["Shift", "P"], combo: "shift+p", scope: "watch", label: "Previous episode", icon: "ChevronLeft" },
+  { keys: ["Shift", "B"], combo: "shift+b", scope: "watch", label: "Previous episode (alt)", icon: "ChevronLeft" },
+  { keys: ["Shift", "N"], combo: "shift+n", scope: "watch", label: "Next episode", icon: "ChevronRight" },
+
+  // Player controls (what we can drive on the wrapped iframe)
+  { keys: ["F"], combo: "f", scope: "watch", label: "Toggle fullscreen", icon: "Maximize" },
+  { keys: ["T"], combo: "t", scope: "watch", label: "Toggle sub / dub", icon: "Languages" },
 ];
 
 /* -------------------------------------------------------------------------- */
@@ -107,10 +112,11 @@ export function GlobalShortcuts() {
       if (pathname.startsWith("/watch")) {
         const dispatch = (name: string) =>
           window.dispatchEvent(new CustomEvent(`aniora:watch:${name}`));
-        if (e.key === "[") { e.preventDefault(); dispatch("prev"); }
-        else if (e.key === "]") { e.preventDefault(); dispatch("next"); }
-        else if (e.key.toLowerCase() === "f") { e.preventDefault(); dispatch("fullscreen"); }
-        else if (e.key.toLowerCase() === "t") { e.preventDefault(); dispatch("toggle-lang"); }
+        const k = e.key.toLowerCase();
+        if (e.shiftKey && (k === "p" || k === "b")) { e.preventDefault(); dispatch("prev"); }
+        else if (e.shiftKey && k === "n") { e.preventDefault(); dispatch("next"); }
+        else if (!e.shiftKey && k === "f") { e.preventDefault(); dispatch("fullscreen"); }
+        else if (!e.shiftKey && k === "t") { e.preventDefault(); dispatch("toggle-lang"); }
       }
     };
 

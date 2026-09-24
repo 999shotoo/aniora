@@ -36,8 +36,34 @@ export function SettingsModal() {
   const active =
     (SECTIONS.find((s) => s.id === section)?.id as SectionId) ?? "behavior";
 
-  const filtered = query
-    ? SECTIONS.filter((s) => s.label.toLowerCase().includes(query.toLowerCase()))
+  // Search matches section labels AND known setting/shortcut labels — pressing
+  // Enter jumps to the first matching section.
+  const SEARCH_INDEX: { section: SectionId; label: string }[] = [
+    ...SECTIONS.map((s) => ({ section: s.id, label: s.label })),
+    { section: "behavior", label: "Auto sync AniList" },
+    { section: "behavior", label: "Sync threshold" },
+    { section: "behavior", label: "Hide spoilers" },
+    { section: "behavior", label: "Anime card destination" },
+    { section: "appearance", label: "Glass navigation bar" },
+    { section: "appearance", label: "Smooth scroll" },
+    { section: "appearance", label: "Watch history on home" },
+    { section: "media", label: "Default language sub dub" },
+    { section: "media", label: "Auto play" },
+    { section: "media", label: "Auto next episode" },
+    { section: "media", label: "Episodes view mode grid list thumb" },
+    { section: "shortcuts", label: "Keyboard shortcuts hotkeys" },
+    { section: "other", label: "Disable right click" },
+    { section: "other", label: "Disable text selection" },
+    { section: "other", label: "Clear watch history" },
+    { section: "other", label: "Restore default settings" },
+  ];
+  const q = query.trim().toLowerCase();
+  const matches = q
+    ? SEARCH_INDEX.filter((s) => s.label.toLowerCase().includes(q))
+    : [];
+  const matchedSectionIds = new Set(matches.map((m) => m.section));
+  const filtered = q
+    ? SECTIONS.filter((s) => matchedSectionIds.has(s.id))
     : SECTIONS;
 
   return (
@@ -71,7 +97,12 @@ export function SettingsModal() {
                 <input
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
-                  placeholder="Search"
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" && filtered[0]) {
+                      setSection(filtered[0].id);
+                    }
+                  }}
+                  placeholder="Search settings…"
                   className="w-full border border-border bg-input px-3 py-2 text-xs text-foreground placeholder:text-muted-foreground focus:border-foreground focus:outline-none"
                 />
               </div>
@@ -174,14 +205,16 @@ function Toggle({
       aria-checked={checked}
       aria-label={label}
       className={
-        "relative inline-flex h-6 w-11 items-center rounded-full transition-colors " +
-        (checked ? "bg-primary" : "bg-muted")
+        "relative inline-flex h-6 w-11 items-center rounded-full border transition-colors " +
+        (checked
+          ? "border-primary bg-primary"
+          : "border-border bg-muted/60")
       }
     >
       <span
         className={
-          "inline-block h-5 w-5 transform rounded-full bg-background shadow transition-transform " +
-          (checked ? "translate-x-5" : "translate-x-0.5")
+          "inline-block h-4 w-4 transform rounded-full shadow-md ring-1 ring-black/20 transition-transform " +
+          (checked ? "translate-x-[1.4rem] bg-white" : "translate-x-1 bg-white/90")
         }
       />
     </button>
@@ -337,6 +370,20 @@ function MediaSection({ settings, update }: UpdaterProps) {
         <Toggle
           checked={settings.autoNextEpisode}
           onChange={(v) => update("autoNextEpisode", v)}
+        />
+      </Row>
+      <Row
+        title="Episodes view mode"
+        description="Default layout for the episodes list. Changes here save automatically when you cycle from the panel."
+      >
+        <Segmented
+          value={settings.episodesView}
+          onChange={(v) => update("episodesView", v)}
+          options={[
+            { value: "thumb", label: "Thumb" },
+            { value: "row", label: "Row" },
+            { value: "grid", label: "Grid" },
+          ]}
         />
       </Row>
     </div>

@@ -4,6 +4,7 @@ import type { MappingEpisode } from "@/lib/mappings";
 import { isAired } from "@/lib/mappings";
 import { FALLBACK_EP_IMAGE } from "./player";
 import { SmartImage } from "./smart-image";
+import { useSettings } from "@/lib/settings";
 
 type ViewMode = "thumb" | "row" | "grid";
 
@@ -75,7 +76,9 @@ export function EpisodesPanel({
     if (idx >= 0) setRangeIdx(idx);
   }, [currentEp, ranges]);
 
-  const [view, setView] = useState<ViewMode>(total > 100 ? "grid" : "thumb");
+  const { settings, update } = useSettings();
+  const view: ViewMode = settings.episodesView ?? (total > 100 ? "grid" : "thumb");
+  const setView = (v: ViewMode) => update("episodesView", v);
   const [query, setQuery] = useState("");
 
   const activeRange = ranges[rangeIdx];
