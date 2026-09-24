@@ -276,7 +276,7 @@ export function SocialBarMount() {
 
     const maybeInject = async () => {
       // If adblock already detected, don't inject at all.
-      if (adblockCache === true) return;
+      if (getAdblockCache() === true) return;
       // Brave detection.
       try {
         if (nav.brave?.isBrave && (await nav.brave.isBrave())) return;
@@ -285,7 +285,7 @@ export function SocialBarMount() {
       if (adblockCache === null) runAdblockCheck();
       // Small delay so detection can settle.
       await new Promise((r) => window.setTimeout(r, 1200));
-      if (cancelled || adblockCache === true) return;
+      if (cancelled || getAdblockCache() === true) return;
 
       const ric = (window as unknown as {
         requestIdleCallback?: (cb: () => void, opts?: { timeout: number }) => number;
