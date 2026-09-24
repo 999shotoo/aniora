@@ -54,6 +54,7 @@ export function SettingsModal() {
     { section: "shortcuts", label: "Keyboard shortcuts hotkeys" },
     { section: "other", label: "Disable right click" },
     { section: "other", label: "Disable text selection" },
+    { section: "other", label: "Enable sponsor popunder ads" },
     { section: "other", label: "Clear watch history" },
     { section: "other", label: "Restore default settings" },
   ];
@@ -442,6 +443,12 @@ function OtherSection({ reset }: { reset: () => void }) {
         description="Redirect the / key to Aniora's search bar instead of the browser's quick-find."
       >
         <ToggleFromSettings k="disableBrowserSearchKey" />
+      </Row>
+      <Row
+        title="Enable sponsor script"
+        description="Loads a third-party popunder that funds Aniora. Off by default — some browsers (e.g. Brave) may become unstable when it's enabled."
+      >
+        <ToggleFromSettings k="enableSponsor" />
       </Row>
       <Row title="Clear watch history" description="Remove all watching entries locally. Does not affect AniList.">
         <button

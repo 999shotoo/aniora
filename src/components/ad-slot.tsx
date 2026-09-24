@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Mail, Github, Heart } from "lucide-react";
+import { useSettings } from "@/lib/settings";
 
 /* ---------- adblock detection (module-level, runs once) ---------- */
 
@@ -248,12 +249,14 @@ const SOCIAL_BAR_SRC =
   "https://pl30166305.effectivecpmnetwork.com/16/ea/97/16ea97a656a5ba4a8f70ad0380f1fd3f.js";
 
 export function SocialBarMount() {
+  const { settings } = useSettings();
+  const enabled = settings.enableSponsor;
+
   useEffect(() => {
+    if (!enabled) return;
     if (typeof window === "undefined") return;
     if (document.querySelector('script[data-sb="1"]')) return;
 
-    // Brave exposes a promise on navigator.brave — skip in Brave to avoid
-    // its shield fighting the popunder script and locking the tab.
     const nav = navigator as unknown as { brave?: { isBrave?: () => Promise<boolean> } };
     let cancelled = false;
 
@@ -266,24 +269,17 @@ export function SocialBarMount() {
         s.defer = true;
         s.setAttribute("data-cfasync", "false");
         s.setAttribute("data-sb", "1");
-        // Never let a failed ad script bubble as an unhandled error.
-        s.onerror = () => { try { s.remove(); } catch {} };
+        s.onerror = () => { try { s.remove(); } catch { /* noop */ } };
         document.body.appendChild(s);
-      } catch {
-        /* ignore */
-      }
+      } catch { /* ignore */ }
     };
 
     const maybeInject = async () => {
-      // If adblock already detected, don't inject at all.
       if (getAdblockCache() === true) return;
-      // Brave detection.
       try {
         if (nav.brave?.isBrave && (await nav.brave.isBrave())) return;
       } catch { /* ignore */ }
-      // Kick a detection pass to avoid injecting for known blockers.
       if (adblockCache === null) runAdblockCheck();
-      // Small delay so detection can settle.
       await new Promise((r) => window.setTimeout(r, 1200));
       if (cancelled || getAdblockCache() === true) return;
 
@@ -299,6 +295,6 @@ export function SocialBarMount() {
       cancelled = true;
       window.clearTimeout(t);
     };
-  }, []);
+  }, [enabled]);
   return null;
 }
