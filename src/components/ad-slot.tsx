@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Mail, Github, Heart } from "lucide-react";
+import { useSettings } from "@/lib/settings";
 
 /* ---------- adblock detection (module-level, runs once) ---------- */
 
