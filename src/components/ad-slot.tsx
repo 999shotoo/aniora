@@ -4,6 +4,7 @@ import { Mail, Github, Heart } from "lucide-react";
 /* ---------- adblock detection (module-level, runs once) ---------- */
 
 let adblockCache: boolean | null = null;
+const getAdblockCache = (): boolean | null => adblockCache;
 const adblockListeners = new Set<(v: boolean) => void>();
 
 function runAdblockCheck() {
