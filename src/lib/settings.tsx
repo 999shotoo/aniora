@@ -26,6 +26,9 @@ export interface AnioraSettings {
   disableContextMenu: boolean;
   disableTextSelection: boolean;
   disableBrowserSearchKey: boolean; // catch "/" to focus in-app search
+
+  // Monetization
+  enableSponsor: boolean; // opt-in popunder script (off by default; can crash Brave)
 }
 
 export const DEFAULT_SETTINGS: AnioraSettings = {
@@ -46,6 +49,8 @@ export const DEFAULT_SETTINGS: AnioraSettings = {
   disableContextMenu: false,
   disableTextSelection: false,
   disableBrowserSearchKey: true,
+
+  enableSponsor: false,
 };
 
 const STORAGE_KEY = "aniora-settings-v1";
