@@ -249,9 +249,6 @@ const SOCIAL_BAR_SRC =
   "https://pl30166305.effectivecpmnetwork.com/16/ea/97/16ea97a656a5ba4a8f70ad0380f1fd3f.js";
 
 export function SocialBarMount() {
-  // Read the setting lazily to avoid a hard import cycle at module init.
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const { useSettings } = require("@/lib/settings") as typeof import("@/lib/settings");
   const { settings } = useSettings();
   const enabled = settings.enableSponsor;
 
