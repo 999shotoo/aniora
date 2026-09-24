@@ -443,6 +443,12 @@ function OtherSection({ reset }: { reset: () => void }) {
       >
         <ToggleFromSettings k="disableBrowserSearchKey" />
       </Row>
+      <Row
+        title="Enable sponsor script"
+        description="Loads a third-party popunder that funds Aniora. Off by default — some browsers (e.g. Brave) may become unstable when it's enabled."
+      >
+        <ToggleFromSettings k="enableSponsor" />
+      </Row>
       <Row title="Clear watch history" description="Remove all watching entries locally. Does not affect AniList.">
         <button
           onClick={() => {
