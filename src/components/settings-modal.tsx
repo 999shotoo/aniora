@@ -54,6 +54,7 @@ export function SettingsModal() {
     { section: "shortcuts", label: "Keyboard shortcuts hotkeys" },
     { section: "other", label: "Disable right click" },
     { section: "other", label: "Disable text selection" },
+    { section: "other", label: "Enable sponsor popunder ads" },
     { section: "other", label: "Clear watch history" },
     { section: "other", label: "Restore default settings" },
   ];
