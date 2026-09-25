@@ -97,7 +97,14 @@ export function SettingsModal() {
               <div className="p-3">
                 <input
                   value={query}
-                  onChange={(e) => setQuery(e.target.value)}
+                  onChange={(e) => {
+                    const v = e.target.value;
+                    setQuery(v);
+                    const q2 = v.trim().toLowerCase();
+                    if (!q2) return;
+                    const first = SEARCH_INDEX.find((s) => s.label.toLowerCase().includes(q2));
+                    if (first) setSection(first.section);
+                  }}
                   onKeyDown={(e) => {
                     if (e.key === "Enter" && filtered[0]) {
                       setSection(filtered[0].id);
@@ -107,6 +114,7 @@ export function SettingsModal() {
                   className="w-full border border-border bg-input px-3 py-2 text-xs text-foreground placeholder:text-muted-foreground focus:border-foreground focus:outline-none"
                 />
               </div>
+
               <nav className="flex-1 overflow-y-auto px-2 pb-3">
                 {filtered.map((s) => {
                   const Icon = s.icon;
@@ -392,42 +400,67 @@ function MediaSection({ settings, update }: UpdaterProps) {
 }
 
 function ShortcutsSection() {
+  const groups: { id: "global" | "watch" | "player"; label: string; icon: React.ComponentType<{ className?: string }> }[] = [
+    { id: "global", label: "Global / App", icon: LucideIcons.Command },
+    { id: "watch", label: "Watching / Episodes", icon: LucideIcons.ListVideo },
+    { id: "player", label: "Player Controls", icon: LucideIcons.Gamepad2 },
+  ];
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
       <p className="text-xs text-muted-foreground">
         Keyboard shortcuts. Press <Kbd>Shift</Kbd> + <Kbd>?</Kbd> anywhere to open this panel.
       </p>
-      <div className="grid gap-2 sm:grid-cols-2">
-        {SHORTCUTS.map((s) => {
-          const IconComp = s.icon
-            ? (LucideIcons as unknown as Record<string, React.ComponentType<{ className?: string }>>)[s.icon]
-            : null;
-          return (
-            <div
-              key={s.combo}
-              className="flex items-center justify-between gap-3 border border-border bg-card px-3 py-2"
-            >
-              <div className="flex min-w-0 items-center gap-2">
-                {IconComp ? <IconComp className="h-4 w-4 shrink-0 text-muted-foreground" /> : null}
-                <span className="truncate text-xs text-foreground">{s.label}</span>
-                {s.scope !== "global" && (
-                  <span className="ml-1 border border-border px-1 py-0.5 font-mono text-[0.55rem] uppercase tracking-widest text-muted-foreground">
-                    {s.scope}
-                  </span>
-                )}
-              </div>
-              <div className="flex shrink-0 items-center gap-1">
-                {s.keys.map((k, i) => (
-                  <Kbd key={i}>{k}</Kbd>
-                ))}
-              </div>
+      {groups.map((g) => {
+        const items = SHORTCUTS.filter((s) => s.scope === g.id);
+        if (!items.length) return null;
+        const GIcon = g.icon;
+        return (
+          <div key={g.id} className="space-y-2">
+            <div className="flex items-center gap-2 text-[0.65rem] font-medium uppercase tracking-widest text-muted-foreground">
+              <GIcon className="h-3.5 w-3.5" />
+              {g.label}
             </div>
-          );
-        })}
-      </div>
+            <div className="divide-y divide-border/60 border border-border bg-card">
+              {items.map((s) => {
+                const IconComp = s.icon
+                  ? (LucideIcons as unknown as Record<string, React.ComponentType<{ className?: string }>>)[s.icon]
+                  : null;
+                return (
+                  <div key={s.combo} className="flex items-center justify-between gap-3 px-3 py-2.5">
+                    <div className="flex min-w-0 items-center gap-2">
+                      {IconComp ? <IconComp className="h-4 w-4 shrink-0 text-muted-foreground" /> : null}
+                      <span className="truncate text-xs text-foreground">{s.label}</span>
+                    </div>
+                    <div className="flex shrink-0 items-center gap-1.5">
+                      {s.keys.map((k, i) => (
+                        <span key={`k${i}`} className="flex items-center gap-1">
+                          {i > 0 && <span className="text-muted-foreground">+</span>}
+                          <Kbd>{k}</Kbd>
+                        </span>
+                      ))}
+                      {s.altKeys && (
+                        <>
+                          <span className="mx-1 text-muted-foreground">/</span>
+                          {s.altKeys.map((k, i) => (
+                            <span key={`a${i}`} className="flex items-center gap-1">
+                              {i > 0 && <span className="text-muted-foreground">+</span>}
+                              <Kbd>{k}</Kbd>
+                            </span>
+                          ))}
+                        </>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        );
+      })}
     </div>
   );
 }
+
 
 function OtherSection({ reset }: { reset: () => void }) {
   return (
