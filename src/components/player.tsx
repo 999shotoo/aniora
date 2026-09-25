@@ -32,6 +32,7 @@ export function Player({ malId, episode, ep, fallbackTitle, onSlowLoad, reloadKe
   const onSlowLoadRef = useRef(onSlowLoad);
   const wrapRef = useRef<HTMLDivElement>(null);
   const autoRetriedRef = useRef(false);
+  const loadedRef = useRef(false);
 
   useEffect(() => {
     onSlowLoadRef.current = onSlowLoad;
