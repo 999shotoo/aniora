@@ -1,6 +1,22 @@
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Heart, Loader2, Trash2, Save } from "lucide-react";
+import {
+  BookmarkPlus,
+  Check,
+  CircleDot,
+  Clock,
+  Eye,
+  Heart,
+  Loader2,
+  Minus,
+  Pause,
+  Plus,
+  Repeat,
+  Save,
+  Star,
+  Trash2,
+  X,
+} from "lucide-react";
 import { useAniListViewer } from "@/lib/anilist-auth";
 import {
   fetchMediaEntry,
@@ -11,13 +27,17 @@ import {
 } from "@/lib/anilist-sync";
 import { toast } from "sonner";
 
-const STATUSES: { value: AniListListStatus; label: string }[] = [
-  { value: "CURRENT", label: "watching" },
-  { value: "PLANNING", label: "planning" },
-  { value: "COMPLETED", label: "completed" },
-  { value: "PAUSED", label: "paused" },
-  { value: "DROPPED", label: "dropped" },
-  { value: "REPEATING", label: "rewatching" },
+const STATUSES: {
+  value: AniListListStatus;
+  label: string;
+  Icon: typeof Eye;
+}[] = [
+  { value: "CURRENT", label: "watching", Icon: Eye },
+  { value: "PLANNING", label: "planning", Icon: BookmarkPlus },
+  { value: "COMPLETED", label: "completed", Icon: Check },
+  { value: "PAUSED", label: "paused", Icon: Pause },
+  { value: "DROPPED", label: "dropped", Icon: X },
+  { value: "REPEATING", label: "rewatching", Icon: Repeat },
 ];
 
 export function AniListTracker({
@@ -58,8 +78,7 @@ export function AniListTracker({
   }
 
   const save = useMutation({
-    mutationFn: () =>
-      saveMediaEntry({ mediaId, status, progress, score }),
+    mutationFn: () => saveMediaEntry({ mediaId, status, progress, score }),
     onSuccess: () => {
       toast.success("Saved to AniList");
       setDirty(false);
@@ -92,116 +111,234 @@ export function AniListTracker({
 
   if (!hasToken) return null;
 
+  const clampProgress = (n: number) => {
+    const max = totalEpisodes && totalEpisodes > 0 ? totalEpisodes : 9999;
+    return Math.min(max, Math.max(0, Math.round(n)));
+  };
+  const stepProgress = (delta: number) => {
+    setProgress((p) => clampProgress(p + delta));
+    setDirty(true);
+  };
+
   return (
-    <div className="mt-5 border border-border bg-card/60 p-4">
-      <div className="mb-3 flex items-center justify-between gap-2">
-        <div className="text-[0.65rem] uppercase tracking-widest text-muted-foreground">
+    <div className="mt-5 border border-border bg-card/60">
+      {/* header */}
+      <div className="flex items-center justify-between gap-2 border-b border-border/70 bg-background/40 px-4 py-2.5">
+        <div className="flex items-center gap-2 text-[0.6rem] uppercase tracking-widest text-muted-foreground">
+          <CircleDot className="h-3 w-3 text-chart-2" />
           anilist tracking
+          {entry && (
+            <span className="ml-1 border border-border bg-background px-1.5 py-0.5 text-[0.55rem] text-foreground">
+              on your list
+            </span>
+          )}
         </div>
         <button
           onClick={() => fav.mutate()}
           disabled={fav.isPending || isLoading}
-          className="inline-flex items-center gap-1.5 border border-border bg-background px-2.5 py-1 text-[0.6rem] uppercase tracking-widest hover:bg-accent disabled:opacity-50"
+          className={
+            "inline-flex items-center gap-1.5 border px-2.5 py-1 text-[0.6rem] uppercase tracking-widest transition-colors disabled:opacity-50 " +
+            (isFav
+              ? "border-red-500/60 bg-red-500/10 text-red-400 hover:bg-red-500/20"
+              : "border-border bg-background text-muted-foreground hover:bg-accent hover:text-foreground")
+          }
           aria-label={isFav ? "Remove from favourites" : "Add to favourites"}
         >
-          <Heart
-            className={`h-3 w-3 ${isFav ? "fill-red-500 text-red-500" : ""}`}
-          />
+          <Heart className={`h-3 w-3 ${isFav ? "fill-current" : ""}`} />
           {isFav ? "favourited" : "favourite"}
         </button>
       </div>
 
       {isLoading ? (
-        <div className="flex items-center gap-2 text-[0.7rem] text-muted-foreground">
+        <div className="flex items-center gap-2 px-4 py-6 text-[0.7rem] text-muted-foreground">
           <Loader2 className="h-3.5 w-3.5 animate-spin" /> loading entry…
         </div>
       ) : (
-        <div className="grid gap-3 sm:grid-cols-3">
-          <label className="flex flex-col gap-1">
-            <span className="text-[0.55rem] uppercase tracking-widest text-muted-foreground">
+        <div className="space-y-4 p-4">
+          {/* Status pills */}
+          <div>
+            <div className="mb-1.5 text-[0.55rem] uppercase tracking-widest text-muted-foreground">
               status
-            </span>
-            <select
-              value={status}
-              onChange={(e) => {
-                setStatus(e.target.value as AniListListStatus);
-                setDirty(true);
-              }}
-              className="border border-border bg-background px-2 py-1.5 text-xs uppercase tracking-widest focus:outline-none focus:ring-1 focus:ring-foreground"
+            </div>
+            <div className="flex flex-wrap gap-1.5">
+              {STATUSES.map(({ value, label, Icon }) => {
+                const active = status === value;
+                return (
+                  <button
+                    key={value}
+                    onClick={() => {
+                      setStatus(value);
+                      setDirty(true);
+                    }}
+                    className={
+                      "inline-flex items-center gap-1.5 border px-2.5 py-1.5 text-[0.6rem] uppercase tracking-widest transition-colors " +
+                      (active
+                        ? "border-foreground bg-foreground text-background"
+                        : "border-border bg-background text-muted-foreground hover:bg-accent hover:text-foreground")
+                    }
+                  >
+                    <Icon className="h-3 w-3" />
+                    {label}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          <div className="grid gap-4 sm:grid-cols-2">
+            {/* Progress stepper */}
+            <div>
+              <div className="mb-1.5 flex items-baseline justify-between">
+                <span className="text-[0.55rem] uppercase tracking-widest text-muted-foreground">
+                  progress
+                </span>
+                <span className="font-mono text-[0.6rem] text-muted-foreground">
+                  {progress}
+                  {totalEpisodes ? ` / ${totalEpisodes}` : ""}
+                </span>
+              </div>
+              <div className="flex items-stretch border border-border bg-background">
+                <button
+                  onClick={() => stepProgress(-1)}
+                  disabled={progress <= 0}
+                  className="flex w-9 items-center justify-center border-r border-border text-muted-foreground hover:bg-accent hover:text-foreground disabled:opacity-40"
+                  aria-label="Decrease progress"
+                >
+                  <Minus className="h-3.5 w-3.5" />
+                </button>
+                <input
+                  type="number"
+                  min={0}
+                  max={totalEpisodes ?? 9999}
+                  value={progress}
+                  onChange={(e) => {
+                    setProgress(clampProgress(Number(e.target.value) || 0));
+                    setDirty(true);
+                  }}
+                  className="flex-1 bg-transparent px-3 py-1.5 text-center text-sm tabular-nums focus:outline-none [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+                />
+                <button
+                  onClick={() => stepProgress(1)}
+                  disabled={!!totalEpisodes && progress >= totalEpisodes}
+                  className="flex w-9 items-center justify-center border-l border-border text-muted-foreground hover:bg-accent hover:text-foreground disabled:opacity-40"
+                  aria-label="Increase progress"
+                >
+                  <Plus className="h-3.5 w-3.5" />
+                </button>
+              </div>
+              {totalEpisodes && totalEpisodes > 0 && (
+                <div className="mt-2 h-1 w-full overflow-hidden border border-border bg-background">
+                  <div
+                    className="h-full bg-foreground transition-[width]"
+                    style={{
+                      width: `${Math.min(100, (progress / totalEpisodes) * 100)}%`,
+                    }}
+                  />
+                </div>
+              )}
+            </div>
+
+            {/* Score stars */}
+            <div>
+              <div className="mb-1.5 flex items-baseline justify-between">
+                <span className="text-[0.55rem] uppercase tracking-widest text-muted-foreground">
+                  score
+                </span>
+                <span className="font-mono text-[0.6rem] text-muted-foreground">
+                  {score.toFixed(score % 1 === 0 ? 0 : 1)} / 10
+                </span>
+              </div>
+              <div className="flex items-center gap-0.5">
+                {Array.from({ length: 10 }).map((_, i) => {
+                  const n = i + 1;
+                  const active = score >= n;
+                  return (
+                    <button
+                      key={n}
+                      onClick={() => {
+                        setScore(score === n ? 0 : n);
+                        setDirty(true);
+                      }}
+                      aria-label={`Score ${n}`}
+                      className="flex h-7 w-7 items-center justify-center hover:scale-110"
+                    >
+                      <Star
+                        className={
+                          "h-3.5 w-3.5 transition-colors " +
+                          (active
+                            ? "fill-chart-3 text-chart-3"
+                            : "text-muted-foreground/40")
+                        }
+                      />
+                    </button>
+                  );
+                })}
+                {score > 0 && (
+                  <button
+                    onClick={() => {
+                      setScore(0);
+                      setDirty(true);
+                    }}
+                    className="ml-1 text-[0.55rem] uppercase tracking-widest text-muted-foreground hover:text-foreground"
+                    title="Clear score"
+                  >
+                    clear
+                  </button>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* Actions */}
+          <div className="flex flex-wrap gap-2 border-t border-border/60 pt-3">
+            <button
+              onClick={() => save.mutate()}
+              disabled={save.isPending || (!dirty && !!entry)}
+              className="inline-flex items-center gap-1.5 border border-foreground bg-foreground px-3.5 py-2 text-[0.6rem] uppercase tracking-widest text-background transition-opacity hover:opacity-90 disabled:opacity-40"
             >
-              {STATUSES.map((s) => (
-                <option key={s.value} value={s.value}>
-                  {s.label}
-                </option>
-              ))}
-            </select>
-          </label>
+              {save.isPending ? (
+                <Loader2 className="h-3 w-3 animate-spin" />
+              ) : (
+                <Save className="h-3 w-3" />
+              )}
+              {entry ? (dirty ? "save changes" : "saved") : "add to list"}
+            </button>
+            {entry && (
+              <>
+                <button
+                  onClick={() => {
+                    setStatus("COMPLETED");
+                    if (totalEpisodes) setProgress(totalEpisodes);
+                    setDirty(true);
+                  }}
+                  className="inline-flex items-center gap-1.5 border border-border bg-background px-3 py-2 text-[0.6rem] uppercase tracking-widest text-muted-foreground hover:bg-accent hover:text-foreground"
+                >
+                  <Check className="h-3 w-3" /> mark completed
+                </button>
+                <button
+                  onClick={() => remove.mutate()}
+                  disabled={remove.isPending}
+                  className="ml-auto inline-flex items-center gap-1.5 border border-destructive/40 bg-background px-3 py-2 text-[0.6rem] uppercase tracking-widest text-destructive hover:bg-destructive/10 disabled:opacity-50"
+                >
+                  {remove.isPending ? (
+                    <Loader2 className="h-3 w-3 animate-spin" />
+                  ) : (
+                    <Trash2 className="h-3 w-3" />
+                  )}
+                  remove
+                </button>
+              </>
+            )}
+          </div>
 
-          <label className="flex flex-col gap-1">
-            <span className="text-[0.55rem] uppercase tracking-widest text-muted-foreground">
-              progress {totalEpisodes ? `/ ${totalEpisodes}` : ""}
-            </span>
-            <input
-              type="number"
-              min={0}
-              max={totalEpisodes ?? 9999}
-              value={progress}
-              onChange={(e) => {
-                setProgress(Math.max(0, Number(e.target.value) || 0));
-                setDirty(true);
-              }}
-              className="border border-border bg-background px-2 py-1.5 text-xs focus:outline-none focus:ring-1 focus:ring-foreground"
-            />
-          </label>
-
-          <label className="flex flex-col gap-1">
-            <span className="text-[0.55rem] uppercase tracking-widest text-muted-foreground">
-              score / 10
-            </span>
-            <input
-              type="number"
-              min={0}
-              max={10}
-              step={0.5}
-              value={score}
-              onChange={(e) => {
-                setScore(Math.min(10, Math.max(0, Number(e.target.value) || 0)));
-                setDirty(true);
-              }}
-              className="border border-border bg-background px-2 py-1.5 text-xs focus:outline-none focus:ring-1 focus:ring-foreground"
-            />
-          </label>
+          {entry?.status && (
+            <div className="flex items-center gap-1.5 text-[0.55rem] uppercase tracking-widest text-muted-foreground">
+              <Clock className="h-3 w-3" />
+              last synced status: {String(entry.status).toLowerCase()}
+            </div>
+          )}
         </div>
       )}
-
-      <div className="mt-3 flex flex-wrap gap-2">
-        <button
-          onClick={() => save.mutate()}
-          disabled={save.isPending || isLoading || (!dirty && !!entry)}
-          className="inline-flex items-center gap-1.5 border border-foreground bg-foreground px-3 py-1.5 text-[0.6rem] uppercase tracking-widest text-background hover:bg-foreground/90 disabled:opacity-50"
-        >
-          {save.isPending ? (
-            <Loader2 className="h-3 w-3 animate-spin" />
-          ) : (
-            <Save className="h-3 w-3" />
-          )}
-          {entry ? "update" : "add to list"}
-        </button>
-        {entry && (
-          <button
-            onClick={() => remove.mutate()}
-            disabled={remove.isPending}
-            className="inline-flex items-center gap-1.5 border border-border bg-background px-3 py-1.5 text-[0.6rem] uppercase tracking-widest text-destructive hover:bg-destructive/10 disabled:opacity-50"
-          >
-            {remove.isPending ? (
-              <Loader2 className="h-3 w-3 animate-spin" />
-            ) : (
-              <Trash2 className="h-3 w-3" />
-            )}
-            remove
-          </button>
-        )}
-      </div>
     </div>
   );
 }
