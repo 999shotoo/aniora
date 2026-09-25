@@ -70,6 +70,7 @@ export function Player({ malId, episode, ep, fallbackTitle, onSlowLoad, reloadKe
   useEffect(() => {
     setReadySrc(null);
     setLoaded(false);
+    loadedRef.current = false;
     autoRetriedRef.current = false;
     if (!src) return;
 
