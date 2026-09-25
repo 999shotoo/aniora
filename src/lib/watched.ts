@@ -148,20 +148,28 @@ export function mergeAniListEntries(entries: AniListSyncEntry[]): Array<{
     if (targetProgress > localMax) {
       const existingSet = new Set(existing.map((e) => e.episode));
       const baseWatchedAt = entry.updatedAt ? entry.updatedAt * 1000 : Date.now();
+      const additions: WatchedEpisodeItem[] = [];
+      const malId = entry.malId ?? null;
       for (let ep = 1; ep <= targetProgress; ep++) {
         if (existingSet.has(ep)) continue;
-        upsert(store, id, {
+        additions.push({
           animeId: entry.animeId,
-          animeTitle: entry.title,
-          animeCover: entry.cover,
-          animePoster: entry.poster,
+          animeTitle: entry.title || "Unknown title",
+          animeCover: entry.cover || null,
+          animePoster: entry.poster || null,
           episode: ep,
           episodeTitle: `Episode ${ep}`,
-          episodeImage: entry.cover || entry.poster,
-          malId: entry.malId,
+          episodeImage: entry.cover || entry.poster || null,
+          malId,
+          streamPath: malId ? `/stream/mal/${malId}/${ep}/sub` : null,
           runtime: null,
           watchedAt: baseWatchedAt - (targetProgress - ep) * 1000,
         });
+      }
+      if (additions.length) {
+        store[id] = [...additions, ...existing].sort(
+          (a, b) => b.watchedAt - a.watchedAt || b.episode - a.episode,
+        );
       }
     }
   }
