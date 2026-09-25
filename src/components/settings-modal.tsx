@@ -97,7 +97,14 @@ export function SettingsModal() {
               <div className="p-3">
                 <input
                   value={query}
-                  onChange={(e) => setQuery(e.target.value)}
+                  onChange={(e) => {
+                    const v = e.target.value;
+                    setQuery(v);
+                    const q2 = v.trim().toLowerCase();
+                    if (!q2) return;
+                    const first = SEARCH_INDEX.find((s) => s.label.toLowerCase().includes(q2));
+                    if (first) setSection(first.section);
+                  }}
                   onKeyDown={(e) => {
                     if (e.key === "Enter" && filtered[0]) {
                       setSection(filtered[0].id);
@@ -107,6 +114,7 @@ export function SettingsModal() {
                   className="w-full border border-border bg-input px-3 py-2 text-xs text-foreground placeholder:text-muted-foreground focus:border-foreground focus:outline-none"
                 />
               </div>
+
               <nav className="flex-1 overflow-y-auto px-2 pb-3">
                 {filtered.map((s) => {
                   const Icon = s.icon;
