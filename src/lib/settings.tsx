@@ -72,24 +72,24 @@ interface Ctx {
 
 const SettingsCtx = createContext<Ctx | null>(null);
 
+function loadInitial(): AnioraSettings {
+  if (typeof window === "undefined") return DEFAULT_SETTINGS;
+  try {
+    const raw = window.localStorage.getItem(STORAGE_KEY);
+    if (!raw) return DEFAULT_SETTINGS;
+    const parsed = JSON.parse(raw);
+    return { ...DEFAULT_SETTINGS, ...parsed };
+  } catch {
+    return DEFAULT_SETTINGS;
+  }
+}
+
 export function SettingsProvider({ children }: { children: ReactNode }) {
-  const [settings, setSettings] = useState<AnioraSettings>(DEFAULT_SETTINGS);
+  const [settings, setSettings] = useState<AnioraSettings>(loadInitial);
   const [isOpen, setOpen] = useState(false);
   const [section, setSection] = useState<string>("behavior");
 
-  // Load from LS.
-  useEffect(() => {
-    try {
-      const raw = localStorage.getItem(STORAGE_KEY);
-      if (!raw) return;
-      const parsed = JSON.parse(raw);
-      setSettings((prev) => ({ ...prev, ...parsed }));
-    } catch {
-      /* ignore */
-    }
-  }, []);
-
-  // Persist.
+  // Persist on change.
   useEffect(() => {
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(settings));
@@ -97,6 +97,7 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
       /* ignore */
     }
   }, [settings]);
+
 
   // Apply body-level side effects.
   useEffect(() => {
