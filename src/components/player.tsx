@@ -124,11 +124,15 @@ export function Player({ malId, episode, ep, fallbackTitle, onSlowLoad, reloadKe
             src={readySrc}
             title={`Ep ${episode} — ${mode}`}
             className="h-full w-full"
+            style={{ visibility: loaded ? "visible" : "hidden" }}
             allow="autoplay; fullscreen; picture-in-picture; encrypted-media"
             allowFullScreen
             scrolling="no"
             frameBorder={0}
-            onLoad={() => setLoaded(true)}
+            onLoad={() => {
+              loadedRef.current = true;
+              setLoaded(true);
+            }}
           />
         )}
       </div>
