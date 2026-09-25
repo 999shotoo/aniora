@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { Maximize2, RefreshCcw } from "lucide-react";
 import type { MappingEpisode } from "@/lib/mappings";
 import { useSettings } from "@/lib/settings";
 
@@ -27,22 +28,26 @@ export function Player({ malId, episode, ep, fallbackTitle, onSlowLoad, reloadKe
   const setMode = (m: "sub" | "dub") => update("defaultLanguage", m);
   const [readySrc, setReadySrc] = useState<string | null>(null);
   const [loaded, setLoaded] = useState(false);
+  const [nonce, setNonce] = useState(0); // forces internal iframe remount
   const onSlowLoadRef = useRef(onSlowLoad);
   const wrapRef = useRef<HTMLDivElement>(null);
+  const autoRetriedRef = useRef(false);
 
   useEffect(() => {
     onSlowLoadRef.current = onSlowLoad;
   }, [onSlowLoad]);
 
+  const enterFs = () => {
+    const el = wrapRef.current;
+    if (!el) return;
+    if (document.fullscreenElement) void document.exitFullscreen();
+    else void el.requestFullscreen?.();
+  };
+
   // React to shortcut events.
   useEffect(() => {
     const onToggle = () => setMode(mode === "sub" ? "dub" : "sub");
-    const onFs = () => {
-      const el = wrapRef.current;
-      if (!el) return;
-      if (document.fullscreenElement) void document.exitFullscreen();
-      else void el.requestFullscreen?.();
-    };
+    const onFs = () => enterFs();
     window.addEventListener("aniora:watch:toggle-lang", onToggle);
     window.addEventListener("aniora:watch:fullscreen", onFs);
     return () => {
@@ -58,17 +63,37 @@ export function Player({ malId, episode, ep, fallbackTitle, onSlowLoad, reloadKe
     : "";
   const title = ep?.title?.en || ep?.nameTvdb || fallbackTitle || `Episode ${episode}`;
 
+  // Mount + auto-retry lifecycle. If iframe hasn't fired onLoad within 4s,
+  // silently remount once. If still not loaded by 8s, surface the warning.
   useEffect(() => {
     setReadySrc(null);
     setLoaded(false);
+    autoRetriedRef.current = false;
     if (!src) return;
-    const mountTimer = window.setTimeout(() => setReadySrc(src), 180);
-    const slowTimer = window.setTimeout(() => onSlowLoadRef.current?.(), 7000);
+
+    const mountTimer = window.setTimeout(() => setReadySrc(src), 80);
+    const retryTimer = window.setTimeout(() => {
+      if (!autoRetriedRef.current) {
+        autoRetriedRef.current = true;
+        setLoaded(false);
+        setNonce((n) => n + 1);
+      }
+    }, 4200);
+    const slowTimer = window.setTimeout(() => {
+      onSlowLoadRef.current?.();
+    }, 8000);
+
     return () => {
       window.clearTimeout(mountTimer);
+      window.clearTimeout(retryTimer);
       window.clearTimeout(slowTimer);
     };
   }, [src, reloadKey]);
+
+  const manualReload = () => {
+    setLoaded(false);
+    setNonce((n) => n + 1);
+  };
 
   if (!malId || !validEp || !ep) {
     return (
@@ -93,7 +118,7 @@ export function Player({ malId, episode, ep, fallbackTitle, onSlowLoad, reloadKe
         )}
         {readySrc && (
           <iframe
-            key={`${readySrc}-${reloadKey}`}
+            key={`${readySrc}-${reloadKey}-${nonce}`}
             src={readySrc}
             title={`Ep ${episode} — ${mode}`}
             className="h-full w-full"
@@ -115,21 +140,41 @@ export function Player({ malId, episode, ep, fallbackTitle, onSlowLoad, reloadKe
         <span className="line-clamp-1 flex-1 text-xs text-card-foreground">
           {title}
         </span>
-        <div className="ml-auto flex border border-border">
-          {(["sub", "dub"] as const).map((m) => (
-            <button
-              key={m}
-              onClick={() => setMode(m)}
-              className={
-                "px-3 py-1 text-[0.6rem] uppercase tracking-widest transition-colors " +
-                (mode === m
-                  ? "bg-foreground text-background"
-                  : "text-muted-foreground hover:text-foreground")
-              }
-            >
-              {m}
-            </button>
-          ))}
+
+        <div className="ml-auto flex items-center gap-2">
+          <button
+            onClick={manualReload}
+            title="Reload stream (R)"
+            aria-label="Reload stream"
+            className="inline-flex items-center gap-1.5 border border-border bg-background px-2.5 py-1 text-[0.6rem] uppercase tracking-widest text-muted-foreground hover:bg-accent hover:text-foreground"
+          >
+            <RefreshCcw className="h-3 w-3" />
+            reload
+          </button>
+          <button
+            onClick={enterFs}
+            title="Fullscreen (F)"
+            aria-label="Fullscreen"
+            className="inline-flex h-[26px] w-[26px] items-center justify-center border border-border bg-background text-muted-foreground hover:bg-accent hover:text-foreground"
+          >
+            <Maximize2 className="h-3 w-3" />
+          </button>
+          <div className="flex border border-border">
+            {(["sub", "dub"] as const).map((m) => (
+              <button
+                key={m}
+                onClick={() => setMode(m)}
+                className={
+                  "px-3 py-1 text-[0.6rem] uppercase tracking-widest transition-colors " +
+                  (mode === m
+                    ? "bg-foreground text-background"
+                    : "text-muted-foreground hover:text-foreground")
+                }
+              >
+                {m}
+              </button>
+            ))}
+          </div>
         </div>
       </div>
 
@@ -151,3 +196,4 @@ export function PlayerPlaceholder({ message = "select an episode to start watchi
 }
 
 export { FALLBACK_EP_IMAGE };
+
