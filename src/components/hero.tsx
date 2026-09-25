@@ -62,10 +62,10 @@ export function Hero({ items, intervalMs = 6500 }: Props) {
             onError={(e) => {
               (e.currentTarget as HTMLImageElement).src = FALLBACK_BANNER;
             }}
-            initial={{ opacity: 0, scale: 1.06 }}
-            animate={{ opacity: 1, scale: 1 }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ opacity: { duration: 1.2 }, scale: { duration: 6, ease: "easeOut" } }}
+            transition={{ duration: 0.6 }}
             className="absolute inset-0 h-full w-full object-cover object-center"
           />
         </AnimatePresence>
