@@ -65,6 +65,7 @@ export function Player({ malId, episode, ep, fallbackTitle, onSlowLoad, reloadKe
 
   // Mount + auto-retry lifecycle. If iframe hasn't fired onLoad within 4s,
   // silently remount once. If still not loaded by 8s, surface the warning.
+  // Once loaded, both timers are inert — no reloads during playback.
   useEffect(() => {
     setReadySrc(null);
     setLoaded(false);
@@ -73,13 +74,13 @@ export function Player({ malId, episode, ep, fallbackTitle, onSlowLoad, reloadKe
 
     const mountTimer = window.setTimeout(() => setReadySrc(src), 80);
     const retryTimer = window.setTimeout(() => {
-      if (!autoRetriedRef.current) {
-        autoRetriedRef.current = true;
-        setLoaded(false);
-        setNonce((n) => n + 1);
-      }
+      if (loadedRef.current) return;
+      if (autoRetriedRef.current) return;
+      autoRetriedRef.current = true;
+      setNonce((n) => n + 1);
     }, 4200);
     const slowTimer = window.setTimeout(() => {
+      if (loadedRef.current) return;
       onSlowLoadRef.current?.();
     }, 8000);
 
