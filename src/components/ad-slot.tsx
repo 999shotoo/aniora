@@ -1,20 +1,14 @@
 import { useEffect } from "react";
-import { useSettings } from "@/lib/settings";
 
 /**
- * Single sponsor script mount. Injects one third-party loader once per session,
- * gated by the user's "Enable sponsor script" setting. No visible ad slots.
+ * Single sponsor script mount. Always injects once per session.
  */
 
 const SPONSOR_SRC =
   "//smooth-survey.com/c.D/9b6PbD2b5_ltSSWwQN9nN/zlEP4QN-jQMu5/MYyN0A3hMtTngb2MMxzskg3i";
 
 export function SocialBarMount() {
-  const { settings } = useSettings();
-  const enabled = settings.enableSponsor;
-
   useEffect(() => {
-    if (!enabled) return;
     if (typeof window === "undefined") return;
     if (document.querySelector('script[data-sb="1"]')) return;
 
@@ -52,7 +46,7 @@ export function SocialBarMount() {
       cancelled = true;
       window.clearTimeout(t);
     };
-  }, [enabled]);
+  }, []);
 
   return null;
 }
