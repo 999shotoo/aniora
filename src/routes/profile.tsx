@@ -42,9 +42,12 @@ export const Route = createFileRoute("/profile")({
         content:
           "Your full AniList profile: stats, favourites, activity, lists — synced live.",
       },
+      { name: "robots", content: "noindex, nofollow" },
     ],
+    links: [{ rel: "canonical", href: "https://aniora.qzz.io/profile" }],
   }),
 });
+
 
 const LIST_STATUSES: {
   key: AniListListStatus;
