@@ -9,19 +9,27 @@ export const Route = createFileRoute("/movies")({
   component: MoviesPage,
   head: () => ({
     meta: [
-      { title: "Browse Anime Movies — Aniora" },
+      { title: "Anime Movies — Watch Free in HD, Sub & Dub | Aniora" },
       {
         name: "description",
         content:
-          "Browse popular, top-rated, trending, and recent anime films. Stream anime movies dub or sub on Aniora.",
+          "Browse popular, top-rated, trending, and recent anime films on Aniora. Stream anime movies free in HD — sub or dub.",
       },
-      { property: "og:title", content: "Browse Anime Movies — Aniora" },
-      { property: "og:description", content: "Popular, top-rated, trending, and recent anime films." },
+      { property: "og:title", content: "Anime Movies — Aniora" },
+      {
+        property: "og:description",
+        content: "Popular, top-rated, trending, and recent anime films — free on Aniora.",
+      },
       { property: "og:url", content: "https://aniora.qzz.io/movies" },
+      { property: "og:image", content: "https://aniora.qzz.io/og.png" },
+      { property: "og:image:width", content: "1200" },
+      { property: "og:image:height", content: "630" },
+      { name: "twitter:image", content: "https://aniora.qzz.io/og.png" },
     ],
     links: [{ rel: "canonical", href: "https://aniora.qzz.io/movies" }],
   }),
 });
+
 
 const TABS = [
   { key: "popular", label: "popular", sort: ["POPULARITY_DESC"] },
