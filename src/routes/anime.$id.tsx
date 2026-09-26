@@ -40,58 +40,153 @@ export const Route = createFileRoute("/anime/$id")({
     }
   },
   head: ({ params, loaderData }) => {
-    const url = `https://aniora.qzz.io/anime/${params.id}`;
+    const path = `/anime/${params.id}`;
+    const url = `https://aniora.qzz.io${path}`;
     const media = loaderData ?? null;
-    const title = media ? pickTitle(media.title) : "Anime";
-    const rawDesc = media?.description
-      ? media.description.replace(/<[^>]+>/g, "").replace(/\s+/g, " ").trim()
+    if (!media) {
+      return {
+        meta: [
+          { title: "Anime — Aniora" },
+          { name: "description", content: "Watch anime free on Aniora — sub or dub in HD." },
+          { property: "og:url", content: url },
+          { property: "og:image", content: "https://aniora.qzz.io/og.png" },
+          { property: "og:image:width", content: "1200" },
+          { property: "og:image:height", content: "630" },
+          { name: "twitter:image", content: "https://aniora.qzz.io/og.png" },
+        ],
+        links: [{ rel: "canonical", href: url }],
+      };
+    }
+    const title = pickTitle(media.title);
+    const year = media.seasonYear ? ` (${media.seasonYear})` : "";
+    const isMovie = media.format === "MOVIE";
+    const rawDesc = media.description
+      ? media.description.replace(/<br\s*\/?>/gi, " ").replace(/<[^>]+>/g, "").replace(/\s+/g, " ").trim()
       : "";
-    const desc = rawDesc
-      ? rawDesc.slice(0, 155) + (rawDesc.length > 155 ? "…" : "")
-      : `Watch ${title} on Aniora — dub or sub, episode guide, and streaming info.`;
-    const pageTitle = `${title} — Aniora`.slice(0, 60);
-    const image = media?.coverImage?.extraLarge || media?.coverImage?.large || undefined;
-    const scripts = media
-      ? [
-          {
-            type: "application/ld+json",
-            children: JSON.stringify({
-              "@context": "https://schema.org",
-              "@type": media.format === "MOVIE" ? "Movie" : "TVSeries",
-              name: title,
-              alternateName: [media.title.english, media.title.native].filter(Boolean),
-              description: rawDesc || undefined,
-              image: image || undefined,
-              genre: media.genres,
-              numberOfEpisodes: media.episodes ?? undefined,
-              aggregateRating:
-                media.averageScore != null
-                  ? {
-                      "@type": "AggregateRating",
-                      ratingValue: (media.averageScore / 10).toFixed(2),
-                      bestRating: "10",
-                      ratingCount: media.popularity ?? 1,
-                    }
-                  : undefined,
-            }),
-          },
-        ]
-      : undefined;
-    return {
-      meta: [
-        { title: pageTitle },
-        { name: "description", content: desc },
-        { property: "og:title", content: pageTitle },
-        { property: "og:description", content: desc },
-        { property: "og:type", content: media?.format === "MOVIE" ? "video.movie" : "video.tv_show" },
-        { property: "og:url", content: url },
-        ...(image ? [{ property: "og:image", content: image }, { name: "twitter:image", content: image }] : []),
+    const truncated = rawDesc.length > 158 ? `${rawDesc.slice(0, 157).replace(/[.,;:!?-]+$/, "")}…` : rawDesc;
+    const desc =
+      truncated ||
+      `Watch ${title}${year} online on Aniora — ${isMovie ? "the full movie" : "every episode"} in HD, sub or dub.`;
+    const pageTitle = `${title}${year} — Watch on Aniora`.slice(0, 65);
+    const image =
+      media.bannerImage ||
+      media.coverImage?.extraLarge ||
+      media.coverImage?.large ||
+      "https://aniora.qzz.io/og.png";
+    const cover = media.coverImage?.extraLarge || media.coverImage?.large || undefined;
+    const keywords = [
+      title,
+      media.title.english,
+      media.title.romaji,
+      `watch ${title} online`,
+      `${title} sub`,
+      `${title} dub`,
+      ...(media.genres ?? []).slice(0, 6).map((g) => `${g} anime`),
+      "anime streaming",
+      "aniora",
+    ]
+      .filter(Boolean)
+      .join(", ");
+
+    const startISO =
+      media.startDate?.year
+        ? `${media.startDate.year}-${String(media.startDate.month ?? 1).padStart(2, "0")}-${String(media.startDate.day ?? 1).padStart(2, "0")}`
+        : undefined;
+    const endISO =
+      media.endDate?.year
+        ? `${media.endDate.year}-${String(media.endDate.month ?? 1).padStart(2, "0")}-${String(media.endDate.day ?? 1).padStart(2, "0")}`
+        : undefined;
+
+    const jsonLdMedia = {
+      "@context": "https://schema.org",
+      "@type": isMovie ? "Movie" : "TVSeries",
+      name: title,
+      alternateName: [media.title.english, media.title.romaji, media.title.native]
+        .filter((v): v is string => Boolean(v) && v !== title),
+      description: rawDesc || undefined,
+      image: cover ? [cover, image].filter((v, i, a) => a.indexOf(v) === i) : undefined,
+      url,
+      genre: media.genres,
+      inLanguage: "ja",
+      datePublished: startISO,
+      dateCreated: startISO,
+      numberOfEpisodes: media.episodes ?? undefined,
+      timeRequired: media.duration ? `PT${media.duration}M` : undefined,
+      productionCompany: media.studios?.nodes?.length
+        ? media.studios.nodes.map((n) => ({ "@type": "Organization", name: n.name }))
+        : undefined,
+      aggregateRating:
+        media.averageScore != null
+          ? {
+              "@type": "AggregateRating",
+              ratingValue: (media.averageScore / 10).toFixed(2),
+              bestRating: "10",
+              worstRating: "1",
+              ratingCount: Math.max(media.popularity ?? 1, 1),
+            }
+          : undefined,
+      trailer:
+        media.trailer?.site === "youtube" && media.trailer.id
+          ? {
+              "@type": "VideoObject",
+              name: `${title} — Trailer`,
+              embedUrl: `https://www.youtube.com/embed/${media.trailer.id}`,
+              thumbnailUrl: cover,
+              uploadDate: startISO,
+            }
+          : undefined,
+    };
+
+    const jsonLdBreadcrumb = {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      itemListElement: [
+        { "@type": "ListItem", position: 1, name: "Home", item: "https://aniora.qzz.io/" },
+        {
+          "@type": "ListItem",
+          position: 2,
+          name: isMovie ? "Movies" : "Anime",
+          item: `https://aniora.qzz.io${isMovie ? "/movies" : "/anime"}`,
+        },
+        { "@type": "ListItem", position: 3, name: title, item: url },
       ],
+    };
+
+    const meta = [
+      { title: pageTitle },
+      { name: "description", content: desc },
+      { name: "keywords", content: keywords },
+      { property: "og:title", content: pageTitle },
+      { property: "og:description", content: desc },
+      { property: "og:type", content: isMovie ? "video.movie" : "video.tv_show" },
+      { property: "og:url", content: url },
+      { property: "og:image", content: image },
+      { property: "og:image:width", content: "1200" },
+      { property: "og:image:height", content: "630" },
+      { property: "og:image:alt", content: `${title} — cover art` },
+      { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:title", content: pageTitle },
+      { name: "twitter:description", content: desc },
+      { name: "twitter:image", content: image },
+      ...(startISO ? [{ property: "video:release_date", content: startISO }] : []),
+      ...(endISO ? [{ property: "video:end_date", content: endISO }] : []),
+      ...(media.duration
+        ? [{ property: "video:duration", content: String(media.duration * 60) }]
+        : []),
+      ...(media.genres ?? []).map((g) => ({ property: "video:tag", content: g })),
+    ];
+
+    return {
+      meta,
       links: [{ rel: "canonical", href: url }],
-      scripts,
+      scripts: [
+        { type: "application/ld+json", children: JSON.stringify(jsonLdMedia) },
+        { type: "application/ld+json", children: JSON.stringify(jsonLdBreadcrumb) },
+      ],
     };
   },
 });
+
 
 function formatDate(d?: { year: number | null; month: number | null; day: number | null } | null) {
   if (!d?.year) return null;
