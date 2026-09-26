@@ -11,6 +11,8 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as WishlistRouteImport } from './routes/wishlist'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
+import { Route as SitemapPagesDotxmlRouteImport } from './routes/sitemap-pages[.]xml'
+import { Route as SitemapBlogDotxmlRouteImport } from './routes/sitemap-blog[.]xml'
 import { Route as SearchRouteImport } from './routes/search'
 import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as MoviesRouteImport } from './routes/movies'
@@ -30,6 +32,16 @@ const WishlistRoute = WishlistRouteImport.update({
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   id: '/sitemap.xml',
   path: '/sitemap.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SitemapPagesDotxmlRoute = SitemapPagesDotxmlRouteImport.update({
+  id: '/sitemap-pages.xml',
+  path: '/sitemap-pages.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SitemapBlogDotxmlRoute = SitemapBlogDotxmlRouteImport.update({
+  id: '/sitemap-blog.xml',
+  path: '/sitemap-blog.xml',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SearchRoute = SearchRouteImport.update({
@@ -89,6 +101,8 @@ export interface FileRoutesByFullPath {
   '/movies': typeof MoviesRoute
   '/profile': typeof ProfileRoute
   '/search': typeof SearchRoute
+  '/sitemap-blog.xml': typeof SitemapBlogDotxmlRoute
+  '/sitemap-pages.xml': typeof SitemapPagesDotxmlRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/wishlist': typeof WishlistRoute
   '/anime/$id': typeof AnimeIdRoute
@@ -103,6 +117,8 @@ export interface FileRoutesByTo {
   '/movies': typeof MoviesRoute
   '/profile': typeof ProfileRoute
   '/search': typeof SearchRoute
+  '/sitemap-blog.xml': typeof SitemapBlogDotxmlRoute
+  '/sitemap-pages.xml': typeof SitemapPagesDotxmlRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/wishlist': typeof WishlistRoute
   '/anime/$id': typeof AnimeIdRoute
@@ -118,6 +134,8 @@ export interface FileRoutesById {
   '/movies': typeof MoviesRoute
   '/profile': typeof ProfileRoute
   '/search': typeof SearchRoute
+  '/sitemap-blog.xml': typeof SitemapBlogDotxmlRoute
+  '/sitemap-pages.xml': typeof SitemapPagesDotxmlRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/wishlist': typeof WishlistRoute
   '/anime/$id': typeof AnimeIdRoute
@@ -134,6 +152,8 @@ export interface FileRouteTypes {
     | '/movies'
     | '/profile'
     | '/search'
+    | '/sitemap-blog.xml'
+    | '/sitemap-pages.xml'
     | '/sitemap.xml'
     | '/wishlist'
     | '/anime/$id'
@@ -148,6 +168,8 @@ export interface FileRouteTypes {
     | '/movies'
     | '/profile'
     | '/search'
+    | '/sitemap-blog.xml'
+    | '/sitemap-pages.xml'
     | '/sitemap.xml'
     | '/wishlist'
     | '/anime/$id'
@@ -162,6 +184,8 @@ export interface FileRouteTypes {
     | '/movies'
     | '/profile'
     | '/search'
+    | '/sitemap-blog.xml'
+    | '/sitemap-pages.xml'
     | '/sitemap.xml'
     | '/wishlist'
     | '/anime/$id'
@@ -177,6 +201,8 @@ export interface RootRouteChildren {
   MoviesRoute: typeof MoviesRoute
   ProfileRoute: typeof ProfileRoute
   SearchRoute: typeof SearchRoute
+  SitemapBlogDotxmlRoute: typeof SitemapBlogDotxmlRoute
+  SitemapPagesDotxmlRoute: typeof SitemapPagesDotxmlRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   WishlistRoute: typeof WishlistRoute
   AnimeIdRoute: typeof AnimeIdRoute
@@ -200,6 +226,20 @@ declare module '@tanstack/react-router' {
       path: '/sitemap.xml'
       fullPath: '/sitemap.xml'
       preLoaderRoute: typeof SitemapDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sitemap-pages.xml': {
+      id: '/sitemap-pages.xml'
+      path: '/sitemap-pages.xml'
+      fullPath: '/sitemap-pages.xml'
+      preLoaderRoute: typeof SitemapPagesDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sitemap-blog.xml': {
+      id: '/sitemap-blog.xml'
+      path: '/sitemap-blog.xml'
+      fullPath: '/sitemap-blog.xml'
+      preLoaderRoute: typeof SitemapBlogDotxmlRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/search': {
@@ -281,6 +321,8 @@ const rootRouteChildren: RootRouteChildren = {
   MoviesRoute: MoviesRoute,
   ProfileRoute: ProfileRoute,
   SearchRoute: SearchRoute,
+  SitemapBlogDotxmlRoute: SitemapBlogDotxmlRoute,
+  SitemapPagesDotxmlRoute: SitemapPagesDotxmlRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   WishlistRoute: WishlistRoute,
   AnimeIdRoute: AnimeIdRoute,
