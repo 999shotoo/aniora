@@ -32,6 +32,7 @@ export function Player({ malId, episode, ep, fallbackTitle, onSlowLoad, reloadKe
   const onSlowLoadRef = useRef(onSlowLoad);
   const wrapRef = useRef<HTMLDivElement>(null);
   const autoRetriedRef = useRef(false);
+  const loadedRef = useRef(false);
 
   useEffect(() => {
     onSlowLoadRef.current = onSlowLoad;
@@ -65,21 +66,23 @@ export function Player({ malId, episode, ep, fallbackTitle, onSlowLoad, reloadKe
 
   // Mount + auto-retry lifecycle. If iframe hasn't fired onLoad within 4s,
   // silently remount once. If still not loaded by 8s, surface the warning.
+  // Once loaded, both timers are inert — no reloads during playback.
   useEffect(() => {
     setReadySrc(null);
     setLoaded(false);
+    loadedRef.current = false;
     autoRetriedRef.current = false;
     if (!src) return;
 
     const mountTimer = window.setTimeout(() => setReadySrc(src), 80);
     const retryTimer = window.setTimeout(() => {
-      if (!autoRetriedRef.current) {
-        autoRetriedRef.current = true;
-        setLoaded(false);
-        setNonce((n) => n + 1);
-      }
+      if (loadedRef.current) return;
+      if (autoRetriedRef.current) return;
+      autoRetriedRef.current = true;
+      setNonce((n) => n + 1);
     }, 4200);
     const slowTimer = window.setTimeout(() => {
+      if (loadedRef.current) return;
       onSlowLoadRef.current?.();
     }, 8000);
 
@@ -92,6 +95,8 @@ export function Player({ malId, episode, ep, fallbackTitle, onSlowLoad, reloadKe
 
   const manualReload = () => {
     setLoaded(false);
+    loadedRef.current = false;
+    autoRetriedRef.current = false;
     setNonce((n) => n + 1);
   };
 
@@ -122,11 +127,15 @@ export function Player({ malId, episode, ep, fallbackTitle, onSlowLoad, reloadKe
             src={readySrc}
             title={`Ep ${episode} — ${mode}`}
             className="h-full w-full"
+            style={{ visibility: loaded ? "visible" : "hidden" }}
             allow="autoplay; fullscreen; picture-in-picture; encrypted-media"
             allowFullScreen
             scrolling="no"
             frameBorder={0}
-            onLoad={() => setLoaded(true)}
+            onLoad={() => {
+              loadedRef.current = true;
+              setLoaded(true);
+            }}
           />
         )}
       </div>
