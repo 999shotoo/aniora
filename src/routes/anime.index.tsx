@@ -9,19 +9,27 @@ export const Route = createFileRoute("/anime/")({
   component: AnimePage,
   head: () => ({
     meta: [
-      { title: "Browse TV Anime — Aniora" },
+      { title: "Browse TV Anime — Trending, Popular & Top Rated | Aniora" },
       {
         name: "description",
         content:
-          "Browse trending, popular, top-rated, and recent TV anime series. Stream them dub or sub on Aniora.",
+          "Browse trending, popular, top-rated, and recent TV anime series on Aniora. Free HD streaming with sub or dub — no signup needed.",
       },
       { property: "og:title", content: "Browse TV Anime — Aniora" },
-      { property: "og:description", content: "Trending, popular, top-rated, and recent TV anime series." },
+      {
+        property: "og:description",
+        content: "Trending, popular, top-rated, and recent TV anime series — free on Aniora.",
+      },
       { property: "og:url", content: "https://aniora.qzz.io/anime" },
+      { property: "og:image", content: "https://aniora.qzz.io/og.png" },
+      { property: "og:image:width", content: "1200" },
+      { property: "og:image:height", content: "630" },
+      { name: "twitter:image", content: "https://aniora.qzz.io/og.png" },
     ],
     links: [{ rel: "canonical", href: "https://aniora.qzz.io/anime" }],
   }),
 });
+
 
 const TABS = [
   { key: "trending", label: "trending", sort: ["TRENDING_DESC"] },
