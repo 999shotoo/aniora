@@ -37,29 +37,43 @@ export const Route = createFileRoute("/watch/$id")({
     }
   },
   head: ({ params, loaderData }) => {
+    const infoUrl = `https://aniora.qzz.io/anime/${params.id}`;
     const url = `https://aniora.qzz.io/watch/${params.id}`;
     const media = loaderData ?? null;
     const title = media ? pickTitle(media.title) : "Watch";
-    const pageTitle = `Watch ${title} — Aniora`.slice(0, 60);
+    const pageTitle = `Watch ${title} — Aniora`.slice(0, 65);
     const desc = media
-      ? `Watch ${title} online — dub or sub — with episode guide on Aniora.`.slice(0, 155)
+      ? `Stream ${title} on Aniora — dub or sub, in HD. Episode guide, mappings and player included.`.slice(0, 158)
       : "Stream anime episodes on Aniora — dub or sub, with episode guides.";
-    const image = media?.coverImage?.extraLarge || media?.coverImage?.large || undefined;
+    const image =
+      media?.bannerImage ||
+      media?.coverImage?.extraLarge ||
+      media?.coverImage?.large ||
+      "https://aniora.qzz.io/og.png";
     return {
       meta: [
         { title: pageTitle },
         { name: "description", content: desc },
+        { name: "robots", content: "noindex, follow" },
         { property: "og:title", content: pageTitle },
         { property: "og:description", content: desc },
         { property: "og:type", content: "video.episode" },
         { property: "og:url", content: url },
-        { name: "robots", content: "noindex,follow" },
-        ...(image ? [{ property: "og:image", content: image }, { name: "twitter:image", content: image }] : []),
+        { property: "og:image", content: image },
+        { property: "og:image:width", content: "1200" },
+        { property: "og:image:height", content: "630" },
+        { name: "twitter:card", content: "summary_large_image" },
+        { name: "twitter:title", content: pageTitle },
+        { name: "twitter:description", content: desc },
+        { name: "twitter:image", content: image },
       ],
-      links: [{ rel: "canonical", href: url }],
+      // Canonicalise the watch page to its info page so ranking signal
+      // consolidates on the crawlable route.
+      links: [{ rel: "canonical", href: infoUrl }],
     };
   },
 });
+
 
 function stripHtml(s: string | null): string {
   if (!s) return "";
