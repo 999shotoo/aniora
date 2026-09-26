@@ -95,6 +95,8 @@ export function Player({ malId, episode, ep, fallbackTitle, onSlowLoad, reloadKe
 
   const manualReload = () => {
     setLoaded(false);
+    loadedRef.current = false;
+    autoRetriedRef.current = false;
     setNonce((n) => n + 1);
   };
 
