@@ -40,8 +40,8 @@ export const Route = createFileRoute("/anime/$id")({
     }
   },
   head: ({ params, loaderData }) => {
-    const path = `/anime/${params.id}`;
-    const url = `https://aniora.qzz.io${path}`;
+    const url = `https://aniora.qzz.io/anime/${params.id}`;
+
     const media = loaderData ?? null;
     if (!media) {
       return {
