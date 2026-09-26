@@ -108,8 +108,12 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
   head: () => ({
     meta: [
       { charSet: "utf-8" },
-      { name: "viewport", content: "width=device-width, initial-scale=1" },
+      { name: "viewport", content: "width=device-width, initial-scale=1, viewport-fit=cover" },
       { name: "theme-color", content: "#0a0a0a" },
+      { name: "color-scheme", content: "dark" },
+      { name: "format-detection", content: "telephone=no" },
+      { name: "referrer", content: "strict-origin-when-cross-origin" },
+      { name: "rating", content: "general" },
       { title: "Aniora — Watch Anime Free Online, Sub & Dub in HD" },
       {
         name: "description",
@@ -123,30 +127,42 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       },
       { name: "author", content: "Aniora" },
       { name: "application-name", content: "Aniora" },
-      { name: "robots", content: "index, follow, max-image-preview:large, max-snippet:-1" },
-      { property: "og:site_name", content: "Aniora" },
-      { property: "og:title", content: "Aniora — Watch Anime Free Online, Sub & Dub in HD" },
+      { name: "apple-mobile-web-app-title", content: "Aniora" },
+      { name: "apple-mobile-web-app-capable", content: "yes" },
+      { name: "apple-mobile-web-app-status-bar-style", content: "black-translucent" },
+      { name: "mobile-web-app-capable", content: "yes" },
       {
-        property: "og:description",
-        content:
-          "Free anime streaming with AniList sync. Watch trending, seasonal, and classic anime — sub or dub — in HD.",
+        name: "robots",
+        content: "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1",
       },
+      {
+        name: "googlebot",
+        content: "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1",
+      },
+      { property: "og:site_name", content: "Aniora" },
       { property: "og:type", content: "website" },
       { property: "og:locale", content: "en_US" },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:title", content: "Aniora — Watch Anime Free Online, Sub & Dub in HD" },
-      {
-        name: "twitter:description",
-        content:
-          "Free anime streaming with AniList sync — sub, dub, and a clean player.",
-      },
+      { name: "twitter:site", content: "@aniora" },
+      { name: "twitter:creator", content: "@aniora" },
     ],
     links: [
       { rel: "stylesheet", href: appCss },
-      { rel: "icon", href: "/favicon.ico", type: "image/x-icon" },
-      { rel: "preconnect", href: "https://graphql.anilist.co" },
-      { rel: "preconnect", href: "https://s4.anilist.co" },
+      { rel: "icon", type: "image/svg+xml", href: "/favicon.svg" },
+      { rel: "icon", type: "image/png", sizes: "96x96", href: "/favicon-96x96.png" },
+      { rel: "shortcut icon", href: "/favicon.ico" },
+      { rel: "apple-touch-icon", sizes: "180x180", href: "/apple-touch-icon.png" },
+      { rel: "manifest", href: "/site.webmanifest" },
+      { rel: "preconnect", href: "https://graphql.anilist.co", crossOrigin: "" },
+      { rel: "preconnect", href: "https://s4.anilist.co", crossOrigin: "" },
+      { rel: "dns-prefetch", href: "https://img.anili.st" },
       { rel: "dns-prefetch", href: "https://megaplay.buzz" },
+      {
+        rel: "alternate",
+        type: "application/rss+xml",
+        title: "Aniora Sitemap",
+        href: "https://aniora.qzz.io/sitemap.xml",
+      },
     ],
     scripts: [
       {
@@ -159,9 +175,13 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
           url: "https://aniora.qzz.io",
           description:
             "Free anime streaming site with AniList integration — watch sub or dub in HD.",
+          inLanguage: "en",
           potentialAction: {
             "@type": "SearchAction",
-            target: "https://aniora.qzz.io/search?q={search_term_string}",
+            target: {
+              "@type": "EntryPoint",
+              urlTemplate: "https://aniora.qzz.io/search?q={search_term_string}",
+            },
             "query-input": "required name=search_term_string",
           },
         }),
@@ -173,12 +193,18 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
           "@type": "Organization",
           name: "Aniora",
           url: "https://aniora.qzz.io",
-          logo: "https://aniora.qzz.io/favicon.ico",
+          logo: {
+            "@type": "ImageObject",
+            url: "https://aniora.qzz.io/apple-touch-icon.png",
+            width: 180,
+            height: 180,
+          },
           sameAs: [],
         }),
       },
     ],
   }),
+
   shellComponent: RootShell,
   component: RootComponent,
   notFoundComponent: NotFoundComponent,
