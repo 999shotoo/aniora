@@ -14,9 +14,12 @@ export const Route = createFileRoute("/history")({
         name: "description",
         content: "Everything you've watched, stored locally in your browser.",
       },
+      { name: "robots", content: "noindex, nofollow" },
     ],
+    links: [{ rel: "canonical", href: "https://aniora.qzz.io/history" }],
   }),
 });
+
 
 function relativeTime(ts: number): string {
   if (!ts) return "—";
