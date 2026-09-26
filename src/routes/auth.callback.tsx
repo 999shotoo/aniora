@@ -7,7 +7,14 @@ import { exchangeAniListCode } from "@/lib/anilist-oauth.functions";
 
 export const Route = createFileRoute("/auth/callback")({
   component: AuthCallback,
+  head: () => ({
+    meta: [
+      { title: "Signing in — Aniora" },
+      { name: "robots", content: "noindex, nofollow" },
+    ],
+  }),
 });
+
 
 function AuthCallback() {
   const navigate = useNavigate();
