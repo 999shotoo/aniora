@@ -68,11 +68,12 @@ export const Route = createFileRoute("/anime/$id")({
       truncated ||
       `Watch ${title}${year} online on Aniora — ${isMovie ? "the full movie" : "every episode"} in HD, sub or dub.`;
     const pageTitle = `${title}${year} — Watch on Aniora`.slice(0, 65);
-    const image =
-      media.bannerImage ||
-      media.coverImage?.extraLarge ||
-      media.coverImage?.large ||
-      "https://aniora.qzz.io/og.png";
+    // AniList's img.anili.st renders a proper 1500x500 landscape social card
+    // for every media id (title + characters baked in). Use it as the primary
+    // og:image so Discord / Twitter / Facebook get a real branded preview
+    // instead of a raw stretched banner image.
+    const socialCard = `https://img.anili.st/media/${media.id}`;
+    const image = socialCard;
     const cover = media.coverImage?.extraLarge || media.coverImage?.large || undefined;
     const keywords = [
       title,
