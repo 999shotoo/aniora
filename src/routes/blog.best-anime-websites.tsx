@@ -20,6 +20,15 @@ export const Route = createFileRoute("/blog/best-anime-websites")({
       },
       { property: "og:type", content: "article" },
       { property: "og:url", content: URL },
+      { property: "og:image", content: "https://aniora.qzz.io/og.png" },
+      { property: "og:image:width", content: "1200" },
+      { property: "og:image:height", content: "630" },
+      { property: "article:published_time", content: "2026-01-15" },
+      { property: "article:modified_time", content: "2026-07-01" },
+      { property: "article:author", content: "Aniora" },
+      { property: "article:section", content: "Anime" },
+      { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:image", content: "https://aniora.qzz.io/og.png" },
     ],
     links: [{ rel: "canonical", href: URL }],
     scripts: [
@@ -31,16 +40,34 @@ export const Route = createFileRoute("/blog/best-anime-websites")({
           headline: "Best Anime Websites in 2026: Free Streaming Sites Compared",
           description:
             "A hands-on comparison of the best free anime websites in 2026, covering library size, sub/dub support, player quality, ads, and AniList integration.",
-          author: { "@type": "Organization", name: "Aniora" },
-          publisher: { "@type": "Organization", name: "Aniora" },
+          image: "https://aniora.qzz.io/og.png",
+          author: { "@type": "Organization", name: "Aniora", url: "https://aniora.qzz.io" },
+          publisher: {
+            "@type": "Organization",
+            name: "Aniora",
+            logo: { "@type": "ImageObject", url: "https://aniora.qzz.io/apple-touch-icon.png" },
+          },
           datePublished: "2026-01-15",
           dateModified: "2026-07-01",
           mainEntityOfPage: URL,
         }),
       },
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "BreadcrumbList",
+          itemListElement: [
+            { "@type": "ListItem", position: 1, name: "Home", item: "https://aniora.qzz.io/" },
+            { "@type": "ListItem", position: 2, name: "Blog", item: "https://aniora.qzz.io/blog" },
+            { "@type": "ListItem", position: 3, name: "Best Anime Websites", item: URL },
+          ],
+        }),
+      },
     ],
   }),
 });
+
 
 interface Site {
   name: string;

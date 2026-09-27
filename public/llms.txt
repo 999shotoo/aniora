@@ -1,15 +1,22 @@
 # Aniora
 
-> Terminal-clean anime streaming platform with AniList integration. Search, wishlist, and watch dub or sub.
+> Aniora (https://aniora.qzz.io) is a free anime streaming site with AniList sync. It lets viewers browse trending, seasonal, and classic anime, then stream episodes in sub or dub through an embedded player. There is no signup, and progress can optionally sync to a user's AniList account.
 
-Aniora is a fast, minimalist web app for discovering and streaming anime. It uses AniList for metadata (titles, covers, synopses, scores, seasonal calendars) and provides episode guides sourced from open mapping data. Users can optionally sign in with AniList to sync their watch list.
+## Content
 
-## Pages
+- Home — [https://aniora.qzz.io/](https://aniora.qzz.io/): Trending, seasonal, and popular anime
+- Anime — [https://aniora.qzz.io/anime](https://aniora.qzz.io/anime): Browse TV anime by trending / popular / top / recent
+- Movies — [https://aniora.qzz.io/movies](https://aniora.qzz.io/movies): Anime films by popularity, score, trend, recency
+- Search — [https://aniora.qzz.io/search](https://aniora.qzz.io/search): Filter by title, genre, format, status, year, score
+- Anime info — https://aniora.qzz.io/anime/{anilistId}: Full details, synopsis, stats, cast, trailer
+- Watch — https://aniora.qzz.io/watch/{anilistId}?ep={episodeNumber}: Player with sub/dub toggle and episode list
 
-- [Home](/): Featured hero, trending, popular, seasonal, top-rated, and top-airing anime.
-- [Browse TV Anime](/anime): Trending, popular, top-rated, and recently aired TV anime series.
-- [Browse Anime Movies](/movies): Popular, top-rated, trending, and recent anime films.
-- [Search](/search): Full-text anime search with genre, year, format, status, and sort filters.
-- [Wishlist](/wishlist): Locally saved anime titles.
-- [History](/history): Locally tracked watch history.
-- [Profile](/profile): AniList profile, lists, stats, favorites, and activity when signed in.
+## Guides
+
+- [Best Anime Websites 2026](https://aniora.qzz.io/blog/best-anime-websites): Comparison of free anime streaming sites
+
+## Notes
+
+- Data source: AniList GraphQL (https://graphql.anilist.co) for metadata; Zenshin mapping API for episode data; MegaPlay embed for the player.
+- No user files or media are hosted on Aniora's server — playback is served from third-party embeds.
+- AniList sync is optional; local wishlist and history work without login.

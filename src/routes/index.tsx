@@ -26,10 +26,16 @@ export const Route = createFileRoute("/")({
           "Free anime streaming with AniList sync. Watch trending, seasonal, and classic anime — sub or dub — in HD.",
       },
       { property: "og:url", content: "https://aniora.qzz.io/" },
+      { property: "og:image", content: "https://aniora.qzz.io/og.png" },
+      { property: "og:image:width", content: "1200" },
+      { property: "og:image:height", content: "630" },
+      { property: "og:image:alt", content: "Aniora — Watch Anime Free Online in HD" },
+      { name: "twitter:image", content: "https://aniora.qzz.io/og.png" },
     ],
     links: [{ rel: "canonical", href: "https://aniora.qzz.io/" }],
   }),
 });
+
 
 function currentSeason(): { season: string; year: number } {
   const now = new Date();

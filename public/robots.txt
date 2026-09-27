@@ -1,6 +1,61 @@
+# Aniora — https://aniora.qzz.io
+# We welcome search-engine and AI crawlers on public pages.
+
 User-agent: *
+Allow: /
+Allow: /anime/
+Allow: /movies
+Allow: /blog/
+Disallow: /auth/
+Disallow: /watch/
+Disallow: /profile
+Disallow: /wishlist
+Disallow: /history
+Disallow: /search
+
+# Search-engine crawlers — full access to public pages
+User-agent: Googlebot
 Allow: /
 Disallow: /auth/
 Disallow: /watch/
+Disallow: /profile
+Disallow: /wishlist
+Disallow: /history
+
+User-agent: Googlebot-Image
+Allow: /
+
+User-agent: Bingbot
+Allow: /
+Disallow: /auth/
+Disallow: /watch/
+
+User-agent: DuckDuckBot
+Allow: /
+
+User-agent: Applebot
+Allow: /
+
+User-agent: YandexBot
+Allow: /
+
+# AI crawlers welcome
+User-agent: GPTBot
+Allow: /
+
+User-agent: OAI-SearchBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
 
 Sitemap: https://aniora.qzz.io/sitemap.xml

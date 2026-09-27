@@ -10,9 +10,12 @@ export const Route = createFileRoute("/wishlist")({
     meta: [
       { title: "Wishlist — Aniora" },
       { name: "description", content: "Your saved anime, stored locally in your browser." },
+      { name: "robots", content: "noindex, nofollow" },
     ],
+    links: [{ rel: "canonical", href: "https://aniora.qzz.io/wishlist" }],
   }),
 });
+
 
 function WishlistPage() {
   const { items, remove } = useWishlist();

@@ -28,11 +28,23 @@ export const Route = createFileRoute("/search")({
   }),
   head: () => ({
     meta: [
-      { title: "Search — Aniora" },
-      { name: "description", content: "Search anime powered by AniList." },
+      { title: "Search Anime — Aniora" },
+      {
+        name: "description",
+        content:
+          "Search anime by title, genre, format, year, and score. Free HD streaming with sub or dub on Aniora.",
+      },
+      { name: "robots", content: "noindex, follow" },
+      { property: "og:title", content: "Search Anime — Aniora" },
+      { property: "og:description", content: "Find anime by title, genre, year, and more." },
+      { property: "og:url", content: "https://aniora.qzz.io/search" },
+      { property: "og:image", content: "https://aniora.qzz.io/og.png" },
+      { name: "twitter:image", content: "https://aniora.qzz.io/og.png" },
     ],
+    links: [{ rel: "canonical", href: "https://aniora.qzz.io/search" }],
   }),
 });
+
 
 const GENRES = [
   "Action", "Adventure", "Comedy", "Drama", "Ecchi", "Fantasy", "Horror",
