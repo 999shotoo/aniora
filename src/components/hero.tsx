@@ -58,11 +58,15 @@ export function Hero({ items, intervalMs = 6500 }: Props) {
           <motion.img
             key={banner}
             src={banner}
-            alt=""
+            alt={`${title} banner`}
+            width={1920}
+            height={1080}
+            fetchPriority="high"
+            decoding="async"
             onError={(e) => {
               (e.currentTarget as HTMLImageElement).src = FALLBACK_BANNER;
             }}
-            initial={{ opacity: 0 }}
+            initial={{ opacity: index === 0 ? 1 : 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.6 }}
