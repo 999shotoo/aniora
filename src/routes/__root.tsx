@@ -263,6 +263,8 @@ function RootComponent() {
         <SmoothScrollMount />
         <GlobalShortcuts />
         <SettingsModal />
+        <SocialBarMount />
+
         
         <div className="flex min-h-screen flex-col bg-background">
           <AniListSyncMount />
