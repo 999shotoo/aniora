@@ -1,36 +1,65 @@
 import { useEffect } from "react";
-import { useSetting } from "@/lib/settings";
 
 /**
- * Sponsor popunder mount.
- *
- * Opt-in only via Settings → "Enable sponsor popunder ads". Off by default
- * because the provider has historically been flagged by Google Safe Browsing;
- * users who opt in accept that risk. The script is injected client-side only,
- * so it never ships in the SSR HTML crawlers see — protecting SEO / Safe
- * Browsing status for the domain itself.
+ * Single sponsor script mount. Always injects once per session.
+ * Skips Brave (which blocks + can crash on this provider) and defers
+ * injection to idle time so it never blocks LCP / hydration / SEO paint.
  */
-const SPONSOR_SRC = "//pl24000000.profitableratecpm.com/8e/6c/94/8e6c94a1c9c1b9f9c5e6a7b2c3d4e5f6.js";
+const SPONSOR_SRC =
+  "//smooth-survey.com/c.D/9b6PbD2b5_ltSSWwQN9nN/zlEP4QN-jQMu5/MYyN0A3hMtTngb2MMxzskg3i";
 
 export function SocialBarMount() {
-  const enabled = useSetting("enableSponsor");
-
   useEffect(() => {
-    if (!enabled) return;
-    if (typeof document === "undefined") return;
-    if (document.getElementById("aniora-sponsor-script")) return;
+    if (typeof window === "undefined") return;
+    if (document.querySelector('script[data-sb="1"]')) return;
 
-    const s = document.createElement("script");
-    s.id = "aniora-sponsor-script";
-    s.src = SPONSOR_SRC;
-    s.async = true;
-    s.dataset.cfasync = "false";
-    document.body.appendChild(s);
+    const nav = navigator as unknown as { brave?: { isBrave?: () => Promise<boolean> } };
+    let cancelled = false;
+
+    const inject = () => {
+      if (cancelled) return;
+      try {
+        const s = document.createElement("script");
+        s.src = SPONSOR_SRC;
+        s.async = true;
+        s.referrerPolicy = "no-referrer-when-downgrade";
+        s.setAttribute("data-sb", "1");
+        (s as unknown as { settings?: Record<string, unknown> }).settings = {};
+        s.onerror = () => {
+          try {
+            s.remove();
+          } catch {
+            /* noop */
+          }
+        };
+        document.body.appendChild(s);
+      } catch {
+        /* ignore */
+      }
+    };
+
+    const maybeInject = async () => {
+      try {
+        if (nav.brave?.isBrave && (await nav.brave.isBrave())) return;
+      } catch {
+        /* ignore */
+      }
+      const ric = (window as unknown as {
+        requestIdleCallback?: (cb: () => void, opts?: { timeout: number }) => number;
+      }).requestIdleCallback;
+      if (ric) ric(inject, { timeout: 2000 });
+      else window.setTimeout(inject, 500);
+    };
+
+    const t = window.setTimeout(() => {
+      void maybeInject();
+    }, 2000);
 
     return () => {
-      s.remove();
+      cancelled = true;
+      window.clearTimeout(t);
     };
-  }, [enabled]);
+  }, []);
 
   return null;
 }
