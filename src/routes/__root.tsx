@@ -19,7 +19,7 @@ import { SettingsProvider } from "@/lib/settings";
 import { SettingsModal } from "@/components/settings-modal";
 import { GlobalShortcuts } from "@/lib/shortcuts";
 import { SmoothScrollMount } from "@/components/smooth-scroll";
-import { SocialBarMount } from "@/components/ad-slot";
+// Sponsor script removed — was triggering Google Safe Browsing "harmful downloads" flag.
 
 function AniListSyncMount() {
   useAniListWatchSync();
@@ -263,7 +263,7 @@ function RootComponent() {
         <SmoothScrollMount />
         <GlobalShortcuts />
         <SettingsModal />
-        <SocialBarMount />
+        
         <div className="flex min-h-screen flex-col bg-background">
           <AniListSyncMount />
           <SiteHeader />
