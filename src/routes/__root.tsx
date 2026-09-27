@@ -19,7 +19,7 @@ import { SettingsProvider } from "@/lib/settings";
 import { SettingsModal } from "@/components/settings-modal";
 import { GlobalShortcuts } from "@/lib/shortcuts";
 import { SmoothScrollMount } from "@/components/smooth-scroll";
-// Sponsor script removed — was triggering Google Safe Browsing "harmful downloads" flag.
+import { SocialBarMount } from "@/components/ad-slot";
 
 function AniListSyncMount() {
   useAniListWatchSync();
