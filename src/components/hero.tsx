@@ -70,7 +70,7 @@ export function Hero({ items, intervalMs = 6500 }: Props) {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.6 }}
-            className="absolute inset-0 h-full w-full object-cover object-center"
+            className="absolute inset-0 h-full w-full object-cover object-[center_20%]"
           />
         </AnimatePresence>
         {/* Mobile: darker bottom fade, lighter top so image is visible */}

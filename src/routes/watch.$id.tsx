@@ -45,11 +45,9 @@ export const Route = createFileRoute("/watch/$id")({
     const desc = media
       ? `Stream ${title} on Aniora — dub or sub, in HD. Episode guide, mappings and player included.`.slice(0, 158)
       : "Stream anime episodes on Aniora — dub or sub, with episode guides.";
-    const image =
-      media?.bannerImage ||
-      media?.coverImage?.extraLarge ||
-      media?.coverImage?.large ||
-      "https://aniora.qzz.io/og.png";
+    const image = media
+      ? `https://img.anili.st/media/${media.id}`
+      : "https://aniora.qzz.io/og.png";
     return {
       meta: [
         { title: pageTitle },
@@ -60,12 +58,16 @@ export const Route = createFileRoute("/watch/$id")({
         { property: "og:type", content: "video.episode" },
         { property: "og:url", content: url },
         { property: "og:image", content: image },
-        { property: "og:image:width", content: "1200" },
-        { property: "og:image:height", content: "630" },
+        { property: "og:image:secure_url", content: image },
+        { property: "og:image:type", content: "image/jpeg" },
+        { property: "og:image:width", content: "1500" },
+        { property: "og:image:height", content: "500" },
+        { property: "og:image:alt", content: `${title} — Watch on Aniora` },
         { name: "twitter:card", content: "summary_large_image" },
         { name: "twitter:title", content: pageTitle },
         { name: "twitter:description", content: desc },
         { name: "twitter:image", content: image },
+        { name: "twitter:image:alt", content: `${title} — Watch on Aniora` },
       ],
       // Canonicalise the watch page to its info page so ranking signal
       // consolidates on the crawlable route.

@@ -68,11 +68,12 @@ export const Route = createFileRoute("/anime/$id")({
       truncated ||
       `Watch ${title}${year} online on Aniora — ${isMovie ? "the full movie" : "every episode"} in HD, sub or dub.`;
     const pageTitle = `${title}${year} — Watch on Aniora`.slice(0, 65);
-    const image =
-      media.bannerImage ||
-      media.coverImage?.extraLarge ||
-      media.coverImage?.large ||
-      "https://aniora.qzz.io/og.png";
+    // AniList's img.anili.st renders a proper 1500x500 landscape social card
+    // for every media id (title + characters baked in). Use it as the primary
+    // og:image so Discord / Twitter / Facebook get a real branded preview
+    // instead of a raw stretched banner image.
+    const socialCard = `https://img.anili.st/media/${media.id}`;
+    const image = socialCard;
     const cover = media.coverImage?.extraLarge || media.coverImage?.large || undefined;
     const keywords = [
       title,
@@ -161,13 +162,16 @@ export const Route = createFileRoute("/anime/$id")({
       { property: "og:type", content: isMovie ? "video.movie" : "video.tv_show" },
       { property: "og:url", content: url },
       { property: "og:image", content: image },
-      { property: "og:image:width", content: "1200" },
-      { property: "og:image:height", content: "630" },
-      { property: "og:image:alt", content: `${title} — cover art` },
+      { property: "og:image:secure_url", content: image },
+      { property: "og:image:type", content: "image/jpeg" },
+      { property: "og:image:width", content: "1500" },
+      { property: "og:image:height", content: "500" },
+      { property: "og:image:alt", content: `${title} — Watch on Aniora` },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:title", content: pageTitle },
       { name: "twitter:description", content: desc },
       { name: "twitter:image", content: image },
+      { name: "twitter:image:alt", content: `${title} — Watch on Aniora` },
       ...(startISO ? [{ property: "video:release_date", content: startISO }] : []),
       ...(endISO ? [{ property: "video:end_date", content: endISO }] : []),
       ...(media.duration
@@ -290,16 +294,20 @@ function AnimeInfoPage() {
     <div className="pb-16">
       {/* header banner */}
       <div className="relative border-b border-border">
-        <div className="absolute inset-0">
+        <div className="absolute inset-0 overflow-hidden">
           <img
             src={banner}
             alt=""
+            aria-hidden="true"
+            fetchPriority="high"
+            decoding="async"
             onError={(e) => {
               (e.currentTarget as HTMLImageElement).src = FALLBACK_BANNER;
             }}
-            className="h-full w-full object-cover opacity-40"
+            className="h-full w-full object-cover object-[center_25%] opacity-40"
           />
-          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-background/70 to-background" />
+          <div className="absolute inset-0 bg-gradient-to-b from-background/40 via-background/70 to-background" />
+          <div className="absolute inset-0 bg-gradient-to-r from-background/60 via-transparent to-background/60" />
         </div>
         <div className="relative mx-auto flex max-w-none flex-col gap-6 px-6 lg:px-10 py-10 md:flex-row">
           <img
