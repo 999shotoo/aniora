@@ -211,7 +211,7 @@ function WatchPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [airedEpisodes, episode]);
 
-  const canShowPlayer = Boolean(mapping.data && currentEp && episode && malId);
+  const canShowPlayer = Boolean(mapping.data && currentEp && episode && anilistId);
   const showEmpty =
     !mapping.isLoading && airedEpisodes.length === 0;
   const warningVisible = Boolean(
