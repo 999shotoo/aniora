@@ -282,11 +282,12 @@ function WatchPage() {
               <PlayerPlaceholder message="episode stream is not ready" />
             ) : (
               <Player
-                malId={malId}
+                anilistId={anilistId}
                 episode={episode!}
                 ep={currentEp}
                 fallbackTitle={media ? pickTitle(media.title) : `Episode ${episode}`}
-                onSlowLoad={() => setStreamWarningKey(`${malId}-${episode}`)}
+                onSlowLoad={() => setStreamWarningKey(`${anilistId}-${episode}`)}
+
                 reloadKey={streamReloadKey}
               />
             )}
