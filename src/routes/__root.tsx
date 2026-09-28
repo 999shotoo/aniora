@@ -112,7 +112,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "theme-color", content: "#0a0a0a" },
       { name: "color-scheme", content: "dark" },
       { name: "format-detection", content: "telephone=no" },
-      { name: "referrer", content: "strict-origin-when-cross-origin" },
+      { name: "referrer", content: "no-referrer-when-downgrade" },
       { name: "rating", content: "general" },
       { title: "Aniora — Watch Anime Free Online, Sub & Dub in HD" },
       {
