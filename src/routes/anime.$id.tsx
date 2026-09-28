@@ -294,16 +294,20 @@ function AnimeInfoPage() {
     <div className="pb-16">
       {/* header banner */}
       <div className="relative border-b border-border">
-        <div className="absolute inset-0">
+        <div className="absolute inset-0 overflow-hidden">
           <img
             src={banner}
             alt=""
+            aria-hidden="true"
+            fetchPriority="high"
+            decoding="async"
             onError={(e) => {
               (e.currentTarget as HTMLImageElement).src = FALLBACK_BANNER;
             }}
-            className="h-full w-full object-cover opacity-40"
+            className="h-full w-full object-cover object-[center_25%] opacity-40"
           />
-          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-background/70 to-background" />
+          <div className="absolute inset-0 bg-gradient-to-b from-background/40 via-background/70 to-background" />
+          <div className="absolute inset-0 bg-gradient-to-r from-background/60 via-transparent to-background/60" />
         </div>
         <div className="relative mx-auto flex max-w-none flex-col gap-6 px-6 lg:px-10 py-10 md:flex-row">
           <img
