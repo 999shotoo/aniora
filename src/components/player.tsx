@@ -102,14 +102,15 @@ export function Player({ anilistId, episode, ep, fallbackTitle, onSlowLoad, relo
     setNonce((n) => n + 1);
   };
 
-  if (!malId || !validEp || !ep) {
+  if (!anilistId || !validEp || !ep) {
     return (
       <div className="flex aspect-video w-full items-center justify-center border border-border bg-card text-xs uppercase tracking-widest text-muted-foreground">
-        {!malId
-          ? "stream unavailable · no mal id"
+        {!anilistId
+          ? "stream unavailable · no id"
           : "waiting for episode mapping"}
       </div>
     );
+
   }
 
   return (
