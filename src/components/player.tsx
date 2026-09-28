@@ -23,7 +23,7 @@ const FALLBACK_EP_IMAGE =
     </svg>`,
   );
 
-export function Player({ malId, episode, ep, fallbackTitle, onSlowLoad, reloadKey = 0 }: Props) {
+export function Player({ anilistId, episode, ep, fallbackTitle, onSlowLoad, reloadKey = 0 }: Props) {
   const { settings, update } = useSettings();
   const mode = settings.defaultLanguage;
   const setMode = (m: "sub" | "dub") => update("defaultLanguage", m);
