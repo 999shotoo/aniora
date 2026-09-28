@@ -51,13 +51,26 @@ export function SiteHeader() {
 
   const loginWithAniList = () => {
     if (!authUrl) return;
+    const w = 520;
+    const h = 760;
+    // Center on the current screen (multi-monitor safe).
+    const dualLeft = window.screenLeft ?? window.screenX ?? 0;
+    const dualTop = window.screenTop ?? window.screenY ?? 0;
+    const width =
+      window.innerWidth || document.documentElement.clientWidth || screen.width;
+    const height =
+      window.innerHeight || document.documentElement.clientHeight || screen.height;
+    const left = dualLeft + Math.max(0, (width - w) / 2);
+    const top = dualTop + Math.max(0, (height - h) / 2);
     const popup = window.open(
       authUrl,
       "anilist-oauth",
-      "popup=yes,width=520,height=760",
+      `popup=yes,width=${w},height=${h},left=${left},top=${top}`,
     );
     if (!popup) window.location.href = authUrl;
+    else popup.focus?.();
   };
+
 
   return (
     <header
