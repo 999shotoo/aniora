@@ -4,7 +4,7 @@ import type { MappingEpisode } from "@/lib/mappings";
 import { useSettings } from "@/lib/settings";
 
 interface Props {
-  malId: number | null;
+  anilistId: number | null;
   episode: number;
   onEpisodeChange?: (ep: number) => void;
   ep?: MappingEpisode;
@@ -12,6 +12,7 @@ interface Props {
   onSlowLoad?: () => void;
   reloadKey?: number;
 }
+
 
 const FALLBACK_EP_IMAGE =
   "data:image/svg+xml;utf8," +
@@ -22,7 +23,7 @@ const FALLBACK_EP_IMAGE =
     </svg>`,
   );
 
-export function Player({ malId, episode, ep, fallbackTitle, onSlowLoad, reloadKey = 0 }: Props) {
+export function Player({ anilistId, episode, ep, fallbackTitle, onSlowLoad, reloadKey = 0 }: Props) {
   const { settings, update } = useSettings();
   const mode = settings.defaultLanguage;
   const setMode = (m: "sub" | "dub") => update("defaultLanguage", m);
@@ -59,9 +60,10 @@ export function Player({ malId, episode, ep, fallbackTitle, onSlowLoad, reloadKe
 
   const validEp = Number.isFinite(episode) && episode > 0;
   const autoParam = settings.autoPlay ? "?autoplay=1" : "";
-  const src = malId && validEp && ep
-    ? `https://megaplay.buzz/stream/mal/${malId}/${episode}/${mode}${autoParam}`
+  const src = anilistId && validEp && ep
+    ? `https://megaplay.buzz/stream/ani/${anilistId}/${episode}/${mode}${autoParam}`
     : "";
+
   const title = ep?.title?.en || ep?.nameTvdb || fallbackTitle || `Episode ${episode}`;
 
   // Mount + auto-retry lifecycle. If iframe hasn't fired onLoad within 4s,
@@ -100,14 +102,15 @@ export function Player({ malId, episode, ep, fallbackTitle, onSlowLoad, reloadKe
     setNonce((n) => n + 1);
   };
 
-  if (!malId || !validEp || !ep) {
+  if (!anilistId || !validEp || !ep) {
     return (
       <div className="flex aspect-video w-full items-center justify-center border border-border bg-card text-xs uppercase tracking-widest text-muted-foreground">
-        {!malId
-          ? "stream unavailable · no mal id"
+        {!anilistId
+          ? "stream unavailable · no id"
           : "waiting for episode mapping"}
       </div>
     );
+
   }
 
   return (
