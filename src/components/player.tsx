@@ -4,7 +4,7 @@ import type { MappingEpisode } from "@/lib/mappings";
 import { useSettings } from "@/lib/settings";
 
 interface Props {
-  malId: number | null;
+  anilistId: number | null;
   episode: number;
   onEpisodeChange?: (ep: number) => void;
   ep?: MappingEpisode;
@@ -12,6 +12,7 @@ interface Props {
   onSlowLoad?: () => void;
   reloadKey?: number;
 }
+
 
 const FALLBACK_EP_IMAGE =
   "data:image/svg+xml;utf8," +
