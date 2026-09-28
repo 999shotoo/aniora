@@ -167,27 +167,12 @@ export function EpisodesPanelSkeleton({
 
 export function PlayerSkeleton() {
   return (
-    <div className="flex flex-col gap-3">
-      <div className="relative aspect-video w-full border border-border">
-        <Skeleton className="absolute inset-0" />
-        {/* fake play button */}
-        <div className="absolute inset-0 flex items-center justify-center">
-          <div className="h-14 w-14 border border-border bg-background/40" />
-        </div>
-        {/* fake scrubber */}
-        <div className="absolute inset-x-3 bottom-3 h-1 bg-background/50" />
-      </div>
-      <div className="flex flex-wrap items-center gap-3 border border-border bg-card px-3 py-2">
-        <Bar className="h-3 w-24" />
-        <Bar className="h-3 flex-1 min-w-[4rem]" />
-        <div className="flex gap-1">
-          <Bar className="h-7 w-16" />
-          <Bar className="h-7 w-16" />
-        </div>
-      </div>
+    <div className="relative aspect-video w-full overflow-hidden border border-border">
+      <Skeleton className="absolute inset-0" />
     </div>
   );
 }
+
 
 /** Full info header skeleton — matches anime.$id.tsx hero. */
 export function InfoHeaderSkeleton() {
