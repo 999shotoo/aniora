@@ -60,9 +60,10 @@ export function Player({ anilistId, episode, ep, fallbackTitle, onSlowLoad, relo
 
   const validEp = Number.isFinite(episode) && episode > 0;
   const autoParam = settings.autoPlay ? "?autoplay=1" : "";
-  const src = malId && validEp && ep
-    ? `https://megaplay.buzz/stream/mal/${malId}/${episode}/${mode}${autoParam}`
+  const src = anilistId && validEp && ep
+    ? `https://megaplay.buzz/stream/ani/${anilistId}/${episode}/${mode}${autoParam}`
     : "";
+
   const title = ep?.title?.en || ep?.nameTvdb || fallbackTitle || `Episode ${episode}`;
 
   // Mount + auto-retry lifecycle. If iframe hasn't fired onLoad within 4s,
