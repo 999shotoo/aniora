@@ -99,6 +99,7 @@ export interface AniListViewer {
 }
 
 const TOKEN_KEY = "anilist_token";
+export const ANILIST_TOKEN_EVENT = "aniora:anilist:token";
 
 export function getAniListToken(): string | null {
   if (typeof window === "undefined") return null;
@@ -107,11 +108,18 @@ export function getAniListToken(): string | null {
 
 export function setAniListToken(token: string): void {
   localStorage.setItem(TOKEN_KEY, token);
+  if (typeof window !== "undefined") {
+    window.dispatchEvent(new CustomEvent(ANILIST_TOKEN_EVENT, { detail: { hasToken: true } }));
+  }
 }
 
 export function clearAniListToken(): void {
   localStorage.removeItem(TOKEN_KEY);
+  if (typeof window !== "undefined") {
+    window.dispatchEvent(new CustomEvent(ANILIST_TOKEN_EVENT, { detail: { hasToken: false } }));
+  }
 }
+
 
 export async function anilistFetch<T>(
   query: string,
