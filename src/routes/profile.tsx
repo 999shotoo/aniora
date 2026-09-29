@@ -671,6 +671,8 @@ function ProfileTabs({
         </>
       )}
 
+      {tab === "settings" && <SettingsPanel viewer={viewer} />}
+
       {tab === "local" && (
         <>
           <Section title="~$ cat local/*.log" className="max-w-none">
