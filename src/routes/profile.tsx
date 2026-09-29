@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useQueries, useQuery } from "@tanstack/react-query";
-import { useState } from "react";
+import { useQueries, useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useEffect, useState } from "react";
 import {
   Activity,
   Calendar,
@@ -11,14 +11,18 @@ import {
   Hash,
   Heart,
   History,
+  Loader2,
   LogOut,
   RefreshCw,
+  Save,
+  Settings as SettingsIcon,
   Star,
   Tag,
   Tv,
   User,
   Users,
 } from "lucide-react";
+import { toast } from "sonner";
 import { useAniListViewer, useAniListLogout } from "@/lib/anilist-auth";
 import { getAniListAuthUrl } from "@/lib/anilist-config";
 import { useWishlist } from "@/lib/wishlist";
@@ -26,6 +30,7 @@ import { useWatchHistory } from "@/lib/watched";
 import {
   fetchViewerActivity,
   fetchViewerList,
+  updateViewerSettings,
   type AniListListStatus,
 } from "@/lib/anilist-sync";
 import { FALLBACK_COVER, pickTitle } from "@/lib/anilist";
@@ -228,6 +233,7 @@ type TabKey =
   | "favorites"
   | "stats"
   | "activity"
+  | "settings"
   | "local";
 
 const TABS: { key: TabKey; label: string }[] = [
@@ -236,6 +242,7 @@ const TABS: { key: TabKey; label: string }[] = [
   { key: "favorites", label: "favorites" },
   { key: "stats", label: "stats" },
   { key: "activity", label: "activity" },
+  { key: "settings", label: "settings" },
   { key: "local", label: "local" },
 ];
 
