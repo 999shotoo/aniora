@@ -20,6 +20,7 @@ import { SettingsModal } from "@/components/settings-modal";
 import { GlobalShortcuts } from "@/lib/shortcuts";
 import { SmoothScrollMount } from "@/components/smooth-scroll";
 import { SocialBarMount } from "@/components/ad-slot";
+import { Analytics } from "@vercel/analytics/react";
 
 function AniListSyncMount() {
   useAniListWatchSync();
@@ -311,6 +312,7 @@ function RootComponent() {
               </div>
             </div>
           </footer>
+          <Analytics />
         </div>
       </SettingsProvider>
     </PersistQueryClientProvider>
