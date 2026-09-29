@@ -1,5 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
+import { useQueryClient } from "@tanstack/react-query";
 import { useEffect, useRef, useState } from "react";
 import { getAniListToken, setAniListToken } from "@/lib/anilist";
 import { getAniListAuthUrl, getAniListRedirectUri } from "@/lib/anilist-config";
