@@ -18,9 +18,11 @@ export interface AnioraSettings {
 
   // Media
   defaultLanguage: "sub" | "dub";
+  defaultServer: string;
   autoPlay: boolean;
   autoNextEpisode: boolean;
   episodesView: "thumb" | "row" | "grid";
+
 
   // Behavior
   disableContextMenu: boolean;
@@ -42,6 +44,7 @@ export const DEFAULT_SETTINGS: AnioraSettings = {
   showWatchHistoryHome: true,
 
   defaultLanguage: "sub",
+  defaultServer: "hd-1",
   autoPlay: false,
   autoNextEpisode: false,
   episodesView: "thumb",
