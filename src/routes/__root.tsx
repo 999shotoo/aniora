@@ -242,9 +242,12 @@ function RootComponent() {
 
   if (!persister) {
     return (
-      <div className="flex min-h-screen flex-col bg-background">
-        <main className="flex-1"><Outlet /></main>
-      </div>
+      <SettingsProvider>
+        <div className="flex min-h-screen flex-col bg-background">
+          <SiteHeader />
+          <main className="flex-1"><Outlet /></main>
+        </div>
+      </SettingsProvider>
     );
   }
 
