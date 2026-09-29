@@ -59,7 +59,7 @@ export interface UpdateUserInput {
 
 export async function updateViewerSettings(input: UpdateUserInput): Promise<void> {
   if (!getAniListToken()) return;
-  await anilistFetch(UPDATE_USER_MUTATION, input);
+  await anilistFetch(UPDATE_USER_MUTATION, input as Record<string, unknown>);
 }
 
 
