@@ -316,7 +316,7 @@ function AnimeInfoPage() {
             onError={(e) => {
               (e.currentTarget as HTMLImageElement).src = FALLBACK_COVER;
             }}
-            className="aspect-[2/3] w-32 shrink-0 border border-border object-cover sm:w-40 md:w-48"
+            className="aspect-[2/3] w-32 shrink-0 self-start border border-border object-cover sm:w-40 md:w-48"
           />
           <div className="min-w-0 flex-1">
             <div className="mb-2 flex flex-wrap items-center gap-2 text-[0.6rem] uppercase tracking-widest text-muted-foreground">
