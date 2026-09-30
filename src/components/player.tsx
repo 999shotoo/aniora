@@ -48,10 +48,19 @@ export function Player({ anilistId, episode, ep, fallbackTitle, onSlowLoad, relo
   const serversQuery = useServers(anilistId, episode);
   const modeList = serversQuery.data?.[mode] ?? [];
 
-  const selected = useMemo(
-    () => pickDefault(modeList, settings.defaultServer),
-    [modeList, settings.defaultServer],
-  );
+  // Per-episode failed-server tracker for automatic fallback.
+  const [failed, setFailed] = useState<Set<string>>(new Set());
+  useEffect(() => {
+    setFailed(new Set());
+  }, [anilistId, episode, mode]);
+
+  const selected = useMemo(() => {
+    const available = modeList.filter((s) => !failed.has(s.server));
+    return (
+      pickDefault(available, settings.defaultServer) ??
+      pickDefault(modeList, settings.defaultServer)
+    );
+  }, [modeList, settings.defaultServer, failed]);
 
   useEffect(() => {
     onSlowLoadRef.current = onSlowLoad;
