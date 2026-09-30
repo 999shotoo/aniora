@@ -48,10 +48,19 @@ export function Player({ anilistId, episode, ep, fallbackTitle, onSlowLoad, relo
   const serversQuery = useServers(anilistId, episode);
   const modeList = serversQuery.data?.[mode] ?? [];
 
-  const selected = useMemo(
-    () => pickDefault(modeList, settings.defaultServer),
-    [modeList, settings.defaultServer],
-  );
+  // Per-episode failed-server tracker for automatic fallback.
+  const [failed, setFailed] = useState<Set<string>>(new Set());
+  useEffect(() => {
+    setFailed(new Set());
+  }, [anilistId, episode, mode]);
+
+  const selected = useMemo(() => {
+    const available = modeList.filter((s) => !failed.has(s.server));
+    return (
+      pickDefault(available, settings.defaultServer) ??
+      pickDefault(modeList, settings.defaultServer)
+    );
+  }, [modeList, settings.defaultServer, failed]);
 
   useEffect(() => {
     onSlowLoadRef.current = onSlowLoad;
@@ -91,22 +100,36 @@ export function Player({ anilistId, episode, ep, fallbackTitle, onSlowLoad, relo
       autoRetriedRef.current = true;
       setNonce((n) => n + 1);
     }, 4200);
+    const failoverTimer = window.setTimeout(() => {
+      if (loadedRef.current) return;
+      // Current server hasn't loaded — mark it failed so pickDefault picks the next.
+      const current = selected?.server;
+      if (!current) return;
+      setFailed((prev) => {
+        if (prev.has(current)) return prev;
+        const next = new Set(prev);
+        next.add(current);
+        return next;
+      });
+    }, 7000);
     const slowTimer = window.setTimeout(() => {
       if (loadedRef.current) return;
       onSlowLoadRef.current?.();
-    }, 8000);
+    }, 10000);
 
     return () => {
       window.clearTimeout(mountTimer);
       window.clearTimeout(retryTimer);
+      window.clearTimeout(failoverTimer);
       window.clearTimeout(slowTimer);
     };
-  }, [src, reloadKey]);
+  }, [src, reloadKey, selected]);
 
   const manualReload = () => {
     setLoaded(false);
     loadedRef.current = false;
     autoRetriedRef.current = false;
+    setFailed(new Set());
     setNonce((n) => n + 1);
   };
 
@@ -164,7 +187,17 @@ export function Player({ anilistId, episode, ep, fallbackTitle, onSlowLoad, relo
             <Server className="h-3 w-3" />
             <select
               value={selected?.server ?? ""}
-              onChange={(e) => update("defaultServer", e.target.value)}
+              onChange={(e) => {
+                const name = e.target.value;
+                // User picked a server → clear its failed mark and prefer it.
+                setFailed((prev) => {
+                  if (!prev.has(name)) return prev;
+                  const next = new Set(prev);
+                  next.delete(name);
+                  return next;
+                });
+                update("defaultServer", name);
+              }}
               disabled={modeList.length === 0}
               className="bg-transparent text-[0.65rem] uppercase tracking-widest text-foreground focus:outline-none disabled:opacity-40"
             >
@@ -173,6 +206,7 @@ export function Player({ anilistId, episode, ep, fallbackTitle, onSlowLoad, relo
                 <option key={s.server} value={s.server} className="bg-background text-foreground">
                   {s.server}
                   {s.default ? " ★" : ""}
+                  {failed.has(s.server) ? " ✕" : ""}
                 </option>
               ))}
             </select>

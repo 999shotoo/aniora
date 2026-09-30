@@ -993,7 +993,27 @@ function SettingsPanel({
       }),
     onSuccess: () => {
       toast.success("AniList profile updated");
-      qc.invalidateQueries({ queryKey: ["anilist", "viewer"] });
+      // Patch viewer in place — avoids full refetch that would flicker the navbar.
+      qc.setQueriesData<typeof viewer | null>(
+        { queryKey: ["anilist", "viewer"] },
+        (prev) =>
+          prev
+            ? {
+                ...prev,
+                about,
+                options: {
+                  ...(prev.options ?? {}),
+                  titleLanguage,
+                  displayAdultContent,
+                  timezone: timezone || prev.options?.timezone,
+                },
+                mediaListOptions: {
+                  ...(prev.mediaListOptions ?? {}),
+                  scoreFormat,
+                },
+              }
+            : prev,
+      );
     },
     onError: (e: unknown) => toast.error(e instanceof Error ? e.message : "Update failed"),
   });

@@ -62,7 +62,18 @@ export function AniListTracker({
     onSuccess: () => {
       toast.success("Saved to AniList");
       setDirty(false);
-      qc.invalidateQueries({ queryKey: key });
+      // Optimistic in-place cache update — no refetch, no navbar/viewer churn.
+      qc.setQueryData<typeof data>(key, (prev) => ({
+        id: mediaId,
+        isFavourite: prev?.isFavourite ?? false,
+        mediaListEntry: {
+          id: prev?.mediaListEntry?.id ?? 0,
+          status,
+          progress,
+          score,
+          notes: prev?.mediaListEntry?.notes ?? null,
+        },
+      }));
     },
     onError: () => toast.error("Failed to save"),
   });
@@ -72,7 +83,9 @@ export function AniListTracker({
     onSuccess: () => {
       toast.success("Removed from list");
       setMenuOpen(false);
-      qc.invalidateQueries({ queryKey: key });
+      qc.setQueryData<typeof data>(key, (prev) =>
+        prev ? { ...prev, mediaListEntry: null } : prev,
+      );
     },
     onError: () => toast.error("Failed to remove"),
   });
@@ -86,7 +99,10 @@ export function AniListTracker({
     },
     onError: () => {
       toast.error("Failed to toggle favourite");
-      qc.invalidateQueries({ queryKey: key });
+      // Revert optimistic toggle without triggering a refetch.
+      qc.setQueryData(key, (prev: typeof data) =>
+        prev ? { ...prev, isFavourite: !prev.isFavourite } : prev,
+      );
     },
   });
 
