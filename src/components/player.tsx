@@ -129,6 +129,7 @@ export function Player({ anilistId, episode, ep, fallbackTitle, onSlowLoad, relo
     setLoaded(false);
     loadedRef.current = false;
     autoRetriedRef.current = false;
+    setFailed(new Set());
     setNonce((n) => n + 1);
   };
 
