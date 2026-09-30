@@ -116,7 +116,7 @@ export function Hero({ items, intervalMs = 6500 }: Props) {
               )}
               <div className="flex flex-wrap gap-2">
                 <Link
-                  to="/anime/$id"
+                  to="/watch/$id"
                   params={{ id: String(media.id) }}
                   className="inline-flex items-center gap-2 border border-foreground bg-foreground px-4 py-2 text-[0.7rem] font-medium uppercase tracking-widest text-background transition-opacity hover:opacity-90 sm:px-6"
                 >
