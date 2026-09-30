@@ -956,3 +956,149 @@ function KV({
 function stripHtml(s: string): string {
   return s.replace(/<[^>]+>/g, "").replace(/\s+\n/g, "\n").trim();
 }
+
+const TITLE_LANGUAGES = ["ROMAJI", "ENGLISH", "NATIVE", "ROMAJI_STYLISED", "ENGLISH_STYLISED", "NATIVE_STYLISED"];
+const SCORE_FORMATS = ["POINT_100", "POINT_10_DECIMAL", "POINT_10", "POINT_5", "POINT_3"];
+
+function SettingsPanel({
+  viewer,
+}: {
+  viewer: NonNullable<ReturnType<typeof useAniListViewer>["viewer"]>;
+}) {
+  const qc = useQueryClient();
+  const [about, setAbout] = useState(viewer.about ?? "");
+  const [titleLanguage, setTitleLanguage] = useState(viewer.options?.titleLanguage ?? "ROMAJI");
+  const [scoreFormat, setScoreFormat] = useState(viewer.mediaListOptions?.scoreFormat ?? "POINT_10");
+  const [timezone, setTimezone] = useState(viewer.options?.timezone ?? "");
+  const [displayAdultContent, setDisplayAdult] = useState(!!viewer.options?.displayAdultContent);
+  const [airingNotifications, setAiring] = useState(true);
+
+  useEffect(() => {
+    setAbout(viewer.about ?? "");
+    setTitleLanguage(viewer.options?.titleLanguage ?? "ROMAJI");
+    setScoreFormat(viewer.mediaListOptions?.scoreFormat ?? "POINT_10");
+    setTimezone(viewer.options?.timezone ?? "");
+    setDisplayAdult(!!viewer.options?.displayAdultContent);
+  }, [viewer]);
+
+  const save = useMutation({
+    mutationFn: () =>
+      updateViewerSettings({
+        about,
+        titleLanguage,
+        scoreFormat,
+        timezone: timezone || undefined,
+        displayAdultContent,
+        airingNotifications,
+      }),
+    onSuccess: () => {
+      toast.success("AniList profile updated");
+      qc.invalidateQueries({ queryKey: ["anilist", "viewer"] });
+    },
+    onError: (e: unknown) => toast.error(e instanceof Error ? e.message : "Update failed"),
+  });
+
+  return (
+    <section className="mx-auto max-w-3xl px-4 py-8 sm:px-6">
+      <div className="mb-4 flex items-center gap-2 border-b border-border pb-2">
+        <SettingsIcon className="h-4 w-4 text-muted-foreground" />
+        <h2 className="font-mono text-xs uppercase tracking-widest text-muted-foreground">
+          ~$ edit anilist profile
+        </h2>
+      </div>
+
+      <div className="space-y-5 border border-border bg-card p-5">
+        <Field label="about (bio)">
+          <textarea
+            value={about}
+            onChange={(e) => setAbout(e.target.value)}
+            rows={5}
+            placeholder="Tell people about yourself…"
+            className="w-full resize-y border border-border bg-background px-3 py-2 text-sm focus:outline-none focus:border-foreground"
+          />
+        </Field>
+
+        <div className="grid gap-4 sm:grid-cols-2">
+          <Field label="title language">
+            <select
+              value={titleLanguage}
+              onChange={(e) => setTitleLanguage(e.target.value)}
+              className="w-full border border-border bg-background px-2 py-1.5 text-sm focus:outline-none"
+            >
+              {TITLE_LANGUAGES.map((l) => (
+                <option key={l} value={l}>
+                  {l.toLowerCase().replace("_", " ")}
+                </option>
+              ))}
+            </select>
+          </Field>
+          <Field label="score format">
+            <select
+              value={scoreFormat}
+              onChange={(e) => setScoreFormat(e.target.value)}
+              className="w-full border border-border bg-background px-2 py-1.5 text-sm focus:outline-none"
+            >
+              {SCORE_FORMATS.map((f) => (
+                <option key={f} value={f}>
+                  {f.toLowerCase().replace(/_/g, " ")}
+                </option>
+              ))}
+            </select>
+          </Field>
+          <Field label="timezone">
+            <input
+              value={timezone}
+              onChange={(e) => setTimezone(e.target.value)}
+              placeholder="e.g. +05:30 or UTC"
+              className="w-full border border-border bg-background px-2 py-1.5 text-sm focus:outline-none"
+            />
+          </Field>
+          <div className="flex flex-col justify-end gap-2">
+            <label className="flex items-center gap-2 text-xs">
+              <input
+                type="checkbox"
+                checked={displayAdultContent}
+                onChange={(e) => setDisplayAdult(e.target.checked)}
+              />
+              display adult content
+            </label>
+            <label className="flex items-center gap-2 text-xs">
+              <input
+                type="checkbox"
+                checked={airingNotifications}
+                onChange={(e) => setAiring(e.target.checked)}
+              />
+              airing notifications
+            </label>
+          </div>
+        </div>
+
+        <div className="flex items-center justify-end gap-2 border-t border-border/60 pt-4">
+          <button
+            onClick={() => save.mutate()}
+            disabled={save.isPending}
+            className="inline-flex items-center gap-1.5 border border-foreground bg-foreground px-4 py-2 text-[0.65rem] uppercase tracking-widest text-background disabled:opacity-50"
+          >
+            {save.isPending ? <Loader2 className="h-3 w-3 animate-spin" /> : <Save className="h-3 w-3" />}
+            save to anilist
+          </button>
+        </div>
+
+        <p className="text-[0.6rem] uppercase tracking-widest text-muted-foreground/70">
+          changes sync directly with your anilist account.
+        </p>
+      </div>
+    </section>
+  );
+}
+
+function Field({ label, children }: { label: string; children: React.ReactNode }) {
+  return (
+    <label className="block">
+      <span className="mb-1 block text-[0.6rem] uppercase tracking-widest text-muted-foreground">
+        {label}
+      </span>
+      {children}
+    </label>
+  );
+}
