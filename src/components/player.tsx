@@ -1,7 +1,8 @@
-import { useEffect, useRef, useState } from "react";
-import { Maximize2, RefreshCcw } from "lucide-react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { Maximize2, RefreshCcw, Server } from "lucide-react";
 import type { MappingEpisode } from "@/lib/mappings";
 import { useSettings } from "@/lib/settings";
+import { useServers, withAutoplay, type StreamServer } from "@/lib/servers";
 
 interface Props {
   anilistId: number | null;
@@ -13,7 +14,6 @@ interface Props {
   reloadKey?: number;
 }
 
-
 const FALLBACK_EP_IMAGE =
   "data:image/svg+xml;utf8," +
   encodeURIComponent(
@@ -23,17 +23,35 @@ const FALLBACK_EP_IMAGE =
     </svg>`,
   );
 
+function pickDefault(list: StreamServer[], preferred?: string): StreamServer | null {
+  if (!list.length) return null;
+  if (preferred) {
+    const match = list.find((s) => s.server === preferred);
+    if (match) return match;
+  }
+  return list.find((s) => s.default) ?? list[0];
+}
+
 export function Player({ anilistId, episode, ep, fallbackTitle, onSlowLoad, reloadKey = 0 }: Props) {
   const { settings, update } = useSettings();
   const mode = settings.defaultLanguage;
   const setMode = (m: "sub" | "dub") => update("defaultLanguage", m);
   const [readySrc, setReadySrc] = useState<string | null>(null);
   const [loaded, setLoaded] = useState(false);
-  const [nonce, setNonce] = useState(0); // forces internal iframe remount
+  const [nonce, setNonce] = useState(0);
   const onSlowLoadRef = useRef(onSlowLoad);
   const wrapRef = useRef<HTMLDivElement>(null);
   const autoRetriedRef = useRef(false);
   const loadedRef = useRef(false);
+
+  const validEp = Number.isFinite(episode) && episode > 0;
+  const serversQuery = useServers(anilistId, episode);
+  const modeList = serversQuery.data?.[mode] ?? [];
+
+  const selected = useMemo(
+    () => pickDefault(modeList, settings.defaultServer),
+    [modeList, settings.defaultServer],
+  );
 
   useEffect(() => {
     onSlowLoadRef.current = onSlowLoad;
@@ -46,7 +64,6 @@ export function Player({ anilistId, episode, ep, fallbackTitle, onSlowLoad, relo
     else void el.requestFullscreen?.();
   };
 
-  // React to shortcut events.
   useEffect(() => {
     const onToggle = () => setMode(mode === "sub" ? "dub" : "sub");
     const onFs = () => enterFs();
@@ -56,19 +73,11 @@ export function Player({ anilistId, episode, ep, fallbackTitle, onSlowLoad, relo
       window.removeEventListener("aniora:watch:toggle-lang", onToggle);
       window.removeEventListener("aniora:watch:fullscreen", onFs);
     };
-  }, []);
+  }, [mode]);
 
-  const validEp = Number.isFinite(episode) && episode > 0;
-  const autoParam = settings.autoPlay ? "?autoplay=1" : "";
-  const src = anilistId && validEp && ep
-    ? `https://megaplay.buzz/stream/ani/${anilistId}/${episode}/${mode}${autoParam}`
-    : "";
-
+  const src = selected ? withAutoplay(selected.url, settings.autoPlay) : "";
   const title = ep?.title?.en || ep?.nameTvdb || fallbackTitle || `Episode ${episode}`;
 
-  // Mount + auto-retry lifecycle. If iframe hasn't fired onLoad within 4s,
-  // silently remount once. If still not loaded by 8s, surface the warning.
-  // Once loaded, both timers are inert — no reloads during playback.
   useEffect(() => {
     setReadySrc(null);
     setLoaded(false);
@@ -78,8 +87,7 @@ export function Player({ anilistId, episode, ep, fallbackTitle, onSlowLoad, relo
 
     const mountTimer = window.setTimeout(() => setReadySrc(src), 80);
     const retryTimer = window.setTimeout(() => {
-      if (loadedRef.current) return;
-      if (autoRetriedRef.current) return;
+      if (loadedRef.current || autoRetriedRef.current) return;
       autoRetriedRef.current = true;
       setNonce((n) => n + 1);
     }, 4200);
@@ -105,23 +113,22 @@ export function Player({ anilistId, episode, ep, fallbackTitle, onSlowLoad, relo
   if (!anilistId || !validEp || !ep) {
     return (
       <div className="flex aspect-video w-full items-center justify-center border border-border bg-card text-xs uppercase tracking-widest text-muted-foreground">
-        {!anilistId
-          ? "stream unavailable · no id"
-          : "waiting for episode mapping"}
+        {!anilistId ? "stream unavailable · no id" : "waiting for episode mapping"}
       </div>
     );
-
   }
+
+  const noServers = serversQuery.isSuccess && modeList.length === 0;
 
   return (
     <div className="flex flex-col gap-3">
       <div ref={wrapRef} className="relative aspect-video w-full overflow-hidden border border-border bg-black">
-        {(!readySrc || !loaded) && (
-          <div className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-3 bg-card text-center">
-            <div className="h-10 w-10 border border-border shimmer" />
-            <div className="font-mono text-xs uppercase tracking-widest text-muted-foreground">
-              loading stream source
-            </div>
+        {(!readySrc || !loaded) && !noServers && (
+          <div className="absolute inset-0 z-10 bg-card shimmer" />
+        )}
+        {noServers && (
+          <div className="absolute inset-0 z-10 flex items-center justify-center text-xs uppercase tracking-widest text-muted-foreground">
+            no {mode} servers available
           </div>
         )}
         {readySrc && (
@@ -149,11 +156,28 @@ export function Player({ anilistId, episode, ep, fallbackTitle, onSlowLoad, relo
             episode {String(episode).padStart(2, "0")}
           </span>
         </div>
-        <span className="line-clamp-1 flex-1 text-xs text-card-foreground">
-          {title}
-        </span>
+        <span className="line-clamp-1 flex-1 text-xs text-card-foreground">{title}</span>
 
-        <div className="ml-auto flex items-center gap-2">
+        <div className="ml-auto flex flex-wrap items-center gap-2">
+          {/* Server dropdown */}
+          <label className="inline-flex items-center gap-1.5 border border-border bg-background px-2 py-1 text-[0.6rem] uppercase tracking-widest text-muted-foreground">
+            <Server className="h-3 w-3" />
+            <select
+              value={selected?.server ?? ""}
+              onChange={(e) => update("defaultServer", e.target.value)}
+              disabled={modeList.length === 0}
+              className="bg-transparent text-[0.65rem] uppercase tracking-widest text-foreground focus:outline-none disabled:opacity-40"
+            >
+              {modeList.length === 0 && <option value="">—</option>}
+              {modeList.map((s) => (
+                <option key={s.server} value={s.server} className="bg-background text-foreground">
+                  {s.server}
+                  {s.default ? " ★" : ""}
+                </option>
+              ))}
+            </select>
+          </label>
+
           <button
             onClick={manualReload}
             title="Reload stream (R)"
@@ -208,4 +232,3 @@ export function PlayerPlaceholder({ message = "select an episode to start watchi
 }
 
 export { FALLBACK_EP_IMAGE };
-

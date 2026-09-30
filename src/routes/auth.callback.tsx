@@ -1,5 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
+import { useQueryClient } from "@tanstack/react-query";
 import { useEffect, useRef, useState } from "react";
 import { getAniListToken, setAniListToken } from "@/lib/anilist";
 import { getAniListAuthUrl, getAniListRedirectUri } from "@/lib/anilist-config";
@@ -18,6 +19,7 @@ export const Route = createFileRoute("/auth/callback")({
 
 function AuthCallback() {
   const navigate = useNavigate();
+  const qc = useQueryClient();
   const exchangeCode = useServerFn(exchangeAniListCode);
   const [status, setStatus] = useState<"working" | "ok" | "fail">("working");
   const [detail, setDetail] = useState<string>("");
@@ -46,6 +48,7 @@ function AuthCallback() {
 
     if (token) {
       setAniListToken(token);
+      qc.removeQueries({ queryKey: ["anilist"] });
       setStatus("ok");
       window.history.replaceState(null, "", window.location.pathname);
       if (window.opener && !window.opener.closed) {
@@ -71,6 +74,7 @@ function AuthCallback() {
       exchangeCode({ data: { code, redirectUri } })
         .then((result) => {
           setAniListToken(result.accessToken);
+          qc.removeQueries({ queryKey: ["anilist"] });
           setStatus("ok");
           window.history.replaceState(null, "", window.location.pathname);
           if (window.opener && !window.opener.closed) {
@@ -118,7 +122,7 @@ function AuthCallback() {
 
     setStatus("fail");
     setDetail("AniList did not return an authorization code. Please try login again.");
-  }, [exchangeCode, navigate]);
+  }, [exchangeCode, navigate, qc]);
 
   return (
     <div className="mx-auto flex min-h-[60vh] max-w-md flex-col items-center justify-center px-4 text-center font-mono">

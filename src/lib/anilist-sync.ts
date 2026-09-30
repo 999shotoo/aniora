@@ -37,6 +37,31 @@ const DELETE_MUTATION = `
     DeleteMediaListEntry(id: $id) { deleted }
   }
 `;
+const UPDATE_USER_MUTATION = `
+  mutation ($about: String, $titleLanguage: UserTitleLanguage, $displayAdultContent: Boolean, $airingNotifications: Boolean, $timezone: String, $scoreFormat: ScoreFormat) {
+    UpdateUser(about: $about, titleLanguage: $titleLanguage, displayAdultContent: $displayAdultContent, airingNotifications: $airingNotifications, timezone: $timezone, scoreFormat: $scoreFormat) {
+      id
+      about
+      options { titleLanguage displayAdultContent timezone }
+      mediaListOptions { scoreFormat }
+    }
+  }
+`;
+
+export interface UpdateUserInput {
+  about?: string;
+  titleLanguage?: string;
+  displayAdultContent?: boolean;
+  airingNotifications?: boolean;
+  timezone?: string;
+  scoreFormat?: string;
+}
+
+export async function updateViewerSettings(input: UpdateUserInput): Promise<void> {
+  if (!getAniListToken()) return;
+  await anilistFetch(UPDATE_USER_MUTATION, input as Record<string, unknown>);
+}
+
 
 const TOGGLE_FAV_MUTATION = `
   mutation ($animeId: Int) {
