@@ -100,17 +100,30 @@ export function Player({ anilistId, episode, ep, fallbackTitle, onSlowLoad, relo
       autoRetriedRef.current = true;
       setNonce((n) => n + 1);
     }, 4200);
+    const failoverTimer = window.setTimeout(() => {
+      if (loadedRef.current) return;
+      // Current server hasn't loaded — mark it failed so pickDefault picks the next.
+      const current = selected?.server;
+      if (!current) return;
+      setFailed((prev) => {
+        if (prev.has(current)) return prev;
+        const next = new Set(prev);
+        next.add(current);
+        return next;
+      });
+    }, 7000);
     const slowTimer = window.setTimeout(() => {
       if (loadedRef.current) return;
       onSlowLoadRef.current?.();
-    }, 8000);
+    }, 10000);
 
     return () => {
       window.clearTimeout(mountTimer);
       window.clearTimeout(retryTimer);
+      window.clearTimeout(failoverTimer);
       window.clearTimeout(slowTimer);
     };
-  }, [src, reloadKey]);
+  }, [src, reloadKey, selected]);
 
   const manualReload = () => {
     setLoaded(false);
