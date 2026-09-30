@@ -26,9 +26,23 @@ export const Route = createFileRoute("/watch/$id")({
   loader: async ({ params, context }) => {
     const id = Number(params.id);
     if (!Number.isFinite(id)) return null;
+    const key = ["anime", id] as const;
+    // On the client, don't block navigation on network — return whatever's
+    // cached and let the component's useQuery hydrate the rest.
+    if (typeof window !== "undefined") {
+      const cached = context.queryClient.getQueryData<AniListMedia>(key);
+      if (!cached) {
+        void context.queryClient.prefetchQuery({
+          queryKey: key,
+          queryFn: () => getAnimeById(id),
+          staleTime: 10 * 60_000,
+        });
+      }
+      return cached ?? null;
+    }
     try {
       return await context.queryClient.ensureQueryData({
-        queryKey: ["anime", id],
+        queryKey: key,
         queryFn: () => getAnimeById(id),
         staleTime: 10 * 60_000,
       });
