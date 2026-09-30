@@ -22,8 +22,9 @@ export const getRouter = () => {
     context: { queryClient },
     scrollRestoration: true,
     defaultPreloadStaleTime: 0,
-    // No preload — avoids fetching route chunks on hover (cuts edge requests).
-    defaultPreload: false,
+    // Preload route code + loader data on hover/focus so clicks feel instant.
+    defaultPreload: "intent",
+    defaultPreloadDelay: 40,
     defaultPendingMs: 0,
     defaultPendingMinMs: 0,
     defaultViewTransition: false,
