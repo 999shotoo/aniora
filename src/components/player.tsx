@@ -84,7 +84,13 @@ export function Player({ anilistId, episode, ep, fallbackTitle, onSlowLoad, relo
     };
   }, [mode]);
 
-  const src = selected ? withAutoplay(selected.url, settings.autoPlay) : "";
+  const thumbnail = ep?.image || null;
+  const withThumb = (url: string) => {
+    if (!thumbnail) return url;
+    const sep = url.includes("?") ? "&" : "?";
+    return `${url}${sep}thumbnail=${encodeURIComponent(thumbnail)}`;
+  };
+  const src = selected ? withThumb(withAutoplay(selected.url, settings.autoPlay)) : "";
   const title = ep?.title?.en || ep?.nameTvdb || fallbackTitle || `Episode ${episode}`;
 
   useEffect(() => {
