@@ -97,10 +97,20 @@ function TestArtPage() {
               `VAST ad started successfully (${isFallback ? "fallback" : "primary"} tag)`,
             );
           } catch (err) {
-            console.error(
-              `VAST ad failed on ${isFallback ? "fallback" : "primary"} tag:`,
-              err,
+            const message = err instanceof Error ? err.message : String(err);
+            const isEmptyNoFill = message.includes(
+              "Reduce of empty array with no initial value",
             );
+            if (isEmptyNoFill) {
+              console.warn(
+                `No ad available (empty VAST response) on ${isFallback ? "fallback" : "primary"} tag`,
+              );
+            } else {
+              console.error(
+                `VAST ad failed on ${isFallback ? "fallback" : "primary"} tag:`,
+                err,
+              );
+            }
             if (!isFallback) {
               // Primary tag failed — try the fallback tag once.
               await runAd(VAST_TAG_FALLBACK, true);
