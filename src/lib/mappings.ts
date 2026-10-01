@@ -55,16 +55,18 @@ export async function fetchMapping(
 
 function resolvePlayableEpisodeNumber(key: string, ep: MappingEpisode): number {
   const keyNumber = /^\d+$/.test(key) ? Number(key) : 0;
-  const absolute = ep.absoluteEpisodeNumber ?? 0;
   const scoped = ep.episodeNumber ?? 0;
+  const absolute = ep.absoluteEpisodeNumber ?? 0;
 
-  // Some movie mappings report absoluteEpisodeNumber: 0 even though the
-  // playable stream episode is key "1". Only trust positive numbers.
-  if (absolute > 0) return absolute;
+  // Prefer the per-season index (map key / episodeNumber) so URLs read as
+  // "ep=1" for a season premiere instead of the cross-series absolute count.
+  // Fall back to absolute only when neither is available.
   if (keyNumber > 0) return keyNumber;
   if (scoped > 0) return scoped;
+  if (absolute > 0) return absolute;
   return 0;
 }
+
 
 /**
  * Split episode keys into regular numbered episodes and specials (C1, S1, etc).
