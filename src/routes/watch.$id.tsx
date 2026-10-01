@@ -27,6 +27,7 @@ export const Route = createFileRoute("/watch/$id")({
     const id = Number(params.id);
     if (!Number.isFinite(id)) return null;
     const key = ["anime", id] as const;
+    const mappingKey = ["mapping", id] as const;
     // On the client, don't block navigation on network — return whatever's
     // cached and let the component's useQuery hydrate the rest.
     if (typeof window !== "undefined") {
@@ -36,6 +37,14 @@ export const Route = createFileRoute("/watch/$id")({
           queryKey: key,
           queryFn: () => getAnimeById(id),
           staleTime: 10 * 60_000,
+        });
+      }
+      // Warm the mapping cache in parallel — this is what gates the player.
+      if (!context.queryClient.getQueryData(mappingKey)) {
+        void context.queryClient.prefetchQuery({
+          queryKey: mappingKey,
+          queryFn: () => fetchMapping(id),
+          staleTime: 15 * 60_000,
         });
       }
       return cached ?? null;
