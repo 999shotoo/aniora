@@ -29,9 +29,21 @@ export const Route = createFileRoute("/anime/$id")({
   loader: async ({ params, context }) => {
     const id = Number(params.id);
     if (!Number.isFinite(id)) return null;
+    const key = ["anime", id] as const;
+    if (typeof window !== "undefined") {
+      const cached = context.queryClient.getQueryData(key);
+      if (!cached) {
+        void context.queryClient.prefetchQuery({
+          queryKey: key,
+          queryFn: () => getAnimeById(id),
+          staleTime: 10 * 60_000,
+        });
+      }
+      return (cached as Awaited<ReturnType<typeof getAnimeById>>) ?? null;
+    }
     try {
       return await context.queryClient.ensureQueryData({
-        queryKey: ["anime", id],
+        queryKey: key,
         queryFn: () => getAnimeById(id),
         staleTime: 10 * 60_000,
       });
