@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as WishlistRouteImport } from './routes/wishlist'
+import { Route as TestRouteImport } from './routes/test'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as SitemapPagesDotxmlRouteImport } from './routes/sitemap-pages[.]xml'
 import { Route as SitemapMoviesDotxmlRouteImport } from './routes/sitemap-movies[.]xml'
@@ -29,6 +30,11 @@ import { Route as AnimeIdRouteImport } from './routes/anime.$id'
 const WishlistRoute = WishlistRouteImport.update({
   id: '/wishlist',
   path: '/wishlist',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TestRoute = TestRouteImport.update({
+  id: '/test',
+  path: '/test',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
@@ -118,6 +124,7 @@ export interface FileRoutesByFullPath {
   '/sitemap-movies.xml': typeof SitemapMoviesDotxmlRoute
   '/sitemap-pages.xml': typeof SitemapPagesDotxmlRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/test': typeof TestRoute
   '/wishlist': typeof WishlistRoute
   '/anime/$id': typeof AnimeIdRoute
   '/auth/callback': typeof AuthCallbackRoute
@@ -136,6 +143,7 @@ export interface FileRoutesByTo {
   '/sitemap-movies.xml': typeof SitemapMoviesDotxmlRoute
   '/sitemap-pages.xml': typeof SitemapPagesDotxmlRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/test': typeof TestRoute
   '/wishlist': typeof WishlistRoute
   '/anime/$id': typeof AnimeIdRoute
   '/auth/callback': typeof AuthCallbackRoute
@@ -155,6 +163,7 @@ export interface FileRoutesById {
   '/sitemap-movies.xml': typeof SitemapMoviesDotxmlRoute
   '/sitemap-pages.xml': typeof SitemapPagesDotxmlRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/test': typeof TestRoute
   '/wishlist': typeof WishlistRoute
   '/anime/$id': typeof AnimeIdRoute
   '/auth/callback': typeof AuthCallbackRoute
@@ -175,6 +184,7 @@ export interface FileRouteTypes {
     | '/sitemap-movies.xml'
     | '/sitemap-pages.xml'
     | '/sitemap.xml'
+    | '/test'
     | '/wishlist'
     | '/anime/$id'
     | '/auth/callback'
@@ -193,6 +203,7 @@ export interface FileRouteTypes {
     | '/sitemap-movies.xml'
     | '/sitemap-pages.xml'
     | '/sitemap.xml'
+    | '/test'
     | '/wishlist'
     | '/anime/$id'
     | '/auth/callback'
@@ -211,6 +222,7 @@ export interface FileRouteTypes {
     | '/sitemap-movies.xml'
     | '/sitemap-pages.xml'
     | '/sitemap.xml'
+    | '/test'
     | '/wishlist'
     | '/anime/$id'
     | '/auth/callback'
@@ -230,6 +242,7 @@ export interface RootRouteChildren {
   SitemapMoviesDotxmlRoute: typeof SitemapMoviesDotxmlRoute
   SitemapPagesDotxmlRoute: typeof SitemapPagesDotxmlRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
+  TestRoute: typeof TestRoute
   WishlistRoute: typeof WishlistRoute
   AnimeIdRoute: typeof AnimeIdRoute
   AuthCallbackRoute: typeof AuthCallbackRoute
@@ -245,6 +258,13 @@ declare module '@tanstack/react-router' {
       path: '/wishlist'
       fullPath: '/wishlist'
       preLoaderRoute: typeof WishlistRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/test': {
+      id: '/test'
+      path: '/test'
+      fullPath: '/test'
+      preLoaderRoute: typeof TestRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/sitemap.xml': {
@@ -366,6 +386,7 @@ const rootRouteChildren: RootRouteChildren = {
   SitemapMoviesDotxmlRoute: SitemapMoviesDotxmlRoute,
   SitemapPagesDotxmlRoute: SitemapPagesDotxmlRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
+  TestRoute: TestRoute,
   WishlistRoute: WishlistRoute,
   AnimeIdRoute: AnimeIdRoute,
   AuthCallbackRoute: AuthCallbackRoute,
