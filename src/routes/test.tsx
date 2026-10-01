@@ -48,25 +48,25 @@ function TestPage() {
               {
                 roll: "preRoll",
                 vastTag:
-                  "https://smooth-survey.com/dxmEFHzYd.GhNCvqZdGoUa/se/m_9quuZzUdlSkuP/Ticsx/OSTSY/wLMHT/MitZNBzwE/5qNFjaAWx/NBytZ/shaoWM1kpgdVDs0Hxh",
+                  "https://vast.yomeno.xyz/vast?spot_id=1495679",
                 adText: "",
               },
               {
                 roll: "midRoll",
                 vastTag:
-                  "https://smooth-survey.com/dxmEFHzYd.GhNCvqZdGoUa/se/m_9quuZzUdlSkuP/Ticsx/OSTSY/wLMHT/MitZNBzwE/5qNFjaAWx/NBytZ/shaoWM1kpgdVDs0Hxh",
+                  "https://vast.yomeno.xyz/vast?spot_id=1495679",
                 adText: "",
               },
               {
                 roll: "postRoll",
                 vastTag:
-                  "https://smooth-survey.com/dxmEFHzYd.GhNCvqZdGoUa/se/m_9quuZzUdlSkuP/Ticsx/OSTSY/wLMHT/MitZNBzwE/5qNFjaAWx/NBytZ/shaoWM1kpgdVDs0Hxh",
+                  "https://vast.yomeno.xyz/vast?spot_id=1495679",
                 adText: "",
               },
               {
                 roll: "onPauseRoll",
                 vastTag:
-                  "https://smooth-survey.com/dxmEFHzYd.GhNCvqZdGoUa/se/m_9quuZzUdlSkuP/Ticsx/OSTSY/wLMHT/MitZNBzwE/5qNFjaAWx/NBytZ/shaoWM1kpgdVDs0Hxh",
+                  "https://vast.yomeno.xyz/vast?spot_id=1495679",
                 adText: "",
               },
             ],
