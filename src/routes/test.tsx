@@ -1,6 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useRef } from "react";
-
 export const Route = createFileRoute("/test")({
   head: () => ({
     meta: [
@@ -11,19 +10,15 @@ export const Route = createFileRoute("/test")({
   }),
   component: TestPage,
 });
-
 declare global {
   interface Window {
     fluidPlayer?: (id: string, opts?: unknown) => unknown;
   }
 }
-
 function TestPage() {
   const initedRef = useRef(false);
-
   useEffect(() => {
     const SRC = "https://cdn.fluidplayer.com/v3/current/fluidplayer.min.js";
-
     const init = () => {
       if (initedRef.current) return;
       if (typeof window.fluidPlayer !== "function") return;
@@ -47,26 +42,7 @@ function TestPage() {
             adList: [
               {
                 roll: "preRoll",
-                vastTag:
-                  "https://vast.yomeno.xyz/vast?spot_id=1495679",
-                adText: "",
-              },
-              {
-                roll: "midRoll",
-                vastTag:
-                  "https://vast.yomeno.xyz/vast?spot_id=1495679",
-                adText: "",
-              },
-              {
-                roll: "postRoll",
-                vastTag:
-                  "https://vast.yomeno.xyz/vast?spot_id=1495679",
-                adText: "",
-              },
-              {
-                roll: "onPauseRoll",
-                vastTag:
-                  "https://vast.yomeno.xyz/vast?spot_id=1495679",
+                vastTag: "https://vast.yomeno.xyz/vast?spot_id=1495679",
                 adText: "",
               },
             ],
@@ -78,7 +54,6 @@ function TestPage() {
         console.error("fluidPlayer init failed", e);
       }
     };
-
     const existing = document.querySelector<HTMLScriptElement>(
       `script[src="${SRC}"]`,
     );
@@ -93,12 +68,14 @@ function TestPage() {
       document.body.appendChild(s);
     }
   }, []);
-
   return (
     <main className="mx-auto max-w-3xl px-4 py-8">
       <h1 className="mb-4 text-lg uppercase tracking-widest">FluidPlayer Test</h1>
-      <video id="video-id" controls className="w-full">
-        <source src="https://video.wixstatic.com/video/bd1bd7_43978885514d4ed5b048a2a7c84187c5/1080p/mp4/file.mp4" type="video/mp4" />
+      <video id="video-id" controls muted playsInline className="w-full">
+        <source
+          src="https://video.wixstatic.com/video/bd1bd7_43978885514d4ed5b048a2a7c84187c5/1080p/mp4/file.mp4"
+          type="video/mp4"
+        />
       </video>
     </main>
   );
