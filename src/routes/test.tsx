@@ -17,6 +17,36 @@ declare global {
 }
 function TestPage() {
   const initedRef = useRef(false);
+  const adInitedRef = useRef(false);
+
+  // ClickAdilla "Overlay video – JS code" loader for zone #7196013 (admpid 447226).
+  // The overlay script reads the CSS selector you set in ClickAdilla's
+  // dashboard (should be "#video-id") and attaches itself there once it loads.
+  useEffect(() => {
+    if (adInitedRef.current) return;
+    adInitedRef.current = true;
+
+    const ADILLA_SCRIPT_SRC = "https://js.wpadmngr.com/static/adManager.js";
+    const ADILLA_ADMPID = "447226";
+
+    const existing = document.querySelector<HTMLScriptElement>(
+      `script[src="${ADILLA_SCRIPT_SRC}"]`,
+    );
+    if (!existing) {
+      const s = document.createElement("script");
+      s.src = ADILLA_SCRIPT_SRC;
+      s.async = true;
+      s.setAttribute("data-admpid", ADILLA_ADMPID);
+      s.onload = () => {
+        console.log("ClickAdilla overlay script loaded");
+      };
+      s.onerror = () => {
+        console.error("ClickAdilla overlay script failed to load");
+      };
+      document.body.appendChild(s);
+    }
+  }, []);
+
   useEffect(() => {
     const SRC = "https://cdn.fluidplayer.com/v3/current/fluidplayer.min.js";
     const init = () => {
@@ -38,17 +68,11 @@ function TestPage() {
             fillToContainer: false,
             posterImage: "",
           },
-          vastOptions: {
-            adList: [
-              {
-                roll: "preRoll",
-                vastTag: "https://vast.yomeno.xyz/vast?spot_id=1495679",
-                adText: "",
-              },
-            ],
-            adCTAText: false,
-            adCTATextPosition: "",
-          },
+          // No vastOptions here: ClickAdilla's overlay JS script (loaded
+          // above) handles ad serving on its own via the CSS selector you
+          // set in the dashboard. Mixing VAST-in-FluidPlayer with the JS
+          // overlay on the same element can double-serve ads or conflict,
+          // so pick one integration type per zone.
         });
       } catch (e) {
         console.error("fluidPlayer init failed", e);
