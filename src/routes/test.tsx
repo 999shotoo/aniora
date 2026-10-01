@@ -98,7 +98,7 @@ function TestPage() {
     <main className="mx-auto max-w-3xl px-4 py-8">
       <h1 className="mb-4 text-lg uppercase tracking-widest">FluidPlayer Test</h1>
       <video id="video-id" controls className="w-full">
-        <source src="/video.mp4" type="video/mp4" />
+        <source src="https://video.wixstatic.com/video/bd1bd7_43978885514d4ed5b048a2a7c84187c5/1080p/mp4/file.mp4" type="video/mp4" />
       </video>
     </main>
   );
