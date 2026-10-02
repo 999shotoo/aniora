@@ -344,6 +344,15 @@ function WatchPage() {
                 </button>
               </div>
             )}
+
+            {/* Mobile-only: comments trigger right below the player (drawer) */}
+            <div className="mt-3 lg:hidden">
+              <AnimeCommunityComments
+                malId={malId}
+                anilistId={anilistId}
+                episode={episode ?? null}
+              />
+            </div>
           </div>
 
           {/* Episodes column — matches player height on lg, scrolls internally */}
