@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { MessageSquare, X } from "lucide-react";
+import { MessageSquare, RotateCw, X } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import {
   Drawer,
@@ -12,6 +12,7 @@ import {
 declare global {
   interface Window {
     theAnimeCommunityConfig?: Record<string, unknown>;
+    theAnimeCommunity?: { reload?: () => void };
   }
 }
 
@@ -122,69 +123,175 @@ function CommentsEmbed({
   mediaType: "anime" | "manga";
   enabled: boolean;
 }) {
-  const [loaded, setLoaded] = useState(false);
+  const [state, setState] = useState<"loading" | "ready" | "error">("loading");
+  const [retryTick, setRetryTick] = useState(0);
   const mountRef = useRef<HTMLDivElement>(null);
-  const embedKey = `${malId ?? "x"}-${anilistId ?? "x"}-${episode}`;
+  const embedKey = `${malId ?? "x"}-${anilistId ?? "x"}-${episode}-${retryTick}`;
 
   useEffect(() => {
     if (!enabled || !mountRef.current) return;
     const host = mountRef.current;
-    setLoaded(false);
+    setState("loading");
 
     const cs = getComputedStyle(document.documentElement);
     const get = (v: string, fallback: string) =>
       cs.getPropertyValue(v).trim() || fallback;
 
-    window.theAnimeCommunityConfig = {
-      MAL_ID: malId ? String(malId) : undefined,
-      AniList_ID: anilistId ? String(anilistId) : undefined,
-      episodeChapterNumber: String(episode),
-      mediaType,
-      removeBorder: "true",
-      removePadding: "true",
-      colorScheme: {
-        backgroundColor: get("--card", "#111111"),
-        primaryColor: get("--foreground", "#f2f2f2"),
-        dropDownTextColor: get("--foreground", "#f2f2f2"),
-        strongTextColor: get("--foreground", "#f2f2f2"),
-        primaryTextColor: get("--foreground", "#f2f2f2"),
-        secondaryTextColor: get("--muted-foreground", "#a3a3a3"),
-        iconColor: get("--muted-foreground", "#a3a3a3"),
-        accentColor: get("--border", "#242424"),
-      },
-      customCSS: `
-        .mantine-Paper-root { border-radius: 0 !important; }
-        .mantine-Button-root { border-radius: 0 !important; text-transform: uppercase; letter-spacing: 0.08em; font-size: 12px; }
-        .mantine-Textarea-input, .mantine-Input-input { border-radius: 0 !important; }
-        .mantine-Avatar-root { border-radius: 2px !important; }
-      `,
+    const bg = get("--card", "#111111");
+    const fg = get("--foreground", "#f2f2f2");
+    const muted = get("--muted", "#181818");
+    const mutedFg = get("--muted-foreground", "#a3a3a3");
+    const border = get("--border", "#242424");
+    const accent = get("--accent", "#1f1f1f");
+
+    const applyConfig = () => {
+      window.theAnimeCommunityConfig = {
+        MAL_ID: malId ? String(malId) : undefined,
+        AniList_ID: anilistId ? String(anilistId) : undefined,
+        episodeChapterNumber: String(episode),
+        mediaType,
+        removeBorder: "true",
+        removePadding: "true",
+        colorScheme: {
+          backgroundColor: bg,
+          primaryColor: fg,
+          dropDownTextColor: fg,
+          strongTextColor: fg,
+          primaryTextColor: fg,
+          secondaryTextColor: mutedFg,
+          iconColor: mutedFg,
+          accentColor: border,
+        },
+        // Patch remaining white surfaces the widget renders (avatar
+        // placeholders, action-icon hovers, menus, code blocks, etc.)
+        customCSS: `
+          html, body { background: ${bg} !important; color: ${fg} !important; }
+          .mantine-Paper-root { background-color: ${bg} !important; border-radius: 0 !important; border-color: ${border} !important; }
+          .mantine-Card-root { background-color: ${bg} !important; }
+          .mantine-Button-root { border-radius: 0 !important; text-transform: uppercase; letter-spacing: 0.08em; font-size: 12px; }
+          .mantine-Textarea-input, .mantine-Input-input, .mantine-TextInput-input, .mantine-Select-input {
+            border-radius: 0 !important;
+            background-color: ${muted} !important;
+            color: ${fg} !important;
+            border-color: ${border} !important;
+          }
+          .mantine-Avatar-root, .mantine-Avatar-placeholder { border-radius: 2px !important; background-color: ${accent} !important; color: ${fg} !important; }
+          .mantine-Avatar-image { background-color: ${accent} !important; }
+          .mantine-ActionIcon-root { color: ${mutedFg} !important; }
+          .mantine-ActionIcon-root:hover { background-color: ${accent} !important; color: ${fg} !important; }
+          .mantine-Menu-dropdown, .mantine-Popover-dropdown, .mantine-Select-dropdown {
+            background-color: ${bg} !important; border-color: ${border} !important; color: ${fg} !important;
+          }
+          .mantine-Divider-root { border-color: ${border} !important; }
+          code, pre { background-color: ${muted} !important; color: ${fg} !important; }
+          img[src=""], img:not([src]) { background-color: ${accent} !important; }
+        `,
+      };
     };
 
-    host.innerHTML = "";
-    const target = document.createElement("div");
-    target.id = "anime-community-comment-section";
-    host.appendChild(target);
+    // Try to call the widget's own reload API first — it re-renders in place
+    // without racing a fresh <script> insertion (which is what causes blanks).
+    const tryReload = () => {
+      applyConfig();
+      if (typeof window.theAnimeCommunity?.reload === "function") {
+        try {
+          window.theAnimeCommunity.reload();
+          return true;
+        } catch {
+          /* fall through to fresh mount */
+        }
+      }
+      return false;
+    };
 
-    const script = document.createElement("script");
-    script.src = "https://theanimecommunity.com/embed.js";
-    script.id = "anime-community-script";
-    script.defer = true;
-    script.onload = () => setLoaded(true);
-    script.onerror = () => setLoaded(true);
-    target.appendChild(script);
+    // Fresh mount: clear host, drop the target div, append script.
+    const freshMount = () => {
+      applyConfig();
+      host.innerHTML = "";
+      const target = document.createElement("div");
+      target.id = "anime-community-comment-section";
+      host.appendChild(target);
+
+      // If a stale script tag from a previous mount exists, remove it so the
+      // browser re-executes on re-append.
+      document
+        .querySelectorAll("script#anime-community-script")
+        .forEach((n) => n.remove());
+
+      const script = document.createElement("script");
+      script.src = "https://theanimecommunity.com/embed.js";
+      script.id = "anime-community-script";
+      script.defer = true;
+      script.onerror = () => setState("error");
+      target.appendChild(script);
+    };
+
+    // Ensure the host has a target div so reload() has a mount point.
+    if (!host.querySelector("#anime-community-comment-section")) {
+      const target = document.createElement("div");
+      target.id = "anime-community-comment-section";
+      host.innerHTML = "";
+      host.appendChild(target);
+    }
+
+    if (!tryReload()) {
+      freshMount();
+    }
+
+    // Watchdog: if nothing (iframe or Mantine root) appears within 8s, mark
+    // as errored so the user gets a retry button instead of a blank panel.
+    let cancelled = false;
+    const start = Date.now();
+    const poll = window.setInterval(() => {
+      if (cancelled) return;
+      const rendered = host.querySelector("iframe, .mantine-Paper-root, [class*='mantine-']");
+      if (rendered) {
+        setState("ready");
+        window.clearInterval(poll);
+      } else if (Date.now() - start > 8000) {
+        setState("error");
+        window.clearInterval(poll);
+      }
+    }, 250);
 
     return () => {
-      host.innerHTML = "";
+      cancelled = true;
+      window.clearInterval(poll);
     };
   }, [enabled, embedKey, malId, anilistId, episode, mediaType]);
 
+  if (state === "error") {
+    return (
+      <div className="flex flex-col items-center justify-center gap-3 border border-dashed border-border bg-background/40 px-4 py-10 text-center">
+        <p className="text-[0.7rem] uppercase tracking-widest text-muted-foreground">
+          comments failed to load
+        </p>
+        <p className="max-w-xs text-xs text-muted-foreground">
+          The comment service is unreachable or blocked. Check any adblocker and try again.
+        </p>
+        <button
+          onClick={() => setRetryTick((n) => n + 1)}
+          className="inline-flex items-center gap-2 border border-border bg-background px-3 py-1.5 text-[0.65rem] uppercase tracking-widest text-foreground hover:bg-accent"
+        >
+          <RotateCw className="h-3 w-3" /> retry
+        </button>
+      </div>
+    );
+  }
+
   return (
     <>
-      {!loaded && <CommentsSkeleton />}
-      <div key={embedKey} ref={mountRef} className={loaded ? "" : "hidden"} />
+      {state === "loading" && <CommentsSkeleton />}
+      <div
+        key={embedKey}
+        ref={mountRef}
+        className={state === "ready" ? "" : "hidden"}
+      />
     </>
   );
 }
+
+
 
 function CommentsSkeleton() {
   return (
