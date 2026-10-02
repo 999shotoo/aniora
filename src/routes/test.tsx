@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useRef } from "react";
 
-export const Route = createFileRoute("/test-art")({
+export const Route = createFileRoute("/test")({
   head: () => ({
     meta: [
       { title: "ArtPlayer VAST Test" },
