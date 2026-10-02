@@ -184,6 +184,9 @@ function CommentsEmbed({
             background-color: ${bg} !important; border-color: ${border} !important; color: ${fg} !important;
           }
           .mantine-Divider-root { border-color: ${border} !important; }
+          .mantine-Skeleton-root, .mantine-Skeleton-visible { background-color: ${muted} !important; }
+          .mantine-Skeleton-root::after, .mantine-Skeleton-visible::after { background: linear-gradient(90deg, transparent, ${accent}, transparent) !important; }
+          .mantine-Loader-root { color: ${mutedFg} !important; }
           code, pre { background-color: ${muted} !important; color: ${fg} !important; }
           img[src=""], img:not([src]) { background-color: ${accent} !important; }
         `,
