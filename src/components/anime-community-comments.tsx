@@ -292,13 +292,6 @@ function CommentsEmbed({
 }
 
 
-  return (
-    <>
-      {!loaded && <CommentsSkeleton />}
-      <div key={embedKey} ref={mountRef} className={loaded ? "" : "hidden"} />
-    </>
-  );
-}
 
 function CommentsSkeleton() {
   return (
