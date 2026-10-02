@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { MessageSquare, X } from "lucide-react";
+import { MessageSquare, RotateCw, X } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import {
   Drawer,
@@ -12,6 +12,7 @@ import {
 declare global {
   interface Window {
     theAnimeCommunityConfig?: Record<string, unknown>;
+    theAnimeCommunity?: { reload?: () => void };
   }
 }
 
