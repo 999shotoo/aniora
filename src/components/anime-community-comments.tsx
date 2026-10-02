@@ -13,6 +13,7 @@ declare global {
   interface Window {
     theAnimeCommunityConfig?: Record<string, unknown>;
     theAnimeCommunity?: { reload?: () => void };
+    __ANIME_COMMUNITY_WIDGET_LOADED__?: boolean;
   }
 }
 
@@ -21,6 +22,7 @@ interface Props {
   anilistId: number | null | undefined;
   episode: number | null | undefined;
   mediaType?: "anime" | "manga";
+  variant?: "responsive" | "drawer" | "inline";
 }
 
 /**
@@ -34,6 +36,7 @@ export function AnimeCommunityComments({
   anilistId,
   episode,
   mediaType = "anime",
+  variant = "responsive",
 }: Props) {
   const isMobile = useIsMobile();
   const [open, setOpen] = useState(false);
@@ -41,7 +44,9 @@ export function AnimeCommunityComments({
   const canEmbed = Boolean((malId || anilistId) && episode);
   if (!canEmbed) return null;
 
-  if (isMobile) {
+  const useDrawer = variant === "drawer" || (variant === "responsive" && isMobile);
+
+  if (useDrawer) {
     return (
       <>
         <button
@@ -134,6 +139,12 @@ function CommentsEmbed({
     const host = mountRef.current;
     setState("loading");
 
+    // The upstream embed hard-codes document.getElementById(), so only one
+    // mount target can have this id. Remove stale/hidden duplicates first.
+    document.querySelectorAll("#anime-community-comment-section").forEach((node) => {
+      if (!host.contains(node)) node.removeAttribute("id");
+    });
+
     const cs = getComputedStyle(document.documentElement);
     const get = (v: string, fallback: string) =>
       cs.getPropertyValue(v).trim() || fallback;
@@ -193,10 +204,22 @@ function CommentsEmbed({
       };
     };
 
+    const ensureTarget = () => {
+      let target = host.querySelector<HTMLDivElement>("#anime-community-comment-section");
+      if (!target) {
+        host.innerHTML = "";
+        target = document.createElement("div");
+        target.id = "anime-community-comment-section";
+        host.appendChild(target);
+      }
+      return target;
+    };
+
     // Try to call the widget's own reload API first — it re-renders in place
-    // without racing a fresh <script> insertion (which is what causes blanks).
+    // without racing duplicate <script> insertions (which is what causes blanks).
     const tryReload = () => {
       applyConfig();
+      ensureTarget();
       if (typeof window.theAnimeCommunity?.reload === "function") {
         try {
           window.theAnimeCommunity.reload();
@@ -211,16 +234,9 @@ function CommentsEmbed({
     // Fresh mount: clear host, drop the target div, append script.
     const freshMount = () => {
       applyConfig();
-      host.innerHTML = "";
-      const target = document.createElement("div");
-      target.id = "anime-community-comment-section";
-      host.appendChild(target);
+      const target = ensureTarget();
 
-      // If a stale script tag from a previous mount exists, remove it so the
-      // browser re-executes on re-append.
-      document
-        .querySelectorAll("script#anime-community-script")
-        .forEach((n) => n.remove());
+      if (document.querySelector("script#anime-community-script")) return;
 
       const script = document.createElement("script");
       script.src = "https://theanimecommunity.com/embed.js";
@@ -229,14 +245,6 @@ function CommentsEmbed({
       script.onerror = () => setState("error");
       target.appendChild(script);
     };
-
-    // Ensure the host has a target div so reload() has a mount point.
-    if (!host.querySelector("#anime-community-comment-section")) {
-      const target = document.createElement("div");
-      target.id = "anime-community-comment-section";
-      host.innerHTML = "";
-      host.appendChild(target);
-    }
 
     if (!tryReload()) {
       freshMount();
