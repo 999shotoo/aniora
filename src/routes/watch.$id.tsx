@@ -344,6 +344,15 @@ function WatchPage() {
                 </button>
               </div>
             )}
+
+            {/* Mobile-only: comments trigger right below the player (drawer) */}
+            <div className="mt-3 lg:hidden">
+              <AnimeCommunityComments
+                malId={malId}
+                anilistId={anilistId}
+                episode={episode ?? null}
+              />
+            </div>
           </div>
 
           {/* Episodes column — matches player height on lg, scrolls internally */}
@@ -392,11 +401,14 @@ function WatchPage() {
       {!showEmpty && (
         <div className="mx-auto flex max-w-none flex-col gap-6 px-6 lg:px-10">
           <AnimeInfoCard isLoading={anime.isLoading} media={media} />
-          <AnimeCommunityComments
-            malId={malId}
-            anilistId={anilistId}
-            episode={episode ?? null}
-          />
+          {/* Desktop-only: inline comments panel */}
+          <div className="hidden lg:block">
+            <AnimeCommunityComments
+              malId={malId}
+              anilistId={anilistId}
+              episode={episode ?? null}
+            />
+          </div>
         </div>
       )}
     </div>
