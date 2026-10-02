@@ -476,74 +476,210 @@ function AnimeInfoCard({
   ];
 
   return (
-    <div className="border border-border bg-card p-4 md:p-6">
-      <div className="flex flex-col gap-6 md:flex-row">
-        {/* Cover + actions */}
-        <div className="flex shrink-0 flex-col items-center gap-2">
+    <>
+      {/* Mobile: compact card w/ side-by-side cover + meta and collapse toggle */}
+      <MobileInfoCard
+        media={media}
+        cover={cover}
+        title={title}
+        secondary={secondary}
+        description={description}
+        rows={rows}
+      />
+
+      {/* Desktop: original wider layout */}
+      <div className="hidden border border-border bg-card p-4 md:block md:p-6">
+        <div className="flex flex-col gap-6 md:flex-row">
+          <div className="flex shrink-0 flex-col items-center gap-2">
+            <img
+              src={cover}
+              alt={title}
+              onError={(e) => {
+                (e.currentTarget as HTMLImageElement).src = FALLBACK_COVER;
+              }}
+              className="h-64 w-44 border border-border object-cover"
+            />
+            <Link
+              to="/anime/$id"
+              params={{ id: String(media.id) }}
+              className="inline-flex w-full items-center justify-center gap-2 border border-border bg-background px-3 py-2 text-[0.6rem] uppercase tracking-widest text-foreground hover:bg-accent"
+            >
+              <Info className="h-3 w-3" /> full details
+            </Link>
+          </div>
+
+          <div className="min-w-0 flex-1">
+            <h1 className="truncate text-xl font-semibold text-foreground md:text-2xl">
+              {title}
+            </h1>
+            {secondary && (
+              <div className="mt-1 truncate text-xs italic text-muted-foreground">
+                {secondary}
+              </div>
+            )}
+
+            {media.genres?.length > 0 && (
+              <div className="mt-3 flex flex-wrap gap-1.5">
+                {media.genres.map((g) => (
+                  <span
+                    key={g}
+                    className="border border-border bg-background px-2 py-1 text-[0.6rem] uppercase tracking-widest text-muted-foreground"
+                  >
+                    {g}
+                  </span>
+                ))}
+              </div>
+            )}
+
+            {description ? (
+              <p data-lenis-prevent className="mt-4 max-h-40 overflow-y-auto border border-dashed border-border p-3 text-xs leading-relaxed text-card-foreground">
+                {description}
+              </p>
+            ) : (
+              <p className="mt-4 text-xs italic text-muted-foreground">
+                no synopsis available.
+              </p>
+            )}
+
+            <div className="mt-4 grid grid-cols-1 gap-x-6 gap-y-1.5 text-xs sm:grid-cols-2">
+              {rows.map(([k, v]) => (
+                <div key={k} className="flex gap-2">
+                  <span className="w-24 shrink-0 text-muted-foreground">{k}:</span>
+                  <span className="truncate font-medium text-foreground">{v}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    </>
+  );
+}
+
+/* --------------------------- Mobile info card --------------------------- */
+
+function MobileInfoCard({
+  media,
+  cover,
+  title,
+  secondary,
+  description,
+  rows,
+}: {
+  media: AniListMedia;
+  cover: string;
+  title: string;
+  secondary: string;
+  description: string;
+  rows: [string, string][];
+}) {
+  const [open, setOpen] = useState(false);
+
+  const scrollToComments = () => {
+    const el = document.querySelector<HTMLElement>("[data-comments-anchor]");
+    el?.scrollIntoView({ behavior: "smooth", block: "start" });
+  };
+
+  return (
+    <div className="md:hidden">
+      <div className="border border-border bg-card">
+        {/* Top row: cover + meta side by side */}
+        <div className="flex gap-3 p-3">
           <img
             src={cover}
             alt={title}
             onError={(e) => {
               (e.currentTarget as HTMLImageElement).src = FALLBACK_COVER;
             }}
-            className="h-64 w-44 border border-border object-cover"
+            className="h-[168px] w-28 shrink-0 border border-border object-cover"
           />
+          <div className="min-w-0 flex-1">
+            <h1 className="text-base font-semibold leading-tight text-foreground">
+              {title}
+            </h1>
+            {secondary && (
+              <div className="mt-1 truncate text-[0.7rem] italic text-muted-foreground">
+                {secondary}
+              </div>
+            )}
+            {media.genres?.length > 0 && (
+              <div className="mt-2 flex flex-wrap gap-1">
+                {media.genres.slice(0, 5).map((g) => (
+                  <span
+                    key={g}
+                    className="border border-border bg-background px-1.5 py-0.5 text-[0.55rem] uppercase tracking-widest text-muted-foreground"
+                  >
+                    {g}
+                  </span>
+                ))}
+              </div>
+            )}
+            <div className="mt-2 space-y-0.5 text-[0.7rem]">
+              {rows.slice(0, open ? rows.length : 4).map(([k, v]) => (
+                <div key={k} className="flex gap-1.5">
+                  <span className="shrink-0 text-muted-foreground">{k}:</span>
+                  <span className="truncate font-medium text-foreground">{v}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Action row: trailer / full details */}
+        <div className="flex gap-2 border-t border-border px-3 py-2">
           <Link
             to="/anime/$id"
             params={{ id: String(media.id) }}
-            className="inline-flex w-full items-center justify-center gap-2 border border-border bg-background px-3 py-2 text-[0.6rem] uppercase tracking-widest text-foreground hover:bg-accent"
+            className="flex-1 inline-flex items-center justify-center gap-1.5 border border-border bg-background px-2 py-1.5 text-[0.6rem] uppercase tracking-widest text-foreground hover:bg-accent"
           >
             <Info className="h-3 w-3" /> full details
           </Link>
         </div>
 
-        {/* Meta */}
-        <div className="min-w-0 flex-1">
-          <h1 className="truncate text-xl font-semibold text-foreground md:text-2xl">
-            {title}
-          </h1>
-          {secondary && (
-            <div className="mt-1 truncate text-xs italic text-muted-foreground">
-              {secondary}
-            </div>
-          )}
-
-          {/* Genres */}
-          {media.genres?.length > 0 && (
-            <div className="mt-3 flex flex-wrap gap-1.5">
-              {media.genres.map((g) => (
-                <span
-                  key={g}
-                  className="border border-border bg-background px-2 py-1 text-[0.6rem] uppercase tracking-widest text-muted-foreground"
-                >
-                  {g}
-                </span>
-              ))}
-            </div>
-          )}
-
-          {/* Description */}
-          {description ? (
-            <p data-lenis-prevent className="mt-4 max-h-40 overflow-y-auto border border-dashed border-border p-3 text-xs leading-relaxed text-card-foreground">
-              {description}
-            </p>
-          ) : (
-            <p className="mt-4 text-xs italic text-muted-foreground">
-              no synopsis available.
-            </p>
-          )}
-
-          {/* Info grid */}
-          <div className="mt-4 grid grid-cols-1 gap-x-6 gap-y-1.5 text-xs sm:grid-cols-2">
-            {rows.map(([k, v]) => (
-              <div key={k} className="flex gap-2">
-                <span className="w-24 shrink-0 text-muted-foreground">{k}:</span>
-                <span className="truncate font-medium text-foreground">{v}</span>
-              </div>
-            ))}
+        {/* Expanded synopsis */}
+        {open && (
+          <div className="border-t border-border px-3 pb-3 pt-2">
+            {description ? (
+              <p className="text-[0.75rem] leading-relaxed text-card-foreground">
+                {description}
+              </p>
+            ) : (
+              <p className="text-xs italic text-muted-foreground">
+                no synopsis available.
+              </p>
+            )}
           </div>
-        </div>
+        )}
+
+        {/* Expand toggle */}
+        <button
+          onClick={() => setOpen((v) => !v)}
+          aria-expanded={open}
+          className="flex w-full items-center justify-center gap-1.5 border-t border-border py-2 text-[0.65rem] uppercase tracking-widest text-muted-foreground hover:bg-accent hover:text-foreground"
+        >
+          {open ? "show less" : "show more"}
+          <ChevronDown
+            className={"h-3.5 w-3.5 transition-transform " + (open ? "rotate-180" : "")}
+          />
+        </button>
       </div>
+
+      {/* Jump to comments hint */}
+      <button
+        onClick={scrollToComments}
+        className="mt-2 flex w-full items-center gap-2 border border-border bg-card px-3 py-2.5 text-left text-[0.7rem] text-muted-foreground hover:bg-accent hover:text-foreground"
+      >
+        <ArrowUp className="h-3.5 w-3.5 shrink-0" />
+        <span className="flex-1">
+          Looking for the comments?{" "}
+          <span className="text-foreground">They've been moved up — tap to jump.</span>
+        </span>
+        <MessageSquare className="h-3.5 w-3.5 shrink-0" />
+      </button>
+    </div>
+  );
+}
+
     </div>
   );
 }
