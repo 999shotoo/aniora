@@ -680,6 +680,4 @@ function MobileInfoCard({
   );
 }
 
-    </div>
-  );
-}
+
