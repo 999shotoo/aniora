@@ -392,7 +392,11 @@ function WatchPage() {
       {!showEmpty && (
         <div className="mx-auto flex max-w-none flex-col gap-6 px-6 lg:px-10">
           <AnimeInfoCard isLoading={anime.isLoading} media={media} />
-          
+          <AnimeCommunityComments
+            malId={malId}
+            anilistId={anilistId}
+            episode={episode ?? null}
+          />
         </div>
       )}
     </div>
