@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { AlertTriangle, CalendarClock, Info, TvMinimal, X } from "lucide-react";
+import { AlertTriangle, ArrowUp, CalendarClock, ChevronDown, Info, MessageSquare, TvMinimal, X } from "lucide-react";
 import {
   getAnimeById,
   FALLBACK_COVER,
