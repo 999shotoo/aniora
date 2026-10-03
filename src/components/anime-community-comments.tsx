@@ -246,7 +246,12 @@ function CommentsEmbed({
       applyConfig();
       const target = ensureTarget();
 
-      if (document.querySelector("script#anime-community-script")) return;
+      document
+        .querySelectorAll("script#anime-community-script")
+        .forEach((n) => n.remove());
+      if (!window.theAnimeCommunity?.reload) {
+        window.__ANIME_COMMUNITY_WIDGET_LOADED__ = false;
+      }
 
       const script = document.createElement("script");
       script.src = "https://theanimecommunity.com/embed.js";
@@ -261,13 +266,19 @@ function CommentsEmbed({
     }
 
     // Watchdog: the embed creates its iframe at height: 0, then posts a resize
-    // message. Treat it as ready only after that resize happens; otherwise the
-    // panel looks "loaded" but blank on desktop.
+    // message. If the resize message is missed, give the iframe a safe desktop
+    // height instead of leaving a blank 0px panel.
     let cancelled = false;
     const start = Date.now();
     const poll = window.setInterval(() => {
       if (cancelled) return;
       const iframe = host.querySelector<HTMLIFrameElement>("iframe");
+      if (iframe && Date.now() - start > 1200) {
+        iframe.style.opacity = "1";
+        if ((Number.parseFloat(iframe.style.height || "0") || 0) <= 40) {
+          iframe.style.height = window.innerWidth < 768 ? "68vh" : "560px";
+        }
+      }
       const iframeHeight = iframe
         ? Math.max(
             iframe.getBoundingClientRect().height,
@@ -278,7 +289,7 @@ function CommentsEmbed({
       if (rendered) {
         setState("ready");
         window.clearInterval(poll);
-      } else if (Date.now() - start > 10000) {
+      } else if (!iframe && Date.now() - start > 10000) {
         setState("error");
         window.clearInterval(poll);
       }
@@ -300,7 +311,10 @@ function CommentsEmbed({
           The comment service is unreachable or blocked. Check any adblocker and try again.
         </p>
         <button
-          onClick={() => setRetryTick((n) => n + 1)}
+          onClick={() => {
+            setState("loading");
+            setRetryTick((n) => n + 1);
+          }}
           className="inline-flex items-center gap-2 border border-border bg-background px-3 py-1.5 text-[0.65rem] uppercase tracking-widest text-foreground hover:bg-accent"
         >
           <RotateCw className="h-3 w-3" /> retry
