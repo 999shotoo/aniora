@@ -44,7 +44,7 @@ export const DEFAULT_SETTINGS: AnioraSettings = {
   showWatchHistoryHome: true,
 
   defaultLanguage: "sub",
-  defaultServer: "hd-1",
+  defaultServer: "megaplay",
   autoPlay: false,
   autoNextEpisode: false,
   episodesView: "thumb",
