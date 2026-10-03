@@ -19,7 +19,7 @@ import { SettingsProvider } from "@/lib/settings";
 import { SettingsModal } from "@/components/settings-modal";
 import { GlobalShortcuts } from "@/lib/shortcuts";
 import { SmoothScrollMount } from "@/components/smooth-scroll";
-import { SocialBarMount } from "@/components/ad-slot";
+// import { SocialBarMount } from "@/components/ad-slot";
 import { Analytics } from "@vercel/analytics/react";
 
 function AniListSyncMount() {
@@ -269,7 +269,7 @@ function RootComponent() {
         <SmoothScrollMount />
         <GlobalShortcuts />
         <SettingsModal />
-        <SocialBarMount />
+        {/* <SocialBarMount /> */}
 
         
         <div className="flex min-h-screen flex-col bg-background">
