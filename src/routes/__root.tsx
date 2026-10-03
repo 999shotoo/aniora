@@ -12,7 +12,6 @@ import {
 import { useEffect, useMemo, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
-import { reportLovableError } from "../lib/lovable-error-reporting";
 import { SiteHeader } from "@/components/site-header";
 import { useAniListWatchSync } from "@/lib/anilist-sync-hook";
 import { SettingsProvider } from "@/lib/settings";
@@ -69,7 +68,7 @@ function NotFoundComponent() {
 function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
   const router = useRouter();
   useEffect(() => {
-    reportLovableError(error, { boundary: "tanstack_root_error_component" });
+    console.error("Unhandled application error", error);
   }, [error]);
 
   return (
@@ -323,5 +322,4 @@ function RootComponent() {
     </PersistQueryClientProvider>
   );
 }
-
 
