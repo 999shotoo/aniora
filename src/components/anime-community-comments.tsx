@@ -184,53 +184,128 @@ function CommentsEmbed({
           iconColor: mutedFg,
           accentColor: border,
         },
-        // Patch remaining white surfaces the widget renders (avatar
-        // placeholders, action-icon hovers, menus, code blocks, etc.)
+        // Keep the iframe on our dark theme without restyling the widget's
+        // reply/like controls. The embed exposes Mantine classes, so only
+        // target surfaces, text and form fields here; leave buttons/icons alone.
         customCSS: `
-          html, body { background: ${bg} !important; color: ${fg} !important; }
-          [style*="background-color: #fff"],
-          [style*="background-color:#fff"],
-          [style*="background-color: rgb(255, 255, 255)"],
-          [style*="background: #fff"],
-          [style*="background:#fff"],
-          [style*="background: rgb(255, 255, 255)"],
-          [style*="background: white"],
-          [style*="background-color: white"] {
-            background-color: ${bg} !important;
+          :root { color-scheme: dark; }
+          html,
+          body {
+            background: ${bg};
+            color: ${fg};
+          }
+
+          .mantine-Paper-root,
+          .mantine-Card-root,
+          .mantine-Modal-content,
+          .mantine-Modal-header,
+          .mantine-Menu-dropdown,
+          .mantine-Popover-dropdown,
+          .mantine-Select-dropdown {
+            background-color: ${bg};
+            border-color: ${border};
+            color: ${fg};
+            border-radius: 0;
+          }
+
+          .mantine-Paper-root[style*="background"],
+          .mantine-Card-root[style*="background"],
+          .mantine-Modal-content[style*="background"],
+          .mantine-Modal-header[style*="background"],
+          .mantine-Popover-dropdown[style*="background"],
+          .mantine-Menu-dropdown[style*="background"],
+          .mantine-Select-dropdown[style*="background"] {
             background: ${bg} !important;
+            background-color: ${bg} !important;
             color: ${fg} !important;
           }
-          [style*="color: #000"],
-          [style*="color:#000"],
-          [style*="color: rgb(0, 0, 0)"],
-          [style*="color: black"] { color: ${fg} !important; }
-          .mantine-Paper-root { background-color: ${bg} !important; border-radius: 0 !important; border-color: ${border} !important; }
-          .mantine-Card-root { background-color: ${bg} !important; }
-          .mantine-Button-root { border-radius: 0 !important; text-transform: uppercase; letter-spacing: 0.08em; font-size: 12px; background-color: ${accent} !important; color: ${fg} !important; border-color: ${border} !important; }
-          .mantine-Button-root:hover { background-color: ${muted} !important; }
-          .mantine-Button-filled, [data-variant="filled"].mantine-Button-root { background-color: ${fg} !important; color: ${bg} !important; }
-          .mantine-Button-filled:hover, [data-variant="filled"].mantine-Button-root:hover { background-color: ${mutedFg} !important; color: ${bg} !important; }
-          .mantine-Textarea-input, .mantine-Input-input, .mantine-TextInput-input, .mantine-Select-input {
-            border-radius: 0 !important;
-            background-color: ${muted} !important;
-            color: ${fg} !important;
-            border-color: ${border} !important;
+
+          .mantine-Text-root,
+          .mantine-Title-root,
+          .mantine-Input-label,
+          .mantine-Textarea-label,
+          .mantine-Select-label,
+          .mantine-Checkbox-label,
+          .mantine-Menu-label {
+            color: ${fg};
           }
-          .mantine-Avatar-root, .mantine-Avatar-placeholder { border-radius: 2px !important; background-color: ${accent} !important; color: ${fg} !important; }
-          .mantine-Avatar-image { background-color: ${accent} !important; }
-          .mantine-ActionIcon-root { color: ${mutedFg} !important; background-color: transparent !important; }
-          .mantine-ActionIcon-root:hover { background-color: ${accent} !important; color: ${fg} !important; }
-          .mantine-Menu-dropdown, .mantine-Popover-dropdown, .mantine-Select-dropdown, .mantine-Modal-content, .mantine-Modal-header {
-            background-color: ${bg} !important; border-color: ${border} !important; color: ${fg} !important;
+
+          .mantine-Input-description,
+          .mantine-Textarea-description,
+          .mantine-Text-root[data-size="xs"],
+          .mantine-Text-root[data-c="dimmed"] {
+            color: ${mutedFg};
           }
-          .mantine-Menu-item, .mantine-Select-item { color: ${fg} !important; }
-          .mantine-Menu-item:hover, .mantine-Select-item:hover { background-color: ${accent} !important; }
-          .mantine-Divider-root { border-color: ${border} !important; }
-          .mantine-Skeleton-root, .mantine-Skeleton-visible { background-color: ${muted} !important; }
-          .mantine-Skeleton-root::after, .mantine-Skeleton-visible::after { background: linear-gradient(90deg, transparent, ${accent}, transparent) !important; }
-          .mantine-Loader-root { color: ${mutedFg} !important; }
-          code, pre { background-color: ${muted} !important; color: ${fg} !important; }
-          img[src=""], img:not([src]) { background-color: ${accent} !important; }
+
+          .mantine-Textarea-input,
+          .mantine-Input-input,
+          .mantine-TextInput-input,
+          .mantine-Select-input {
+            background-color: ${muted};
+            color: ${fg};
+            border-color: ${border};
+            border-radius: 0;
+          }
+
+          .mantine-Textarea-input::placeholder,
+          .mantine-Input-input::placeholder,
+          .mantine-TextInput-input::placeholder {
+            color: ${mutedFg};
+          }
+
+          .mantine-Avatar-root,
+          .mantine-Avatar-placeholder,
+          .mantine-Avatar-image {
+            background-color: ${accent};
+            color: ${fg};
+            border-radius: 2px;
+          }
+
+          .mantine-Button-root,
+          .mantine-ActionIcon-root,
+          .mantine-UnstyledButton-root {
+            border-radius: 0;
+          }
+
+          .mantine-Menu-item,
+          .mantine-Select-item {
+            color: ${fg};
+          }
+
+          .mantine-Menu-item:hover,
+          .mantine-Select-item:hover {
+            background-color: ${accent};
+          }
+
+          .mantine-Divider-root {
+            border-color: ${border};
+          }
+
+          .mantine-Skeleton-root,
+          .mantine-Skeleton-visible {
+            background-color: ${muted};
+          }
+
+          .mantine-Skeleton-root::after,
+          .mantine-Skeleton-visible::after {
+            background: linear-gradient(90deg, transparent, ${accent}, transparent);
+          }
+
+          .mantine-Loader-root,
+          .mantine-Loader-root::after {
+            color: ${mutedFg};
+          }
+
+          code,
+          pre {
+            background-color: ${muted};
+            color: ${fg};
+          }
+
+          img[src=""],
+          img:not([src]) {
+            background-color: ${accent};
+          }
         `,
       };
     };
