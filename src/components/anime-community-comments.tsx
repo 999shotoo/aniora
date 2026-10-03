@@ -208,6 +208,18 @@ function CommentsEmbed({
             border-radius: 0;
           }
 
+          .mantine-Paper-root[style*="background"],
+          .mantine-Card-root[style*="background"],
+          .mantine-Modal-content[style*="background"],
+          .mantine-Modal-header[style*="background"],
+          .mantine-Popover-dropdown[style*="background"],
+          .mantine-Menu-dropdown[style*="background"],
+          .mantine-Select-dropdown[style*="background"] {
+            background: ${bg} !important;
+            background-color: ${bg} !important;
+            color: ${fg} !important;
+          }
+
           .mantine-Text-root,
           .mantine-Title-root,
           .mantine-Input-label,
