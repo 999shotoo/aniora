@@ -250,17 +250,25 @@ function CommentsEmbed({
       freshMount();
     }
 
-    // Watchdog: if nothing (iframe or Mantine root) appears within 8s, mark
-    // as errored so the user gets a retry button instead of a blank panel.
+    // Watchdog: the embed creates its iframe at height: 0, then posts a resize
+    // message. Treat it as ready only after that resize happens; otherwise the
+    // panel looks "loaded" but blank on desktop.
     let cancelled = false;
     const start = Date.now();
     const poll = window.setInterval(() => {
       if (cancelled) return;
-      const rendered = host.querySelector("iframe, .mantine-Paper-root, [class*='mantine-']");
+      const iframe = host.querySelector<HTMLIFrameElement>("iframe");
+      const iframeHeight = iframe
+        ? Math.max(
+            iframe.getBoundingClientRect().height,
+            Number.parseFloat(iframe.style.height || "0") || 0,
+          )
+        : 0;
+      const rendered = iframe && iframeHeight > 40;
       if (rendered) {
         setState("ready");
         window.clearInterval(poll);
-      } else if (Date.now() - start > 8000) {
+      } else if (Date.now() - start > 10000) {
         setState("error");
         window.clearInterval(poll);
       }
@@ -297,7 +305,7 @@ function CommentsEmbed({
       <div
         key={embedKey}
         ref={mountRef}
-        className={state === "ready" ? "" : "hidden"}
+        className="min-h-0"
       />
     </>
   );
