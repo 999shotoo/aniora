@@ -188,9 +188,28 @@ function CommentsEmbed({
         // placeholders, action-icon hovers, menus, code blocks, etc.)
         customCSS: `
           html, body { background: ${bg} !important; color: ${fg} !important; }
+          [style*="background-color: #fff"],
+          [style*="background-color:#fff"],
+          [style*="background-color: rgb(255, 255, 255)"],
+          [style*="background: #fff"],
+          [style*="background:#fff"],
+          [style*="background: rgb(255, 255, 255)"],
+          [style*="background: white"],
+          [style*="background-color: white"] {
+            background-color: ${bg} !important;
+            background: ${bg} !important;
+            color: ${fg} !important;
+          }
+          [style*="color: #000"],
+          [style*="color:#000"],
+          [style*="color: rgb(0, 0, 0)"],
+          [style*="color: black"] { color: ${fg} !important; }
           .mantine-Paper-root { background-color: ${bg} !important; border-radius: 0 !important; border-color: ${border} !important; }
           .mantine-Card-root { background-color: ${bg} !important; }
-          .mantine-Button-root { border-radius: 0 !important; text-transform: uppercase; letter-spacing: 0.08em; font-size: 12px; }
+          .mantine-Button-root { border-radius: 0 !important; text-transform: uppercase; letter-spacing: 0.08em; font-size: 12px; background-color: ${accent} !important; color: ${fg} !important; border-color: ${border} !important; }
+          .mantine-Button-root:hover { background-color: ${muted} !important; }
+          .mantine-Button-filled, [data-variant="filled"].mantine-Button-root { background-color: ${fg} !important; color: ${bg} !important; }
+          .mantine-Button-filled:hover, [data-variant="filled"].mantine-Button-root:hover { background-color: ${mutedFg} !important; color: ${bg} !important; }
           .mantine-Textarea-input, .mantine-Input-input, .mantine-TextInput-input, .mantine-Select-input {
             border-radius: 0 !important;
             background-color: ${muted} !important;
@@ -199,11 +218,13 @@ function CommentsEmbed({
           }
           .mantine-Avatar-root, .mantine-Avatar-placeholder { border-radius: 2px !important; background-color: ${accent} !important; color: ${fg} !important; }
           .mantine-Avatar-image { background-color: ${accent} !important; }
-          .mantine-ActionIcon-root { color: ${mutedFg} !important; }
+          .mantine-ActionIcon-root { color: ${mutedFg} !important; background-color: transparent !important; }
           .mantine-ActionIcon-root:hover { background-color: ${accent} !important; color: ${fg} !important; }
-          .mantine-Menu-dropdown, .mantine-Popover-dropdown, .mantine-Select-dropdown {
+          .mantine-Menu-dropdown, .mantine-Popover-dropdown, .mantine-Select-dropdown, .mantine-Modal-content, .mantine-Modal-header {
             background-color: ${bg} !important; border-color: ${border} !important; color: ${fg} !important;
           }
+          .mantine-Menu-item, .mantine-Select-item { color: ${fg} !important; }
+          .mantine-Menu-item:hover, .mantine-Select-item:hover { background-color: ${accent} !important; }
           .mantine-Divider-root { border-color: ${border} !important; }
           .mantine-Skeleton-root, .mantine-Skeleton-visible { background-color: ${muted} !important; }
           .mantine-Skeleton-root::after, .mantine-Skeleton-visible::after { background: linear-gradient(90deg, transparent, ${accent}, transparent) !important; }
