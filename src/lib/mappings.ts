@@ -1,6 +1,6 @@
 // Episode mappings via the Zenshin mappings API.
 
-const MAPPINGS_ENDPOINT = "https://zenshin-supabase-api-myig.onrender.com/mappings";
+const MAPPINGS_ENDPOINT = "https://zenshin-supabase-api.onrender.com/mappings";
 
 export interface MappingEpisode {
   episode: string;
