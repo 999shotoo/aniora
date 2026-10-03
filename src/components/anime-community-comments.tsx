@@ -40,9 +40,19 @@ export function AnimeCommunityComments({
 }: Props) {
   const isMobile = useIsMobile();
   const [open, setOpen] = useState(false);
+  const [isLargeScreen, setIsLargeScreen] = useState(false);
+
+  useEffect(() => {
+    const mq = window.matchMedia("(min-width: 1024px)");
+    const sync = () => setIsLargeScreen(mq.matches);
+    sync();
+    mq.addEventListener("change", sync);
+    return () => mq.removeEventListener("change", sync);
+  }, []);
 
   const canEmbed = Boolean((malId || anilistId) && episode);
   if (!canEmbed) return null;
+  if (variant === "inline" && !isLargeScreen) return null;
 
   const useDrawer = variant === "drawer" || (variant === "responsive" && isMobile);
 
