@@ -13,6 +13,7 @@ declare global {
   interface Window {
     theAnimeCommunityConfig?: Record<string, unknown>;
     theAnimeCommunity?: { reload?: () => void };
+    __ANIME_COMMUNITY_WIDGET_LOADED__?: boolean;
   }
 }
 
@@ -21,6 +22,7 @@ interface Props {
   anilistId: number | null | undefined;
   episode: number | null | undefined;
   mediaType?: "anime" | "manga";
+  variant?: "responsive" | "drawer" | "inline";
 }
 
 /**
@@ -34,14 +36,27 @@ export function AnimeCommunityComments({
   anilistId,
   episode,
   mediaType = "anime",
+  variant = "responsive",
 }: Props) {
   const isMobile = useIsMobile();
   const [open, setOpen] = useState(false);
+  const [isLargeScreen, setIsLargeScreen] = useState(false);
+
+  useEffect(() => {
+    const mq = window.matchMedia("(min-width: 1024px)");
+    const sync = () => setIsLargeScreen(mq.matches);
+    sync();
+    mq.addEventListener("change", sync);
+    return () => mq.removeEventListener("change", sync);
+  }, []);
 
   const canEmbed = Boolean((malId || anilistId) && episode);
   if (!canEmbed) return null;
+  if (variant === "inline" && !isLargeScreen) return null;
 
-  if (isMobile) {
+  const useDrawer = variant === "drawer" || (variant === "responsive" && isMobile);
+
+  if (useDrawer) {
     return (
       <>
         <button
@@ -134,6 +149,12 @@ function CommentsEmbed({
     const host = mountRef.current;
     setState("loading");
 
+    // The upstream embed hard-codes document.getElementById(), so only one
+    // mount target can have this id. Remove stale/hidden duplicates first.
+    document.querySelectorAll("#anime-community-comment-section").forEach((node) => {
+      if (!host.contains(node)) node.removeAttribute("id");
+    });
+
     const cs = getComputedStyle(document.documentElement);
     const get = (v: string, fallback: string) =>
       cs.getPropertyValue(v).trim() || fallback;
@@ -193,10 +214,22 @@ function CommentsEmbed({
       };
     };
 
+    const ensureTarget = () => {
+      let target = host.querySelector<HTMLDivElement>("#anime-community-comment-section");
+      if (!target) {
+        host.innerHTML = "";
+        target = document.createElement("div");
+        target.id = "anime-community-comment-section";
+        host.appendChild(target);
+      }
+      return target;
+    };
+
     // Try to call the widget's own reload API first — it re-renders in place
-    // without racing a fresh <script> insertion (which is what causes blanks).
+    // without racing duplicate <script> insertions (which is what causes blanks).
     const tryReload = () => {
       applyConfig();
+      ensureTarget();
       if (typeof window.theAnimeCommunity?.reload === "function") {
         try {
           window.theAnimeCommunity.reload();
@@ -211,16 +244,14 @@ function CommentsEmbed({
     // Fresh mount: clear host, drop the target div, append script.
     const freshMount = () => {
       applyConfig();
-      host.innerHTML = "";
-      const target = document.createElement("div");
-      target.id = "anime-community-comment-section";
-      host.appendChild(target);
+      const target = ensureTarget();
 
-      // If a stale script tag from a previous mount exists, remove it so the
-      // browser re-executes on re-append.
       document
         .querySelectorAll("script#anime-community-script")
         .forEach((n) => n.remove());
+      if (!window.theAnimeCommunity?.reload) {
+        window.__ANIME_COMMUNITY_WIDGET_LOADED__ = false;
+      }
 
       const script = document.createElement("script");
       script.src = "https://theanimecommunity.com/embed.js";
@@ -230,29 +261,35 @@ function CommentsEmbed({
       target.appendChild(script);
     };
 
-    // Ensure the host has a target div so reload() has a mount point.
-    if (!host.querySelector("#anime-community-comment-section")) {
-      const target = document.createElement("div");
-      target.id = "anime-community-comment-section";
-      host.innerHTML = "";
-      host.appendChild(target);
-    }
-
     if (!tryReload()) {
       freshMount();
     }
 
-    // Watchdog: if nothing (iframe or Mantine root) appears within 8s, mark
-    // as errored so the user gets a retry button instead of a blank panel.
+    // Watchdog: the embed creates its iframe at height: 0, then posts a resize
+    // message. If the resize message is missed, give the iframe a safe desktop
+    // height instead of leaving a blank 0px panel.
     let cancelled = false;
     const start = Date.now();
     const poll = window.setInterval(() => {
       if (cancelled) return;
-      const rendered = host.querySelector("iframe, .mantine-Paper-root, [class*='mantine-']");
+      const iframe = host.querySelector<HTMLIFrameElement>("iframe");
+      if (iframe && Date.now() - start > 1200) {
+        iframe.style.opacity = "1";
+        if ((Number.parseFloat(iframe.style.height || "0") || 0) <= 40) {
+          iframe.style.height = window.innerWidth < 768 ? "68vh" : "560px";
+        }
+      }
+      const iframeHeight = iframe
+        ? Math.max(
+            iframe.getBoundingClientRect().height,
+            Number.parseFloat(iframe.style.height || "0") || 0,
+          )
+        : 0;
+      const rendered = iframe && iframeHeight > 40;
       if (rendered) {
         setState("ready");
         window.clearInterval(poll);
-      } else if (Date.now() - start > 8000) {
+      } else if (!iframe && Date.now() - start > 10000) {
         setState("error");
         window.clearInterval(poll);
       }
@@ -274,7 +311,10 @@ function CommentsEmbed({
           The comment service is unreachable or blocked. Check any adblocker and try again.
         </p>
         <button
-          onClick={() => setRetryTick((n) => n + 1)}
+          onClick={() => {
+            setState("loading");
+            setRetryTick((n) => n + 1);
+          }}
           className="inline-flex items-center gap-2 border border-border bg-background px-3 py-1.5 text-[0.65rem] uppercase tracking-widest text-foreground hover:bg-accent"
         >
           <RotateCw className="h-3 w-3" /> retry
@@ -289,7 +329,7 @@ function CommentsEmbed({
       <div
         key={embedKey}
         ref={mountRef}
-        className={state === "ready" ? "" : "hidden"}
+        className="min-h-0"
       />
     </>
   );

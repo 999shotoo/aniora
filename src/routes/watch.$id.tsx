@@ -351,6 +351,7 @@ function WatchPage() {
                 malId={malId}
                 anilistId={anilistId}
                 episode={episode ?? null}
+                variant="drawer"
               />
             </div>
           </div>
@@ -407,6 +408,7 @@ function WatchPage() {
               malId={malId}
               anilistId={anilistId}
               episode={episode ?? null}
+              variant="inline"
             />
           </div>
         </div>
