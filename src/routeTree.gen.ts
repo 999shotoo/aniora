@@ -9,72 +9,27 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as WishlistRouteImport } from './routes/wishlist'
-import { Route as TestRouteImport } from './routes/test'
-import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
-import { Route as SitemapPagesDotxmlRouteImport } from './routes/sitemap-pages[.]xml'
-import { Route as SitemapMoviesDotxmlRouteImport } from './routes/sitemap-movies[.]xml'
-import { Route as SitemapBlogDotxmlRouteImport } from './routes/sitemap-blog[.]xml'
-import { Route as SitemapAnimeDotxmlRouteImport } from './routes/sitemap-anime[.]xml'
-import { Route as SearchRouteImport } from './routes/search'
-import { Route as ProfileRouteImport } from './routes/profile'
-import { Route as MoviesRouteImport } from './routes/movies'
-import { Route as HistoryRouteImport } from './routes/history'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as HistoryRouteImport } from './routes/history'
+import { Route as MoviesRouteImport } from './routes/movies'
+import { Route as ProfileRouteImport } from './routes/profile'
+import { Route as SearchRouteImport } from './routes/search'
+import { Route as SitemapAnimeDotxmlRouteImport } from './routes/sitemap-anime[.]xml'
+import { Route as SitemapBlogDotxmlRouteImport } from './routes/sitemap-blog[.]xml'
+import { Route as SitemapMoviesDotxmlRouteImport } from './routes/sitemap-movies[.]xml'
+import { Route as SitemapPagesDotxmlRouteImport } from './routes/sitemap-pages[.]xml'
+import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
+import { Route as TestRouteImport } from './routes/test'
+import { Route as WishlistRouteImport } from './routes/wishlist'
 import { Route as AnimeIndexRouteImport } from './routes/anime.index'
-import { Route as WatchIdRouteImport } from './routes/watch.$id'
-import { Route as BlogBestAnimeWebsitesRouteImport } from './routes/blog.best-anime-websites'
-import { Route as AuthCallbackRouteImport } from './routes/auth.callback'
 import { Route as AnimeIdRouteImport } from './routes/anime.$id'
+import { Route as AuthCallbackRouteImport } from './routes/auth.callback'
+import { Route as BlogBestAnimeWebsitesRouteImport } from './routes/blog.best-anime-websites'
+import { Route as WatchIdRouteImport } from './routes/watch.$id'
 
-const WishlistRoute = WishlistRouteImport.update({
-  id: '/wishlist',
-  path: '/wishlist',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const TestRoute = TestRouteImport.update({
-  id: '/test',
-  path: '/test',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
-  id: '/sitemap.xml',
-  path: '/sitemap.xml',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const SitemapPagesDotxmlRoute = SitemapPagesDotxmlRouteImport.update({
-  id: '/sitemap-pages.xml',
-  path: '/sitemap-pages.xml',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const SitemapMoviesDotxmlRoute = SitemapMoviesDotxmlRouteImport.update({
-  id: '/sitemap-movies.xml',
-  path: '/sitemap-movies.xml',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const SitemapBlogDotxmlRoute = SitemapBlogDotxmlRouteImport.update({
-  id: '/sitemap-blog.xml',
-  path: '/sitemap-blog.xml',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const SitemapAnimeDotxmlRoute = SitemapAnimeDotxmlRouteImport.update({
-  id: '/sitemap-anime.xml',
-  path: '/sitemap-anime.xml',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const SearchRoute = SearchRouteImport.update({
-  id: '/search',
-  path: '/search',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ProfileRoute = ProfileRouteImport.update({
-  id: '/profile',
-  path: '/profile',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const MoviesRoute = MoviesRouteImport.update({
-  id: '/movies',
-  path: '/movies',
+const IndexRoute = IndexRouteImport.update({
+  id: '/',
+  path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const HistoryRoute = HistoryRouteImport.update({
@@ -82,9 +37,54 @@ const HistoryRoute = HistoryRouteImport.update({
   path: '/history',
   getParentRoute: () => rootRouteImport,
 } as any)
-const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
+const MoviesRoute = MoviesRouteImport.update({
+  id: '/movies',
+  path: '/movies',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProfileRoute = ProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SearchRoute = SearchRouteImport.update({
+  id: '/search',
+  path: '/search',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SitemapAnimeDotxmlRoute = SitemapAnimeDotxmlRouteImport.update({
+  id: '/sitemap-anime.xml',
+  path: '/sitemap-anime.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SitemapBlogDotxmlRoute = SitemapBlogDotxmlRouteImport.update({
+  id: '/sitemap-blog.xml',
+  path: '/sitemap-blog.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SitemapMoviesDotxmlRoute = SitemapMoviesDotxmlRouteImport.update({
+  id: '/sitemap-movies.xml',
+  path: '/sitemap-movies.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SitemapPagesDotxmlRoute = SitemapPagesDotxmlRouteImport.update({
+  id: '/sitemap-pages.xml',
+  path: '/sitemap-pages.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
+  id: '/sitemap.xml',
+  path: '/sitemap.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TestRoute = TestRouteImport.update({
+  id: '/test',
+  path: '/test',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const WishlistRoute = WishlistRouteImport.update({
+  id: '/wishlist',
+  path: '/wishlist',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AnimeIndexRoute = AnimeIndexRouteImport.update({
@@ -92,14 +92,9 @@ const AnimeIndexRoute = AnimeIndexRouteImport.update({
   path: '/anime/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const WatchIdRoute = WatchIdRouteImport.update({
-  id: '/watch/$id',
-  path: '/watch/$id',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const BlogBestAnimeWebsitesRoute = BlogBestAnimeWebsitesRouteImport.update({
-  id: '/blog/best-anime-websites',
-  path: '/blog/best-anime-websites',
+const AnimeIdRoute = AnimeIdRouteImport.update({
+  id: '/anime/$id',
+  path: '/anime/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthCallbackRoute = AuthCallbackRouteImport.update({
@@ -107,9 +102,14 @@ const AuthCallbackRoute = AuthCallbackRouteImport.update({
   path: '/auth/callback',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AnimeIdRoute = AnimeIdRouteImport.update({
-  id: '/anime/$id',
-  path: '/anime/$id',
+const BlogBestAnimeWebsitesRoute = BlogBestAnimeWebsitesRouteImport.update({
+  id: '/blog/best-anime-websites',
+  path: '/blog/best-anime-websites',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const WatchIdRoute = WatchIdRouteImport.update({
+  id: '/watch/$id',
+  path: '/watch/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
 
@@ -253,74 +253,11 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/wishlist': {
-      id: '/wishlist'
-      path: '/wishlist'
-      fullPath: '/wishlist'
-      preLoaderRoute: typeof WishlistRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/test': {
-      id: '/test'
-      path: '/test'
-      fullPath: '/test'
-      preLoaderRoute: typeof TestRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/sitemap.xml': {
-      id: '/sitemap.xml'
-      path: '/sitemap.xml'
-      fullPath: '/sitemap.xml'
-      preLoaderRoute: typeof SitemapDotxmlRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/sitemap-pages.xml': {
-      id: '/sitemap-pages.xml'
-      path: '/sitemap-pages.xml'
-      fullPath: '/sitemap-pages.xml'
-      preLoaderRoute: typeof SitemapPagesDotxmlRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/sitemap-movies.xml': {
-      id: '/sitemap-movies.xml'
-      path: '/sitemap-movies.xml'
-      fullPath: '/sitemap-movies.xml'
-      preLoaderRoute: typeof SitemapMoviesDotxmlRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/sitemap-blog.xml': {
-      id: '/sitemap-blog.xml'
-      path: '/sitemap-blog.xml'
-      fullPath: '/sitemap-blog.xml'
-      preLoaderRoute: typeof SitemapBlogDotxmlRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/sitemap-anime.xml': {
-      id: '/sitemap-anime.xml'
-      path: '/sitemap-anime.xml'
-      fullPath: '/sitemap-anime.xml'
-      preLoaderRoute: typeof SitemapAnimeDotxmlRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/search': {
-      id: '/search'
-      path: '/search'
-      fullPath: '/search'
-      preLoaderRoute: typeof SearchRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/profile': {
-      id: '/profile'
-      path: '/profile'
-      fullPath: '/profile'
-      preLoaderRoute: typeof ProfileRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/movies': {
-      id: '/movies'
-      path: '/movies'
-      fullPath: '/movies'
-      preLoaderRoute: typeof MoviesRouteImport
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/history': {
@@ -330,11 +267,74 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof HistoryRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
+    '/movies': {
+      id: '/movies'
+      path: '/movies'
+      fullPath: '/movies'
+      preLoaderRoute: typeof MoviesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/profile': {
+      id: '/profile'
+      path: '/profile'
+      fullPath: '/profile'
+      preLoaderRoute: typeof ProfileRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/search': {
+      id: '/search'
+      path: '/search'
+      fullPath: '/search'
+      preLoaderRoute: typeof SearchRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sitemap-anime.xml': {
+      id: '/sitemap-anime.xml'
+      path: '/sitemap-anime.xml'
+      fullPath: '/sitemap-anime.xml'
+      preLoaderRoute: typeof SitemapAnimeDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sitemap-blog.xml': {
+      id: '/sitemap-blog.xml'
+      path: '/sitemap-blog.xml'
+      fullPath: '/sitemap-blog.xml'
+      preLoaderRoute: typeof SitemapBlogDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sitemap-movies.xml': {
+      id: '/sitemap-movies.xml'
+      path: '/sitemap-movies.xml'
+      fullPath: '/sitemap-movies.xml'
+      preLoaderRoute: typeof SitemapMoviesDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sitemap-pages.xml': {
+      id: '/sitemap-pages.xml'
+      path: '/sitemap-pages.xml'
+      fullPath: '/sitemap-pages.xml'
+      preLoaderRoute: typeof SitemapPagesDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sitemap.xml': {
+      id: '/sitemap.xml'
+      path: '/sitemap.xml'
+      fullPath: '/sitemap.xml'
+      preLoaderRoute: typeof SitemapDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/test': {
+      id: '/test'
+      path: '/test'
+      fullPath: '/test'
+      preLoaderRoute: typeof TestRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/wishlist': {
+      id: '/wishlist'
+      path: '/wishlist'
+      fullPath: '/wishlist'
+      preLoaderRoute: typeof WishlistRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/anime/': {
@@ -344,18 +344,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AnimeIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/watch/$id': {
-      id: '/watch/$id'
-      path: '/watch/$id'
-      fullPath: '/watch/$id'
-      preLoaderRoute: typeof WatchIdRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/blog/best-anime-websites': {
-      id: '/blog/best-anime-websites'
-      path: '/blog/best-anime-websites'
-      fullPath: '/blog/best-anime-websites'
-      preLoaderRoute: typeof BlogBestAnimeWebsitesRouteImport
+    '/anime/$id': {
+      id: '/anime/$id'
+      path: '/anime/$id'
+      fullPath: '/anime/$id'
+      preLoaderRoute: typeof AnimeIdRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/auth/callback': {
@@ -365,11 +358,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthCallbackRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/anime/$id': {
-      id: '/anime/$id'
-      path: '/anime/$id'
-      fullPath: '/anime/$id'
-      preLoaderRoute: typeof AnimeIdRouteImport
+    '/blog/best-anime-websites': {
+      id: '/blog/best-anime-websites'
+      path: '/blog/best-anime-websites'
+      fullPath: '/blog/best-anime-websites'
+      preLoaderRoute: typeof BlogBestAnimeWebsitesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/watch/$id': {
+      id: '/watch/$id'
+      path: '/watch/$id'
+      fullPath: '/watch/$id'
+      preLoaderRoute: typeof WatchIdRouteImport
       parentRoute: typeof rootRouteImport
     }
   }
